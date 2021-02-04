@@ -6,7 +6,8 @@ const commonModel = require('../common/common');
 
 router.post("/", commonModel.upload.single('image'), offersController.create);
 router.put("/:id", commonModel.upload.single('image'), offersController.update);
-router.put("/updateFavorites/:id", commonModel.upload.none(), offersController.updateFavorites);
+router.post("/favorites", commonModel.upload.none(), offersController.saveFavorites);
+router.post("/report", commonModel.upload.none(), offersController.saveReport);
 router.get("/", offersController.getAll);
 router.get("/:id", offersController.getOne);
 router.delete("/:id", offersController.remove);

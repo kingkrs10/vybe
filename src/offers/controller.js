@@ -109,13 +109,27 @@ const remove = async (request, response, next) => {
 	}
 };
 
-const updateFavorites = async (request, response, next) => {
-	const data = {
-		reqObj: request.body,
-		offerId: request.params.id
-	}
+const saveFavorites = async (request, response, next) => {
 	try {
-		const result = await commonModel.tryBlock(data, '(Offers:updateFavorites)', offersModel.updateFavorites);
+		const result = await commonModel.tryBlock(request.body, '(Offers:saveFavorites)', offersModel.saveFavorites);
+		try {
+			response.status(200).send(JSON.stringify(result));
+		} catch (err) {
+			// show error?
+		}
+	} catch (err) {
+		response.status(200).send(
+			JSON.stringify({
+				error: true,
+				message: err.toString()
+			})
+		);
+	}
+};
+
+const saveReport = async (request, response, next) => {
+	try {
+		const result = await commonModel.tryBlock(request.body, '(Offers:saveReport)', offersModel.saveReport);
 		try {
 			response.status(200).send(JSON.stringify(result));
 		} catch (err) {
@@ -137,5 +151,6 @@ module.exports = {
 	getOne,
 	update,
 	remove,
-	updateFavorites
+	saveFavorites,
+	saveReport
 };

@@ -37,14 +37,21 @@ var self = module.exports = {
 	},
 
 	getAll: async (filter, client) => {
-		const result = await client.query(`SELECT
-			O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
-			O."imageURl" offerImage,
+		// TO-DO : Current location get 100KM post Only.
+		const limit = 5
+		const pageNo = parseInt(filter.pageNo) === 1 ? 0 : ((parseInt(filter.pageNo) - 1) * limit) + 1
+		const result = await client.query(`SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
+			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
+			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 			U.profession, U."imageURl" userImage, U."fullName"
-			FROM offers O
+			FROM public.offers O
 			INNER JOIN users U ON U.uid = O.uid
-			WHERE O."isActive" = $1 and  U."isActive" = $1
-			ORDER BY O."createdAt"`, [true]);
+			WHERE O."isActive" =  $2
+			AND U."isActive" =  $2
+			AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
+			AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterId" =  $1)
+			ORDER BY O."createdAt" DESC
+			offset $4 limit $3`, ['5e2cfb9a-3bf4-4466-86d8-74b8013f0a70', true, limit, pageNo]);
 		const data = result.rows;
 		if (result.rowCount > 0) {
 			return { error: false, data, message: 'get all data successfully' };
@@ -57,7 +64,9 @@ var self = module.exports = {
 		const result = await client.query(`SELECT
 			O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
 			O."imageURl" offerImage,
-			U.profession, U."imageURl" userImage, U."fullName"
+			U.profession, U."imageURl" userImage, U."fullName",
+			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
+			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 			FROM offers O
 			INNER JOIN users U ON U.uid = O.uid
 			WHERE O."offerId" = $1`, [id]);
@@ -81,7 +90,7 @@ var self = module.exports = {
 	updateHashTags: async (Obj, client) => {
 		const { reqObj, offerId } = Obj;
 		var result = false;
-		await client.query(`DELETE FROM "offers_hashTags" where "offerId" = $1`, [offerId]);
+		await client.query(`DELETE FROM "offers_hashTags" WHERE "offerId" = $1`, [offerId]);
 		await JSON.parse(reqObj.hashTags).map(item => {
 			client.query(`INSERT INTO "offers_hashTags"("offerId", "hashTag") VALUES ($1, $2)`, [offerId, item]);
 			result = true;
@@ -89,19 +98,28 @@ var self = module.exports = {
 		return { error: false, message: 'Data update successfully' };
 	},
 
-	updateFavorites: async (Obj, client) => {
-		const { reqObj, offerId } = Obj;
-		var result = false;
-		await client.query(`DELETE FROM "offers_favorites" WHERE "offerId" = $1`, [offerId]);
-		await JSON.parse(reqObj.favorites).map(item => {
-			client.query(`INSERT INTO "offers_favorites"("offerId", uid) VALUES ($1, $2)`, [offerId, item]);
-			result = true;
-		});
-
-		if (result) {
-			return { error: false, message: 'Data update successfully' };
+	saveFavorites: async (reqObj, client) => {
+		var result = {};
+		if (!Boolean(Number(reqObj.isFavorite))) {
+			result = await client.query(`DELETE FROM "offers_favorites" WHERE "offerId" = $1 AND uid = $2`, [reqObj.offerId, reqObj.uid]);
 		} else {
-			return { error: true, message: "Data update failed" };
+			result = await client.query(`INSERT INTO "offers_favorites"("offerId", uid) VALUES ($1, $2)`, [reqObj.offerId, reqObj.uid]);
+		}
+		if (result.rowCount > 0) {
+			return { error: false, message: 'Data saved successfully' };
+		} else {
+			return { error: true, message: "Data saved failed" };
+		}
+	},
+
+	saveReport: async (reqObj, client) => {
+		const result = await client.query(`INSERT INTO public.offers_reports("offerId", "reporterId",comment)
+		VALUES ($1, $2, $3)`, [reqObj.offerId, reqObj.reporterId, reqObj.comment]);
+
+		if (result.rowCount > 0) {
+			return { error: false, message: 'Data saved successfully' };
+		} else {
+			return { error: true, message: "Data saved failed" };
 		}
 	}
 };

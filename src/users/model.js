@@ -40,9 +40,9 @@ module.exports = {
 		WHERE uid = $1`, [id]);
 		const data = result.rows[0];
 		if (result.rowCount > 0) {
-			return data;
+			return { error: false, data, message: 'get data successfully' };
 		} else {
-			return null;
+			return { error: true, message: "get data failed" };
 		}
 	},
 
@@ -97,39 +97,11 @@ module.exports = {
 
 	updateBlockedUsers: async (Obj, client) => {
 		const { reqObj, uid } = Obj;
-		var result = false;
-		await client.query(`DELETE FROM "users_blockedUsers" where uid = $1`, [uid]);
-		await JSON.parse(reqObj.BlockedUsers).map(item => {
-			client.query(`INSERT INTO "users_blockedUsers"(uid, "blockedUserId") VALUES ($1, $2)`, [uid, item]);
-			result = true;
-		});
-
+		const result = client.query(`INSERT INTO "users_blockedUsers"(uid, "blockedUserId") VALUES ($1, $2)`, [uid, reqObj.blockedUserId]);
 		if (result) {
 			return { error: false, message: 'Data update successfully' };
 		} else {
 			return { error: true, message: "Data update failed" };
-		}
-	},
-
-	saveUserInvites: async (reqObj, client) => {
-		const result = await client.query(`INSERT INTO users_invites("senderId", "receiverPhoneNumber", status)
-		VALUES($1, $2, $3) RETURNING "senderId"`, [reqObj.uid, reqObj.receiverPhoneNumber, '0']);
-		if (result.rowCount > 0) {
-			return { error: false, message: 'Data saved successfully' };
-		} else {
-			return { error: true, message: "Data save failed" };
-		}
-	},
-
-	updateUserInvites: async (Obj, client) => {
-		const { reqObj, uid } = Obj;
-		const result = await client.query(`UPDATE users_invites SET "receiverId" = $1, status = $4
-		WHERE "senderId"= $2  AND "receiverPhoneNumber" = $3`, [uid, reqObj.senderId, reqObj.receiverPhoneNumber,'1']);
-		if (result.rowCount > 0) {
-			// await client.query(`DELETE FROM users_invites WHERE "receiverPhoneNumber"= $1, AND "senderId" <> $1 AND "receiverId" = $1)`, [reqObj.senderId, reqObj.receiverPhoneNumber,'']);
-			return { error: false, message: 'Data saved successfully' };
-		} else {
-			return { error: true, message: "Data save failed" };
 		}
 	}
 };
