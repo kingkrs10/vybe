@@ -1,5 +1,6 @@
 const notificationsModel = require("./model");
 const commonModel = require('../common/common');
+
 const create = async (request, response, next) => {
 	try {
 		const result = await commonModel.tryBlock(request.body, '(Notifications:create)', notificationsModel.create);
@@ -21,7 +22,7 @@ const create = async (request, response, next) => {
 
 const getUsersNotification = async (request, response, next) => {
 	try {
-		const result = await commonModel.tryBlock(request.params.id, '(Notifications:getUsersNotification)', notificationsModel.getUserInvites);
+		const result = await commonModel.tryBlock(request.params.id, '(Notifications:getUsersNotification)', notificationsModel.getUsersNotification);
 		try {
 			response.status(200).send(JSON.stringify(result));
 		} catch (err) {

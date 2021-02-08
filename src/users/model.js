@@ -3,7 +3,7 @@ module.exports = {
 	create: async (reqObj, client) => {
 		const result = await client.query(`INSERT INTO users(uid, balance, count, "deviceId", "fullName", "imageURl", "phoneNumber", "stripeCustomerId", "currencyCode", "currencySymbol", profession)
 				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING uid`,
-			[uuidv4(), reqObj.balance, reqObj.count, `{${reqObj.deviceId}}`, reqObj.fullName, reqObj.imageURl,
+			[reqObj.uid, reqObj.balance, reqObj.count, `{${reqObj.deviceId}}`, reqObj.fullName, reqObj.imageURl,
 			reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.currencyCode,
 			reqObj.currencySymbol, reqObj.profession]);
 		let data = null;
@@ -12,7 +12,7 @@ module.exports = {
 			data = result1 ? result1 : null;
 		}
 		if (result.rowCount > 0 && data) {
-			return { error: false, data, message: 'Data saved successfully' };
+			return { error: false, data: data['data'], message: 'Data saved successfully' };
 		} else {
 			return { error: true, message: "Data save failed" };
 		}

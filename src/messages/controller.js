@@ -1,17 +1,9 @@
-const offersModel = require("./model");
+const messagesModel = require("./model");
 const commonModel = require('../common/common');
-const { v4: uuidv4 } = require('uuid');
 
 const create = async (request, response) => {
 	try {
-		const offerId = uuidv4();
-		var  imagePath = null;
-		if (request.file) {
-			const result = await commonModel.fileUpload(request.file, offerId, 'offers');
-			imagePath = result.fileLocation ? result.fileLocation : null;
-		}
-		const tempBody = { ...request.body, imageURl: imagePath, offerId: offerId};
-		const result = await commonModel.tryBlock(tempBody, '(Offers:create)', offersModel.create);
+		const result = await commonModel.tryBlock(request.body, '(Messages:create)', messagesModel.create);
 		try {
 			response.status(200).send(JSON.stringify(result));
 		} catch (err) {
@@ -31,15 +23,9 @@ const update = async (request, response, next) => {
 	try {
 		const data = {
 			reqObj: request.body,
-			offerId: request.params.id
+			messageId: request.params.id
 		}
-		if (request.file) {
-			const result = await commonModel.fileUpload(request.file, request.params.id, 'offers');
-			if (result.fileLocation) {
-				data.reqObj.imageURl = result.fileLocation;
-			}
-		}
-		const result = await commonModel.tryBlock(data, '(Offers:update)', offersModel.update);
+		const result = await commonModel.tryBlock(data, '(Messages:update)', messagesModel.update);
 		try {
 			response.status(200).send(JSON.stringify(result));
 		} catch (err) {
@@ -57,7 +43,7 @@ const update = async (request, response, next) => {
 
 const getAll = async (request, response, next) => {
 	try {
-		const result = await commonModel.tryBlock(request.body, '(Offers:getAll)', offersModel.getAll);
+		const result = await commonModel.tryBlock(request.params, '(Messages:getAll)', messagesModel.getAll);
 		try {
 			response.status(200).send(JSON.stringify(result));
 		} catch (err) {
@@ -75,7 +61,25 @@ const getAll = async (request, response, next) => {
 
 const getOne = async (request, response, next) => {
 	try {
-		const result = await commonModel.tryBlock(request.params.id, '(Offers:getOne)', offersModel.getOne);
+		const result = await commonModel.tryBlock(request.params.chatId, '(Messages:getOne)', messagesModel.getOne);
+		try {
+			response.status(200).send(JSON.stringify(result));
+		} catch (err) {
+			// show error?
+		}
+	} catch (err) {
+		response.status(200).send(
+			JSON.stringify({
+				error: true,
+				message: err.toString()
+			})
+		);
+	}
+};
+
+const updateUnRead = async (request, response, next) => {
+	try {
+		const result = await commonModel.tryBlock(request.params.id, '(Messages:updateUnRead)', messagesModel.updateUnRead);
 		try {
 			response.status(200).send(JSON.stringify(result));
 		} catch (err) {
@@ -93,43 +97,7 @@ const getOne = async (request, response, next) => {
 
 const remove = async (request, response, next) => {
 	try {
-		const result = await commonModel.tryBlock(request.params.id, '(Offers:remove)', offersModel.remove);
-		try {
-			response.status(200).send(JSON.stringify(result));
-		} catch (err) {
-			// show error?
-		}
-	} catch (err) {
-		response.status(200).send(
-			JSON.stringify({
-				error: true,
-				message: err.toString()
-			})
-		);
-	}
-};
-
-const saveFavorites = async (request, response, next) => {
-	try {
-		const result = await commonModel.tryBlock(request.body, '(Offers:saveFavorites)', offersModel.saveFavorites);
-		try {
-			response.status(200).send(JSON.stringify(result));
-		} catch (err) {
-			// show error?
-		}
-	} catch (err) {
-		response.status(200).send(
-			JSON.stringify({
-				error: true,
-				message: err.toString()
-			})
-		);
-	}
-};
-
-const saveReport = async (request, response, next) => {
-	try {
-		const result = await commonModel.tryBlock(request.body, '(Offers:saveReport)', offersModel.saveReport);
+		const result = await commonModel.tryBlock(request.params.id, '(Messages:remove)', messagesModel.remove);
 		try {
 			response.status(200).send(JSON.stringify(result));
 		} catch (err) {
@@ -151,6 +119,5 @@ module.exports = {
 	getOne,
 	update,
 	remove,
-	saveFavorites,
-	saveReport
+	updateUnRead
 };

@@ -1,7 +1,7 @@
 module.exports = {
 	create: async (reqObj, client) => {
 		const result = await client.query(`INSERT INTO users_invites("senderId", "receiverPhoneNumber", status)
-		VALUES($1, $2, $3) RETURNING "senderId"`, [reqObj.uid, reqObj.receiverPhoneNumber, '0']);
+		VALUES($1, $2, $3) RETURNING "senderId"`, [reqObj.senderId, reqObj.receiverPhoneNumber, '0']);
 		if (result.rowCount > 0) {
 			return { error: false, message: 'Data saved successfully' };
 		} else {

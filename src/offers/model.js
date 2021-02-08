@@ -36,23 +36,23 @@ var self = module.exports = {
 		}
 	},
 
-	getAll: async (filter, client) => {
-		// TO-DO : Current location get 100KM post Only.
+	getAll: async (reqObj, client) => {
 		const limit = 5
-		const pageNo = parseInt(filter.pageNo) === 1 ? 0 : ((parseInt(filter.pageNo) - 1) * limit) + 1
-		const result = await client.query(`SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
+		const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
+		const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
 			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
 			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
-			U.profession, U."imageURl" userImage, U."fullName"
-			FROM public.offers O
+			U.profession, U."imageURl" userImage, U."fullName",
+			( 3959 * acos( cos( radians($5) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($6) ) + sin( radians($5) ) * sin( radians( O.latitude ) ) ) ) AS distance
+			FROM offers O
 			INNER JOIN users U ON U.uid = O.uid
 			WHERE O."isActive" =  $2
 			AND U."isActive" =  $2
 			AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-			AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterId" =  $1)
-			ORDER BY O."createdAt" DESC
-			offset $4 limit $3`, ['5e2cfb9a-3bf4-4466-86d8-74b8013f0a70', true, limit, pageNo]);
-		const data = result.rows;
+			AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)
+			ORDER BY O."createdAt" DESC) as tbl
+			WHERE tbl.distance < 100
+			offset $4 limit $3`, [reqObj.uid, true, limit, pageNo, reqObj.latitude, reqObj.longitude]);
 		if (result.rowCount > 0) {
 			return { error: false, data, message: 'get all data successfully' };
 		} else {
@@ -66,7 +66,7 @@ var self = module.exports = {
 			O."imageURl" offerImage,
 			U.profession, U."imageURl" userImage, U."fullName",
 			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
-			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
+			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites
 			FROM offers O
 			INNER JOIN users U ON U.uid = O.uid
 			WHERE O."offerId" = $1`, [id]);
@@ -106,15 +106,15 @@ var self = module.exports = {
 			result = await client.query(`INSERT INTO "offers_favorites"("offerId", uid) VALUES ($1, $2)`, [reqObj.offerId, reqObj.uid]);
 		}
 		if (result.rowCount > 0) {
-			return { error: false, message: 'Data saved successfully' };
+			return { error: false, message: 'Data updated successfully' };
 		} else {
 			return { error: true, message: "Data saved failed" };
 		}
 	},
 
 	saveReport: async (reqObj, client) => {
-		const result = await client.query(`INSERT INTO public.offers_reports("offerId", "reporterId",comment)
-		VALUES ($1, $2, $3)`, [reqObj.offerId, reqObj.reporterId, reqObj.comment]);
+		const result = await client.query(`INSERT INTO offers_reports("offerId", "reporterUId",comment)
+		VALUES ($1, $2, $3)`, [reqObj.offerId, reqObj.reporterUId, reqObj.comment]);
 
 		if (result.rowCount > 0) {
 			return { error: false, message: 'Data saved successfully' };
