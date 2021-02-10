@@ -1,14 +1,15 @@
 module.exports = {
     relational_db: {
-        host: "localhost",
+        host: "35.202.0.126",
         port: 5432,
         user: "postgres",
-        pass: "sqlPwd12#",
+        pass: "n9Lyi5Eboh1O3KKt",
         name: "Luhu"
     },
     app: {
         port: 8081
     },
+    stripe_api_key: "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",
     firebaseProjectId: "luhu-production.appspot.com",
     serviceAccountKey: {
         "type": "service_account",

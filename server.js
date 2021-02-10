@@ -10,6 +10,7 @@ const userInvitesRouter = require('./src/userInvites');
 const notificationsRouter = require('./src/notifications');
 const chatsRouter = require('./src/chats');
 const messagesRouter = require('./src/messages');
+const stripeRouter = require('./src/stripe');
 
 
 app.use(express.urlencoded({ extended: true }));
@@ -22,7 +23,7 @@ app.use('/api/v1/userInvites', userInvitesRouter);
 app.use('/api/v1/notifications', notificationsRouter);
 app.use('/api/v1/chats', chatsRouter);
 app.use('/api/v1/messages', messagesRouter);
-
+app.use('/api/v1/stripe', stripeRouter);
 app.listen(config.app.port, () => {
     console.log(`Example app listening on port ${config.app.port}!`)
 });
