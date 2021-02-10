@@ -4,7 +4,7 @@ const config = require("../config/config");
 
 const pool = new Pool({
    user: config.relational_db.user,
-   host: config.relational_db.cloudpath,
+   host: config.relational_db.cloudpath /* "localhost"*/,
    database: config.relational_db.name,
    password: config.relational_db.pass,
    port: config.relational_db.port,
