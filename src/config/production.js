@@ -1,5 +1,6 @@
 module.exports = {
    relational_db: {
+      host: "35.202.0.126",
       port: 5432,
       user: "postgres",
       pass: "n9Lyi5Eboh1O3KKt",

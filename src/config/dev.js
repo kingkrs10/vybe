@@ -5,6 +5,7 @@ module.exports = {
       user: "postgres",
       pass: "n9Lyi5Eboh1O3KKt",
       name: "Luhu",
+      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
    app: {
       port: 8081,
