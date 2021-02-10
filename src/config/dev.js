@@ -5,11 +5,12 @@ module.exports = {
       user: "postgres",
       pass: "n9Lyi5Eboh1O3KKt",
       name: "Luhu",
-      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
    app: {
       port: 8081,
    },
+   stripe_api_key:
+      "sk_test_51HIi1UKuVVSM1kRYQEEPj5OFOR0vGhgGGp7P8NO8o6RwsLe5Mpv7a1c8xyZwTj81Y2GvdNlntTp9FFHas1f3F1Pj00EswMHlps",
    firebaseProjectId: "luhu-dev.appspot.com",
    serviceAccountKey: {
       type: "service_account",
