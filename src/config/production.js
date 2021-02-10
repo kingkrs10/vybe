@@ -1,10 +1,11 @@
 module.exports = {
    relational_db: {
-      host: "/cloudsql/luhu-dev:us-east1:luhu-development-postgres",
+      host: "35.202.0.126",
       port: 5432,
       user: "postgres",
-      pass: "J2HIez7KCclNs0zq",
+      pass: "n9Lyi5Eboh1O3KKt",
       name: "Luhu",
+      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
    app: {
       port: 8081,
