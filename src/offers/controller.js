@@ -1,5 +1,6 @@
 const offersModel = require("./model");
 const commonModel = require("../common/common");
+const responseController = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 
 const create = async (request, response) => {
@@ -24,18 +25,13 @@ const create = async (request, response) => {
          "(Offers:create)",
          offersModel.create
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result)
+      } else {
+         responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -60,18 +56,13 @@ const update = async (request, response, next) => {
          "(Offers:update)",
          offersModel.update
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result.data)
+      } else {
+         responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -82,18 +73,13 @@ const getAll = async (request, response, next) => {
          "(Offers:getAll)",
          offersModel.getAll
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+      } else {
+         responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -104,18 +90,13 @@ const getOne = async (request, response, next) => {
          "(Offers:getOne)",
          offersModel.getOne
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result)
+      } else {
+         responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -126,18 +107,13 @@ const remove = async (request, response, next) => {
          "(Offers:remove)",
          offersModel.remove
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result)
+      } else {
+         responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -148,18 +124,13 @@ const saveFavorites = async (request, response, next) => {
          "(Offers:saveFavorites)",
          offersModel.saveFavorites
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
+      if (!result.error){
+         responseController.sendSuccessResponse(response)
+      } else {
+         responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -170,18 +141,13 @@ const saveReport = async (request, response, next) => {
          "(Offers:saveReport)",
          offersModel.saveReport
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
+      if (!result.error){
+         responseController.sendSuccessResponse(response)
+      } else {
+         responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 

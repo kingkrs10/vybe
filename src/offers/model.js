@@ -53,6 +53,7 @@ var self = module.exports = {
 			ORDER BY O."createdAt" DESC) as tbl
 			WHERE tbl.distance < 100
 			offset $4 limit $3`, [reqObj.uid, true, limit, pageNo, reqObj.latitude, reqObj.longitude]);
+		const data = result.rows;
 		if (result.rowCount > 0) {
 			return { error: false, data, message: 'get all data successfully' };
 		} else {
@@ -81,7 +82,7 @@ var self = module.exports = {
 	remove: async (id, client) => {
 		const result = await client.query(`UPDATE offers SET "isActive" = $1  WHERE "offerId" = $2`, [false, id]);
 		if (result.rowCount > 0) {
-			return { error: false, removedUserId: id, message: 'Offer removed successfully' };
+			return { error: false, removedOfferId: id, message: 'Offer removed successfully' };
 		} else {
 			return { error: true, message: "Offer removed failed" };
 		}

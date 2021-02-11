@@ -8,7 +8,7 @@ module.exports = {
 			reqObj.currencySymbol, reqObj.profession]);
 		let data = null;
 		if (result.rowCount > 0) {
-			const result1 = await module.exports.getOne(result.rows[0].uid, client);
+			const result1 = await module.exports.getOne({id:result.rows[0].uid}, client);
 			data = result1 ? result1 : null;
 		}
 		if (result.rowCount > 0 && data) {
@@ -32,12 +32,14 @@ module.exports = {
 		}
 	},
 
-	getOne: async (id, client) => {
+	getOne: async (obj, client) => {
+		const whereCondition = obj.id ? `WHERE uid = $1` : `WHERE "phoneNumber" = $1`;
+		const val = obj.id ? obj.id : obj.phoneNumber;
 		const result = await client.query(`SELECT
 		uid, balance, count, "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
 		longitude, "currencyCode", "currencySymbol", profession
 		FROM users
-		WHERE uid = $1`, [id]);
+		${whereCondition}`, [val]);
 		const data = result.rows[0];
 		if (result.rowCount > 0) {
 			return { error: false, data, message: 'get data successfully' };
@@ -68,8 +70,8 @@ module.exports = {
 			reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession]);
 		let data = null;
 		if (result.rowCount > 0) {
-			const result1 = await module.exports.getOne(result.rows[0].uid, client);
-			data = result1 ? result1 : null;
+			const result1 = await module.exports.getOne({id:result.rows[0].uid}, client);
+			data = result1 ? result1.data : null;
 		}
 		if (result.rowCount > 0) {
 			return { error: false, data, message: 'Data update successfully' };
@@ -85,8 +87,8 @@ module.exports = {
 			[uid, reqObj.latitude, reqObj.longitude ]);
 		let data = null;
 		if (result.rowCount > 0) {
-			const result1 = await module.exports.getOne(result.rows[0].uid, client);
-			data = result1 ? result1 : null;
+			const result1 = await module.exports.getOne({id:result.rows[0].uid}, client);
+			data = result1 ? result1.data : null;
 		}
 		if (result.rowCount > 0) {
 			return { error: false, data, message: 'Data update successfully' };

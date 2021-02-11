@@ -1,15 +1,50 @@
 const express = require("express");
 const router = express.Router();
 const usersController = require("./controller");
-const commonModel = require('../common/common');
+const { authMiddleware, upload} = require('../common/common');
 
-router.post("/", commonModel.upload.single('image'), usersController.create);
-router.put("/:id", commonModel.upload.single('image'), usersController.update);
-router.get("/", usersController.getAll);
-router.get("/:id", usersController.getOne);
-router.delete("/:id", usersController.remove);
-router.put("/location/:id", commonModel.upload.none(), usersController.updateLocation);
-router.put("/blockedUsers/:id", commonModel.upload.none(), usersController.updateBlockedUsers);
-router.put("/blockedUsers/:id", commonModel.upload.none(), usersController.updateBlockedUsers);
+router.post(
+    "/",
+    authMiddleware,
+    upload.single('image'),
+    usersController.create
+);
+router.put(
+    "/:id",
+    authMiddleware,
+    upload.single('image'),
+    usersController.update
+);
+router.get(
+    "/",
+    authMiddleware,
+    usersController.getAll
+);
+router.get(
+    "/:id",
+    authMiddleware,
+    usersController.getOne
+);
+router.delete(
+    "/:id",
+    authMiddleware,
+    usersController.remove
+);
+router.put(
+    "/location/:id",
+    authMiddleware,
+    upload.none(),
+    usersController.updateLocation
+);
+router.put(
+    "/blockedUsers/:id",
+    authMiddleware,
+    upload.none(),
+    usersController.updateBlockedUsers
+);
+router.get(
+    "/getAuthToken/:phoneNumber",
+    usersController.getAuthToken
+);
 
 module.exports = router;

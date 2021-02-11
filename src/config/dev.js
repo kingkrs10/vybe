@@ -9,6 +9,7 @@ module.exports = {
    },
    app: {
       port: 8081,
+      secretKey: "luhu-jwt-stuff-secret"
    },
    stripe_api_key:
       "sk_test_51HIi1UKuVVSM1kRYQEEPj5OFOR0vGhgGGp7P8NO8o6RwsLe5Mpv7a1c8xyZwTj81Y2GvdNlntTp9FFHas1f3F1Pj00EswMHlps",

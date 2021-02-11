@@ -3,7 +3,11 @@ const pgHelper = require("./pgHelper");
 const { v4: uuidv4 } = require('uuid');
 const firebase = require('./firebase')
 const config = require("../config/config");
+const jwt = require("jsonwebtoken");
 const fs = require('fs');
+const _isUndefined = require('lodash/isUndefined');
+const usersModel = require("../users/model");
+const responseController = require("./ResponseController");
 
 const tryBlock = async (data, modelName, model) => {
     let client = null;
@@ -62,4 +66,47 @@ const upload = multer({
     },
 })
 
-module.exports = { tryBlock, upload, fileUpload };
+// Decode Login User JWT token
+const decodeJwtToken = async (token) => {
+    const jwtDecode = jwt.verify(token, config.app.secretKey);
+    return jwtDecode;
+}
+
+const createJwtToken = async(userData) => {
+    const payload = {
+        userId: userData.uid,
+        phoneNumber: userData.phoneNumber,
+        logintime: Math.round(new Date().getTime() / 1000)
+    };
+    const token = jwt.sign(JSON.stringify(payload), config.app.secretKey);
+    return token;
+}
+
+const authMiddleware = async (request, response, next) => {
+    let authorization = request.headers["authorization"];
+    if (!_isUndefined(authorization)) {
+        const jwtDecode = await decodeJwtToken(request.headers.authorization);
+        const checkUserExist = await tryBlock(
+            { id: jwtDecode.userId },
+            "(User:check auth Middleware)",
+            usersModel.getOne
+        )
+        if (checkUserExist) {
+            request.currentUser = jwtDecode;
+            next();
+            return;
+        }
+        responseController.sendNotAuthorizedResponse(response);
+    } else {
+        responseController.sendNotAuthorizedResponse(response);
+    }
+};
+
+module.exports = {
+    tryBlock,
+    upload,
+    fileUpload,
+    decodeJwtToken,
+    createJwtToken,
+    authMiddleware
+};

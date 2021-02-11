@@ -11,7 +11,8 @@ module.exports = {
 
 	update: async (Obj, client) => {
 		const { reqObj, uid } = Obj;
-		const result = await client.query(`UPDATE users_invites SET "receiverId" = $1, status = $4
+		const result = await client.query(`UPDATE users_invites
+		SET "receiverId" = $1, status=$4
 		WHERE "senderId"= $2  AND "receiverPhoneNumber" = $3`, [uid, reqObj.senderId, reqObj.receiverPhoneNumber,'1']);
 		if (result.rowCount > 0) {
 			// await client.query(`DELETE FROM users_invites WHERE "receiverPhoneNumber"= $1, AND "senderId" <> $1 AND "receiverId" = $1)`, [reqObj.senderId, reqObj.receiverPhoneNumber,'']);
@@ -21,12 +22,12 @@ module.exports = {
 		}
 	},
 
-	getUserInvites: async (Obj, client) => {
+	getUserInvites: async (id, client) => {
 		const result = await client.query(`SELECT
 			"senderId", "receiverId", "receiverPhoneNumber", status
 			FROM public.users_invites UI
 			INNER JOIN users U ON U.uid = UI."senderId"
-		WHERE uid = $1`, [id]);
+		WHERE "receiverId" = $1`, [id]);
 		const data = result.rows;
 		if (result.rowCount > 0) {
 			return { error: false, data, message: 'get users invites data successfully' };

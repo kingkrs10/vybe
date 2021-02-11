@@ -1,7 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 module.exports = {
 	create: async (reqObj, client) => {
-		console.log('reqObj', reqObj);
 		const messageId = uuidv4();
 		const result = await client.query(`INSERT INTO messages("messageId", "chatId", message, "messageFromUId", "messageToUId", "messageType")
 				VALUES($1, $2, $3, $4, $5, $6 )  RETURNING "messageId"`,

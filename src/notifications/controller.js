@@ -1,5 +1,6 @@
 const notificationsModel = require("./model");
 const commonModel = require("../common/common");
+const responseController = require("../common/ResponseController");
 
 const create = async (request, response, next) => {
    try {
@@ -8,18 +9,13 @@ const create = async (request, response, next) => {
          "(Notifications:create)",
          notificationsModel.create
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -30,18 +26,13 @@ const getUsersNotification = async (request, response, next) => {
          "(Notifications:getUsersNotification)",
          notificationsModel.getUsersNotification
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 

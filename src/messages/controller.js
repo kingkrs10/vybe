@@ -1,5 +1,6 @@
 const messagesModel = require("./model");
 const commonModel = require("../common/common");
+const responseController = require("../common/ResponseController");
 
 const create = async (request, response) => {
    try {
@@ -8,18 +9,13 @@ const create = async (request, response) => {
          "(Messages:create)",
          messagesModel.create
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -34,18 +30,13 @@ const update = async (request, response, next) => {
          "(Messages:update)",
          messagesModel.update
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -56,18 +47,13 @@ const getAll = async (request, response, next) => {
          "(Messages:getAll)",
          messagesModel.getAll
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -78,18 +64,13 @@ const getOne = async (request, response, next) => {
          "(Messages:getOne)",
          messagesModel.getOne
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -100,18 +81,13 @@ const updateUnRead = async (request, response, next) => {
          "(Messages:updateUnRead)",
          messagesModel.updateUnRead
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -122,18 +98,13 @@ const remove = async (request, response, next) => {
          "(Messages:remove)",
          messagesModel.remove
       );
-      try {
-         response.status(200).send(result);
-      } catch (err) {
-         // show error?
-      }
+      if (!result.error){
+         responseController.sendSuccessResponse(response, result['data'])
+		} else {
+			responseController.sendInternalErrorResponse(response)
+		}
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      responseController.sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
