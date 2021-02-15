@@ -83,20 +83,33 @@ const createJwtToken = async(userData) => {
 }
 
 const authMiddleware = async (request, response, next) => {
-    let authorization = request.headers["authorization"];
-    if (!_isUndefined(authorization)) {
-        const jwtDecode = await decodeJwtToken(request.headers.authorization);
-        const checkUserExist = await tryBlock(
-            { id: jwtDecode.userId },
-            "(User:check auth Middleware)",
-            usersModel.getOne
-        )
-        if (checkUserExist) {
-            request.currentUser = jwtDecode;
-            next();
-            return;
+    const token = request.headers.authorization;
+    if (!_isUndefined(token)) {
+        let authorization = token;
+        if (token.includes('Bearer')){
+            authorization = token.split(' ')[1];
         }
-        responseController.sendNotAuthorizedResponse(response);
+        try {
+            jwt.verify(authorization, config.app.secretKey, async(err, decoded) => {
+                if (err) {
+                    responseController.sendNotAuthorizedResponse(response);
+                }
+                if (decoded) {
+                    const checkUserExist = await tryBlock(
+                        { id: decoded.userId },
+                        "(User:check auth Middleware)",
+                        usersModel.getOne
+                    )
+                    if (checkUserExist) {
+                        request.currentUser = decoded;
+                        next();
+                        return;
+                    }
+                }
+            })
+        } catch (error) {
+            responseController.sendNotAuthorizedResponse(response);
+        }
     } else {
         responseController.sendNotAuthorizedResponse(response);
     }

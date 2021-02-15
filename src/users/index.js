@@ -5,7 +5,6 @@ const { authMiddleware, upload} = require('../common/common');
 
 router.post(
     "/",
-    authMiddleware,
     upload.single('image'),
     usersController.create
 );

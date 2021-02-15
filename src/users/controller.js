@@ -56,7 +56,7 @@ const getOne = async (request, response, next) => {
          usersModel.getOne
       );
       if (!result.error) {
-         responseController.sendSuccessResponse(response, result)
+         responseController.sendSuccessResponse(response, result.data)
       } else {
          responseController.sendInternalErrorResponse(response)
       }

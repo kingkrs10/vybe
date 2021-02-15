@@ -1,11 +1,14 @@
 const { v4: uuidv4 } = require('uuid');
 module.exports = {
 	create: async (reqObj, client) => {
-		const result = await client.query(`INSERT INTO users(uid, balance, count, "deviceId", "fullName", "imageURl", "phoneNumber", "stripeCustomerId", "currencyCode", "currencySymbol", profession)
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING uid`,
-			[reqObj.uid, reqObj.balance, reqObj.count, `{${reqObj.deviceId}}`, reqObj.fullName, reqObj.imageURl,
-			reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.currencyCode,
-			reqObj.currencySymbol, reqObj.profession]);
+		const result = await client.query(`INSERT INTO users(
+			uid, balance, "notificationUnReadcount", "deviceId",
+			"fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
+			 "currencyCode", "currencySymbol", profession, "firebaseUId")
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING uid`,
+			[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
+			 reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
+			 reqObj.currencyCode,	reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId]);
 		let data = null;
 		if (result.rowCount > 0) {
 			const result1 = await module.exports.getOne({id:result.rows[0].uid}, client);
@@ -20,8 +23,8 @@ module.exports = {
 
 	getAll: async (filter, client) => {
 		const result = await client.query(`SELECT
-		uid, balance, count, "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
-		longitude, "currencyCode", "currencySymbol", profession
+		uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
+		longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid
 		FROM users
 		WHERE "isActive" = $1 ORDER BY uid`, [true]);
 		const data = result.rows;
@@ -36,8 +39,8 @@ module.exports = {
 		const whereCondition = obj.id ? `WHERE uid = $1` : `WHERE "phoneNumber" = $1`;
 		const val = obj.id ? obj.id : obj.phoneNumber;
 		const result = await client.query(`SELECT
-		uid, balance, count, "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
-		longitude, "currencyCode", "currencySymbol", profession
+		uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
+		longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid
 		FROM users
 		${whereCondition}`, [val]);
 		const data = result.rows[0];
@@ -60,12 +63,12 @@ module.exports = {
 	update: async (Obj, client) => {
 		const { reqObj, uid } = Obj;
 		const result = await client.query(`UPDATE users SET
-			balance = $2, count = $3, "deviceId" = $4, "fullName" = $5,
-			"imageURl" = $6, "phoneNumber" = $7, "stripeCustomerId" = $8,
-			latitude = $9, longitude= $10, "currencyCode"= $11, "currencySymbol"= $12,
-			profession= $13
+			balance = $2, "deviceId" = $3, "fullName" = $4,
+			"imageURl" = $5, "phoneNumber" = $6, "stripeCustomerId" = $7,
+			latitude = $8, longitude= $9, "currencyCode"= $10, "currencySymbol"= $11,
+			profession= $12
 			where uid = $1 RETURNING uid`,
-			[uid, reqObj.balance, reqObj.count, `{${reqObj.deviceId}}`, reqObj.fullName,
+			[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
 			reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
 			reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession]);
 		let data = null;

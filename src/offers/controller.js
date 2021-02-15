@@ -2,7 +2,7 @@ const offersModel = require("./model");
 const commonModel = require("../common/common");
 const responseController = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
-
+const _map = require('lodash/map');
 const create = async (request, response) => {
    try {
       const offerId = uuidv4();
@@ -26,7 +26,7 @@ const create = async (request, response) => {
          offersModel.create
       );
       if (!result.error){
-         responseController.sendSuccessResponse(response, result)
+         responseController.sendSuccessResponse(response, result.data)
       } else {
          responseController.sendInternalErrorResponse(response)
       }
@@ -74,7 +74,21 @@ const getAll = async (request, response, next) => {
          offersModel.getAll
       );
       if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+         const offerIds = result.data.map(item => item.offerId);
+         const resultHashTagData = await commonModel.tryBlock(
+            offerIds,
+            "(Offers:gethashTahs)",
+            offersModel.getHashTags
+         );
+         console.log('resultHashTagData :11', resultHashTagData);
+
+         const resultData = _map(result.data, (item) =>{
+            const hashtagData = resultHashTagData.filter(i => i.offerId === item.offerId);
+               item.hasTags = hashtagData;
+               return item;
+            });
+            console.log('resultData', resultData);
+         responseController.sendSuccessResponse(response, resultData)
       } else {
          responseController.sendInternalErrorResponse(response)
       }
@@ -91,6 +105,7 @@ const getOne = async (request, response, next) => {
          offersModel.getOne
       );
       if (!result.error){
+
          responseController.sendSuccessResponse(response, result)
       } else {
          responseController.sendInternalErrorResponse(response)

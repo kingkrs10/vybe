@@ -1,8 +1,8 @@
 var self = module.exports = {
 	create: async (reqObj, client) => {
-		const result = await client.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid)
-				VALUES($1, $2, $3, $4, $5, $6, $7)`,
-			[reqObj.offerId, reqObj.headLine, reqObj.imageURl, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, reqObj.uid]);
+		const result = await client.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId")
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+			[reqObj.offerId, reqObj.headLine, reqObj.imageURl, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, reqObj.uid, reqObj.locationName, reqObj.firebaseOfferId]);
 		let data = null;
 		if (result.rowCount > 0) {
 			const Obj = { reqObj: reqObj, offerId: reqObj.offerId};
@@ -37,9 +37,10 @@ var self = module.exports = {
 	},
 
 	getAll: async (reqObj, client) => {
-		const limit = 5
+		const limit = reqObj.limit ? reqObj.limit : 50;
 		const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
 		const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
+			O."imageURl" offerImage,
 			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
 			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 			U.profession, U."imageURl" userImage, U."fullName",
@@ -97,6 +98,20 @@ var self = module.exports = {
 			result = true;
 		});
 		return { error: false, message: 'Data update successfully' };
+	},
+
+	getHashTags: async (ids, client) => {
+		try{
+			const result = await client.query(`SELECT "offerId", "hashTag" FROM "offers_hashTags" WHERE "offerId" = ANY(ARRAY[$1::uuid[]])`, [ids]);
+			const data = result.rows;
+			if (result.rowCount > 0) {
+				return data;
+			} else {
+				return [];
+			}
+		} catch (err){
+			console.log('err', err);
+		}
 	},
 
 	saveFavorites: async (reqObj, client) => {
