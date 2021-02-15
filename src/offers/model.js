@@ -40,7 +40,7 @@ var self = module.exports = {
 		const limit = reqObj.limit ? reqObj.limit : 50;
 		const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
 		const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
-			O."imageURl" offerImage,
+			O."imageURl" offerImage,"firebaseOfferId",
 			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
 			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 			U.profession, U."imageURl" userImage, U."fullName",
@@ -65,7 +65,7 @@ var self = module.exports = {
 	getOne: async (id, client) => {
 		const result = await client.query(`SELECT
 			O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
-			O."imageURl" offerImage,
+			O."imageURl" offerImage, "firebaseOfferId",
 			U.profession, U."imageURl" userImage, U."fullName",
 			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
 			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites
