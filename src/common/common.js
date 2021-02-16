@@ -74,7 +74,8 @@ const decodeJwtToken = async (token) => {
 
 const createJwtToken = async(userData) => {
     const payload = {
-        userId: userData.uid,
+        userId: userData.userid,
+        firebaseUId: userData.uid,
         phoneNumber: userData.phoneNumber,
         logintime: Math.round(new Date().getTime() / 1000)
     };
