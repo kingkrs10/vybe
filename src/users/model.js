@@ -11,7 +11,7 @@ module.exports = {
 			 reqObj.currencyCode,	reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId]);
 		let data = null;
 		if (result.rowCount > 0) {
-			const result1 = await module.exports.getOne({id:result.rows[0].uid}, client);
+			const result1 = await module.exports.getOne({ id: reqObj.firebaseUId}, client);
 			data = result1 ? result1 : null;
 		}
 		if (result.rowCount > 0 && data) {
@@ -36,7 +36,7 @@ module.exports = {
 	},
 
 	getOne: async (obj, client) => {
-		const whereCondition = obj.id ? `WHERE uid = $1` : `WHERE "phoneNumber" = $1`;
+		const whereCondition = obj.id ? `WHERE "firebaseUId" = $1` : `WHERE "phoneNumber" = $1`;
 		const val = obj.id ? obj.id : obj.phoneNumber;
 		const result = await client.query(`SELECT
 		uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
@@ -67,7 +67,7 @@ module.exports = {
 			"imageURl" = $5, "phoneNumber" = $6, "stripeCustomerId" = $7,
 			latitude = $8, longitude= $9, "currencyCode"= $10, "currencySymbol"= $11,
 			profession= $12
-			where uid = $1 RETURNING uid`,
+			where "firebaseUId" = $1 RETURNING firebaseUId`,
 			[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
 			reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
 			reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession]);
@@ -86,11 +86,11 @@ module.exports = {
 	updateLocation: async (Obj, client) => {
 		const { reqObj, uid } = Obj;
 		const result = await client.query(`UPDATE users SET latitude = $2, "longitude" = $3
-			where uid = $1 RETURNING uid`,
+			where uid = $1 RETURNING firebaseUId`,
 			[uid, reqObj.latitude, reqObj.longitude ]);
 		let data = null;
 		if (result.rowCount > 0) {
-			const result1 = await module.exports.getOne({id:result.rows[0].uid}, client);
+			const result1 = await module.exports.getOne({ id: result.rows[0].firebaseUId}, client);
 			data = result1 ? result1.data : null;
 		}
 		if (result.rowCount > 0) {

@@ -1,3 +1,4 @@
+const _isEmpty = require('lodash/isEmpty');
 var self = module.exports = {
 	create: async (reqObj, client) => {
 		const result = await client.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId")
@@ -39,11 +40,11 @@ var self = module.exports = {
 	getAll: async (reqObj, client) => {
 		const limit = reqObj.limit ? reqObj.limit : 50;
 		const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
-		const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
+		const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid userId, O."isActive",
 			O."imageURl" offerImage,"firebaseOfferId",
 			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
 			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
-			U.profession, U."imageURl" userImage, U."fullName",
+			U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
 			( 3959 * acos( cos( radians($5) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($6) ) + sin( radians($5) ) * sin( radians( O.latitude ) ) ) ) AS distance
 			FROM offers O
 			INNER JOIN users U ON U.uid = O.uid
@@ -62,21 +63,75 @@ var self = module.exports = {
 		}
 	},
 
+	getAllOffers: async (reqObj, client) => {
+		try {
+			const limit =  50;
+			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
+			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
+				O."imageURl" offerImage,"firebaseOfferId",
+				(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
+				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid
+				FROM offers O
+				INNER JOIN users U ON U.uid = O.uid
+				WHERE O."isActive" =  $1
+				AND U."isActive" =  $1`;
+			var qryValue = [true, limit, pageNo];
+
+			if ((reqObj.category && !_isEmpty(reqObj.category)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
+					qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($4))`
+					qryText = `${qryText} AND (LOWER("headLine") like LOWER($5)
+						OR LOWER("offerDescription") like LOWER($5)
+						OR LOWER("locationName") like LOWER($5))`
+				qryValue = [true, limit, pageNo, reqObj.category, `%${reqObj.searchTerm}%`]
+			} else if ((reqObj.category && !_isEmpty(reqObj.category)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
+				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($4))`;
+				qryValue = [true, limit, pageNo, reqObj.category]
+			}else if ((reqObj.location && !_isEmpty(reqObj.location)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
+				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($4)`;
+					qryText = `${qryText} AND (LOWER("headLine") like LOWER($5)
+						OR LOWER("offerDescription") like LOWER($5)
+						OR LOWER("locationName") like LOWER($5))`
+				qryValue = [true, limit, pageNo, reqObj.location, `%${reqObj.searchTerm}%`]
+			} else if ((reqObj.category && !_isEmpty(reqObj.category)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
+				qryText = `${qryText} ND LOWER(O."locationName") = LOWER($4)`;
+				qryValue = [true, limit, pageNo, reqObj.location];
+			} else if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)){
+				qryText = `${qryText} AND (LOWER("headLine") like LOWER($4)
+						OR LOWER("offerDescription") like LOWER($4)
+						OR LOWER("locationName") like LOWER($4))`;
+				qryValue = [true, limit, pageNo, `%${reqObj.searchTerm}%`]
+			}
+
+			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $3 limit $2`, qryValue);
+			const data = result.rows;
+			if (result.rowCount > 0) {
+				return { error: false, data, message: 'get all data successfully' };
+			} else {
+				return { error: false, data:[], message: "get all data failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString() };
+		}
+	},
+
 	getOne: async (id, client) => {
-		const result = await client.query(`SELECT
-			O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid, O."isActive",
-			O."imageURl" offerImage, "firebaseOfferId",
-			U.profession, U."imageURl" userImage, U."fullName",
-			(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
-			(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites
-			FROM offers O
-			INNER JOIN users U ON U.uid = O.uid
-			WHERE O."offerId" = $1`, [id]);
-		const data = result.rows[0];
-		if (result.rowCount > 0) {
-			return data;
-		} else {
-			return null;
+		try {
+			const result = await client.query(`SELECT
+				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid userId, O."isActive",
+				O."imageURl" offerImage, "firebaseOfferId",
+				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
+				(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
+				FROM offers O
+				INNER JOIN users U ON U.uid = O.uid
+				WHERE O."offerId" = $1`, [id]);
+			const data = result.rows[0];
+			if (result.rowCount > 0) {
+				return data;
+			} else {
+				return null;
+			}
+		} catch (error) {
+			return { error: true, message: error.toString() };
 		}
 	},
 
@@ -136,6 +191,55 @@ var self = module.exports = {
 			return { error: false, message: 'Data saved successfully' };
 		} else {
 			return { error: true, message: "Data saved failed" };
+		}
+	},
+
+	getAllCategories: async (reqObj, client) => {
+		var qry = `SELECT DISTINCT "hashTag" name,  count(OH."offerId") length
+		FROM "offers_hashTags" OH
+		INNER JOIN "offers" O on O."offerId" = OH."offerId"
+		WHERE 1 = 1`;
+		qry = reqObj.searchTerm && !_isEmpty(reqObj.searchTerm) ? `${qry} AND (LOWER("hashTag") like LOWER($1)
+			OR LOWER("headLine") like LOWER($1)
+			OR LOWER("offerDescription") like LOWER($1)
+			OR LOWER("locationName") like LOWER($1)) group by "hashTag"`: `${qry} group by "hashTag"`;
+		console.log('qry', `${qry}`);
+
+		if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
+			result = await client.query(`${qry}`, [`%${reqObj.searchTerm}%`]);
+		} else {
+			result = await client.query(`${qry}`);
+		}
+		if (result.rowCount > 0) {
+			return { error: false, data: result.rows, message: 'Get Data successfully' };
+		} else {
+			return { error: true, message: error.toString()};
+		}
+	},
+
+	getAllLocation: async (reqObj, client) => {
+		try {
+			var qry = `SELECT DISTINCT "locationName" as name, count("offerId") as length FROM "offers" WHERE 1 = 1`;
+
+			if(reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)){
+				qry = `${qry} AND (LOWER("locationName") like LOWER($1)
+				OR LOWER("headLine") like LOWER($1)
+				OR LOWER("offerDescription") like LOWER($1))` ;
+			}
+			qry =`${qry} group by "locationName"`;
+			var result = {};
+			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
+				result = await client.query(`${qry}`, [`%${reqObj.searchTerm}%`]);
+			} else {
+				result = await client.query(`${qry}`);
+			}
+			if (result.rowCount > 0) {
+				return { error: false, data: result.rows, message: 'Get Data successfully' };
+			} else {
+				return { error: false, data: [], message: "Get Data failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString()};
 		}
 	}
 };

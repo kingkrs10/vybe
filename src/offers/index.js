@@ -14,11 +14,26 @@ router.post(
    upload.none(),
    offersController.getAll
 );
+router.get(
+   "/",
+   authMiddleware,
+   offersController.getAllOffers
+);
 router.put(
    "/:id",
    authMiddleware,
    upload.single("image"),
    offersController.update
+);
+router.get(
+   "/categories",
+   authMiddleware,
+   offersController.getCategories
+);
+router.get(
+   "/locations",
+   authMiddleware,
+   offersController.getAllLocation
 );
 router.get(
    "/:id",
@@ -43,5 +58,4 @@ router.post(
    upload.none(),
    offersController.saveReport
 );
-
 module.exports = router;
