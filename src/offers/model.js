@@ -97,17 +97,20 @@ var self = module.exports = {
 						OR LOWER("offerDescription") like LOWER($5)
 						OR LOWER("locationName") like LOWER($5))`
 				qryValue = [true, limit, pageNo, reqObj.category, `%${reqObj.searchTerm}%`]
+
 			} else if ((reqObj.category && !_isEmpty(reqObj.category)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
 				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($4))`;
 				qryValue = [true, limit, pageNo, reqObj.category]
+
 			}else if ((reqObj.location && !_isEmpty(reqObj.location)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
 				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($4)`;
 					qryText = `${qryText} AND (LOWER("headLine") like LOWER($5)
 						OR LOWER("offerDescription") like LOWER($5)
 						OR LOWER("locationName") like LOWER($5))`
 				qryValue = [true, limit, pageNo, reqObj.location, `%${reqObj.searchTerm}%`]
-			} else if ((reqObj.category && !_isEmpty(reqObj.category)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
-				qryText = `${qryText} ND LOWER(O."locationName") = LOWER($4)`;
+
+			} else if ((reqObj.location && !_isEmpty(reqObj.location)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
+				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($4)`;
 				qryValue = [true, limit, pageNo, reqObj.location];
 			} else if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)){
 				qryText = `${qryText} AND (LOWER("headLine") like LOWER($4)
