@@ -4,17 +4,14 @@ const responseController = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _map = require('lodash/map');
 const _isEmpty = require('lodash/isEmpty');
+
 const create = async (request, response) => {
    try {
       const offerId = uuidv4();
       var imagePath = null;
-      if (request.file) {
-         const result = await commonModel.fileUpload(
-            request.file,
-            offerId,
-            "offers"
-         );
-         imagePath = result.fileLocation ? result.fileLocation : null;
+      // const imagePathArr = await fileUploadingProcess(request.files, offerId);
+      if (!_isEmpty(request.body.offerImage)) {
+         imagePath = request.body.offerImage;
       }
       const tempBody = {
          ...request.body,
@@ -36,21 +33,28 @@ const create = async (request, response) => {
    }
 };
 
+const fileUploadingProcess = async (filesData, offerId) => {
+   const fileNameArr = [];
+   await filesData.map( async fileItem => {
+      const resp = await commonModel.fileUpload(
+         fileItem,
+         offerId,
+         "offers"
+      );
+      fileNameArr.push(resp.fileLocation);
+   })
+   return fileNameArr;
+}
+
 const update = async (request, response, next) => {
    try {
       const data = {
          reqObj: request.body,
          offerId: request.params.id,
       };
-      if (request.file) {
-         const result = await commonModel.fileUpload(
-            request.file,
-            request.params.id,
-            "offers"
-         );
-         if (result.fileLocation) {
-            data.reqObj.imageURl = result.fileLocation;
-         }
+      // const imagePathArr = await fileUploadingProcess(request.files, offerId);
+      if (!_isEmpty(request.body.offerImage)) {
+         data.reqObj.imageURl = request.body.offerImage;
       }
       const result = await commonModel.tryBlock(
          data,
@@ -209,7 +213,6 @@ const getCategories = async (request, response, next) => {
          "(Offers:getAllCategories)",
          offersModel.getAllCategories
       );
-      console.log('result', result);
       if (!result.error){
          if (!_isEmpty(result.data)){
             responseController.sendSuccessResponse(response, result.data)
@@ -231,7 +234,70 @@ const getAllLocation = async (request, response, next) => {
          "(Offers:getAllLocation)",
          offersModel.getAllLocation
       );
-      console.log('result', result);
+      if (!result.error) {
+         if (!_isEmpty(result.data)) {
+            responseController.sendSuccessResponse(response, result.data)
+         } else {
+            responseController.sendNoContentResponse(response)
+         }
+      } else {
+         responseController.sendInternalErrorResponse(response)
+      }
+   } catch (err) {
+      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+   }
+};
+
+const getUserOffers = async (request, response, next) => {
+   const data = {
+      uid: request.params.id,
+      pageNo: request.query.pageNo || 1
+   }
+
+   try {
+      const result = await commonModel.tryBlock(
+         data,
+         "(Offers:getUserOffers)",
+         offersModel.getAllOffers
+      );
+
+      if (!result.error) {
+         if (!_isEmpty(result.data)) {
+            const offerIds = result.data.map(item => item.offerId);
+            const resultHashTagData = await commonModel.tryBlock(
+               offerIds,
+               "(Offers:gethashTahs)",
+               offersModel.getHashTags
+            );
+            const resultData = _map(result.data, (item) => {
+               const hashtagData = resultHashTagData.filter(i => i.offerId === item.offerId);
+               item.hasTags = hashtagData;
+               return item;
+            });
+
+            responseController.sendSuccessResponse(response, resultData)
+         } else {
+            responseController.sendNoContentResponse(response)
+         }
+      } else {
+         responseController.sendInternalErrorResponse(response)
+      }
+   } catch (err) {
+      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+   }
+};
+
+const getUserfavorites = async (request, response, next) => {
+   const data = {
+      favoriteUid: request.params.id
+   }
+
+   try {
+      const result = await commonModel.tryBlock(
+         data,
+         "(Offers:getUserfavorites)",
+         offersModel.getAllOffers
+      );
       if (!result.error) {
          if (!_isEmpty(result.data)) {
             responseController.sendSuccessResponse(response, result.data)
@@ -256,5 +322,7 @@ module.exports = {
    saveFavorites,
    saveReport,
    getCategories,
-   getAllLocation
+   getAllLocation,
+   getUserOffers,
+   getUserfavorites
 };

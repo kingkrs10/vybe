@@ -2,6 +2,7 @@ const usersModel = require("./model");
 const commonModel = require("../common/common");
 const responseController = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
+const _isEmpty = require('lodash/isEmpty');
 
 const create = async (request, response) => {
    try {
@@ -38,10 +39,10 @@ const getAll = async (request, response, next) => {
          "(User:getAll)",
          usersModel.getAll
       );
-      if (!result.error) {
-         responseController.sendSuccessResponse(response, result['data'])
+      if (!_isEmpty(result.data)) {
+         responseController.sendSuccessResponse(response, result.data)
       } else {
-         responseController.sendInternalErrorResponse(response)
+         responseController.sendNoContentResponse(response)
       }
    } catch (err) {
       responseController.sendInternalErrorResponse(response, { message: err.toString() })
@@ -55,10 +56,10 @@ const getOne = async (request, response, next) => {
          "(User:getOne)",
          usersModel.getOne
       );
-      if (!result.error) {
+      if (!_isEmpty(result.data)) {
          responseController.sendSuccessResponse(response, result.data)
       } else {
-         responseController.sendInternalErrorResponse(response)
+         responseController.sendNoContentResponse(response)
       }
    } catch (err) {
       responseController.sendInternalErrorResponse(response, { message: err.toString() })
@@ -163,10 +164,31 @@ const getAuthToken = async (request, response, next) => {
          usersModel.getOne
       );
       const JwtToken = await commonModel.createJwtToken(result.data);
-      if (!result.error) {
-         responseController.sendSuccessResponse(response, {authToken: JwtToken})
+      if (!_isEmpty(result.data)) {
+         responseController.sendSuccessResponse(response, { authToken: JwtToken })
       } else {
-         responseController.sendInternalErrorResponse(response)
+         responseController.sendNoContentResponse(response)
+      }
+   } catch (err) {
+      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+   }
+};
+
+const getRecentUsers = async (request, response, next) => {
+   try {
+      const reqObj = {
+         ...request.query,
+         recentUsers: true
+      }
+      const result = await commonModel.tryBlock(
+         reqObj,
+         "(User:getRecentUsers)",
+         usersModel.getAll
+      );
+      if (!_isEmpty(result.data)) {
+         responseController.sendSuccessResponse(response, result.data)
+      } else {
+         responseController.sendNoContentResponse(response)
       }
    } catch (err) {
       responseController.sendInternalErrorResponse(response, { message: err.toString() })
@@ -181,5 +203,6 @@ module.exports = {
    remove,
    updateLocation,
    updateBlockedUsers,
-   getAuthToken
+   getAuthToken,
+   getRecentUsers
 };

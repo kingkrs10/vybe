@@ -5,7 +5,7 @@ const { authMiddleware, upload } = require('../common/common');
 
 router.post("/",
    authMiddleware,
-   upload.single("image"),
+   upload.array("image", 10),
    offersController.create
 );
 router.post(
@@ -22,7 +22,7 @@ router.get(
 router.put(
    "/:id",
    authMiddleware,
-   upload.single("image"),
+   upload.array("image", 10),
    offersController.update
 );
 router.get(
@@ -35,6 +35,17 @@ router.get(
    authMiddleware,
    offersController.getAllLocation
 );
+router.get(
+   "/userfavorites/:id",
+   authMiddleware,
+   offersController.getUserfavorites
+);
+router.get(
+   "/user/:id",
+   authMiddleware,
+   offersController.getUserOffers
+);
+
 router.get(
    "/:id",
    authMiddleware,

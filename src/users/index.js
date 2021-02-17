@@ -20,6 +20,11 @@ router.get(
     usersController.getAll
 );
 router.get(
+    "/recentUsers",
+    authMiddleware,
+    usersController.getRecentUsers
+);
+router.get(
     "/:id",
     authMiddleware,
     usersController.getOne
