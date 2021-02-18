@@ -10,8 +10,8 @@ var self = module.exports = {
 			if (result.rowCount > 0) {
 				const Obj = { reqObj: reqObj, offerId: reqObj.offerId};
 				const result1 = await module.exports.getOne(reqObj.offerId, client);
+				data = result1 ? result1.data : null;
 				await self.updateHashTags(Obj, client);
-				data = result1 ? result1 : null;
 			}
 			if (result.rowCount > 0 && data) {
 				return { error: false, data, message: 'Data saved successfully' };
@@ -35,7 +35,7 @@ var self = module.exports = {
 			if (result.rowCount > 0) {
 				const result1 = await module.exports.getOne(result.rows[0].offerId, client);
 				await self.updateHashTags(Obj, client);
-				data = result1 ? result1 : null;
+				data = result1 ? result1.data : null;
 			}
 			if (result.rowCount > 0) {
 				return { error: false, data, message: 'Data update successfully' };
@@ -83,49 +83,49 @@ var self = module.exports = {
 			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
 			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
 				O."imageURl" offerImage,"firebaseOfferId",
-				(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
+				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
+				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid
 				FROM offers O
 				INNER JOIN users U ON U.uid = O.uid
-				WHERE O."isActive" =  $1
-				AND U."isActive" =  $1`;
-			var qryValue = [true, limit, pageNo];
+				WHERE O."isActive" =  $2
+				AND U."isActive" =  $2`;
+			var qryValue = [reqObj.userId, true, limit, pageNo];
 
 			if ((reqObj.category && !_isEmpty(reqObj.category)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
-					qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($4))`
-					qryText = `${qryText} AND (LOWER("headLine") like LOWER($5)
-						OR LOWER("offerDescription") like LOWER($5)
-						OR LOWER("locationName") like LOWER($5))`
-				qryValue = [true, limit, pageNo, reqObj.category, `%${reqObj.searchTerm}%`]
+					qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($5))`
+					qryText = `${qryText} AND (LOWER("headLine") like LOWER($6)
+						OR LOWER("offerDescription") like LOWER($6)
+						OR LOWER("locationName") like LOWER($6))`
+				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.category, `%${reqObj.searchTerm}%`]
 
 			} else if ((reqObj.category && !_isEmpty(reqObj.category)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
-				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($4))`;
-				qryValue = [true, limit, pageNo, reqObj.category]
+				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($5))`;
+				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.category]
 
 			}else if ((reqObj.location && !_isEmpty(reqObj.location)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
-				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($4)`;
-					qryText = `${qryText} AND (LOWER("headLine") like LOWER($5)
-						OR LOWER("offerDescription") like LOWER($5)
-						OR LOWER("locationName") like LOWER($5))`
-				qryValue = [true, limit, pageNo, reqObj.location, `%${reqObj.searchTerm}%`]
+				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($5)`;
+					qryText = `${qryText} AND (LOWER("headLine") like LOWER($6)
+						OR LOWER("offerDescription") like LOWER($6)
+						OR LOWER("locationName") like LOWER($6))`
+				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.location, `%${reqObj.searchTerm}%`]
 
 			} else if ((reqObj.location && !_isEmpty(reqObj.location)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
-				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($4)`;
-				qryValue = [true, limit, pageNo, reqObj.location];
+				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($5)`;
+				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.location];
 			} else if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)){
-				qryText = `${qryText} AND (LOWER("headLine") like LOWER($4)
-						OR LOWER("offerDescription") like LOWER($4)
-						OR LOWER("locationName") like LOWER($4))`;
-				qryValue = [true, limit, pageNo, `%${reqObj.searchTerm}%`]
+				qryText = `${qryText} AND (LOWER("headLine") like LOWER($5)
+						OR LOWER("offerDescription") like LOWER($5)
+						OR LOWER("locationName") like LOWER($5))`;
+				qryValue = [reqObj.userId, true, limit, pageNo, `%${reqObj.searchTerm}%`]
 			} else if (reqObj.uid) {
 				qryText = `${qryText} AND O.uid = $4`;
-				qryValue = [true, limit, pageNo, reqObj.uid]
+				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.uid]
 			} else if (reqObj.favoriteUid) {
 				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $4)`;
-				qryValue = [true, limit, pageNo, reqObj.favoriteUid]
+				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.favoriteUid]
 			}
-
-			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $3 limit $2`, qryValue);
+			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $4 limit $3`, qryValue);
 			const data = result.rows;
 			if (result.rowCount > 0) {
 				return { error: false, data, message: 'get all data successfully' };
@@ -133,6 +133,7 @@ var self = module.exports = {
 				return { error: false, data:[], message: "get all data failed" };
 			}
 		} catch (error) {
+			console.log(error);
 			return { error: true, message: error.toString() };
 		}
 	},
@@ -149,9 +150,9 @@ var self = module.exports = {
 				WHERE O."offerId" = $1`, [id]);
 			const data = result.rows[0];
 			if (result.rowCount > 0) {
-				return data;
+				return {error: false, data};
 			} else {
-				return null;
+				return { error: false, data:[]};
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };

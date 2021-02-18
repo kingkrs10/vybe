@@ -85,13 +85,12 @@ module.exports = {
 			if (result.rowCount > 0) {
 				return { error: false, removedUserId: id, message: 'user removed successfully' };
 			} else {
-				return { error: true, message: "user removed failed" };
+				return { error: false, message: "user removed failed" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
 	},
-
 	update: async (Obj, client) => {
 		try {
 			const { reqObj, uid } = Obj;
@@ -100,21 +99,18 @@ module.exports = {
 				"imageURl" = $5, "phoneNumber" = $6, "stripeCustomerId" = $7,
 				latitude = $8, longitude= $9, "currencyCode"= $10, "currencySymbol"= $11,
 				profession= $12
-				where "firebaseUId" = $1 RETURNING firebaseUId`,
+				WHERE "firebaseUId" = $1`,
 				[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
 				reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
 				reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession]);
-			let data = null;
+
 			if (result.rowCount > 0) {
-				const result1 = await module.exports.getOne({id:result.rows[0].uid}, client);
-				data = result1 ? result1.data : null;
-			}
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'Data update successfully' };
+				return { error: false, message: 'Data update successfully' };
 			} else {
 				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
+			console.log('error', error);
 			return { error: true, message: error.toString() };
 		}
 	},
@@ -123,19 +119,16 @@ module.exports = {
 		try {
 			const { reqObj, uid } = Obj;
 			const result = await client.query(`UPDATE users SET latitude = $2, "longitude" = $3
-				WHERE uid = $1 RETURNING firebaseUId`,
+				WHERE uid = $1`,
 				[uid, reqObj.latitude, reqObj.longitude ]);
-			let data = null;
+
 			if (result.rowCount > 0) {
-				const result1 = await module.exports.getOne({ id: result.rows[0].firebaseUId}, client);
-				data = result1 ? result1.data : null;
-			}
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'Data update successfully' };
+				return { error: false, message: 'Data update successfully' };
 			} else {
 				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
+			console.log('error', error);
 			return { error: true, message: error.toString() };
 		}
 	},
