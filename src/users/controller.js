@@ -8,13 +8,16 @@ const create = async (request, response) => {
    try {
       const userId = uuidv4();
       var imagePath = null;
-      if (request.file) {
-         const result = await commonModel.fileUpload(
-            request.file,
-            userId,
-            "profile"
-         );
-         imagePath = result.fileLocation ? result.fileLocation : null;
+      // if (request.file) {
+      //    const result = await commonModel.fileUpload(
+      //       request.file,
+      //       userId,
+      //       "profile"
+      //    );
+      //    imagePath = result.fileLocation ? result.fileLocation : null;
+      // }
+      if (!_isEmpty(request.body.profileImage)) {
+         imagePath = request.body.profileImage;
       }
       const tempBody = { ...request.body, imageURl: imagePath, uid: userId };
       const result = await commonModel.tryBlock(
@@ -22,13 +25,13 @@ const create = async (request, response) => {
          "(User:create)",
          usersModel.create
       );
-      if (!result.error){
+      if (!result.error) {
          responseController.sendSuccessResponse(response, result['data'])
       } else {
          responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      responseController.sendInternalErrorResponse(response, { message: err.toString() })
    }
 };
 
@@ -52,7 +55,7 @@ const getAll = async (request, response, next) => {
 const getOne = async (request, response, next) => {
    try {
       const result = await commonModel.tryBlock(
-         {id: request.params.id},
+         { id: request.params.id },
          "(User:getOne)",
          usersModel.getOne
       );
@@ -72,15 +75,18 @@ const update = async (request, response, next) => {
          reqObj: request.body,
          uid: request.params.id,
       };
-      if (request.file) {
-         const result = await commonModel.fileUpload(
-            request.file,
-            request.params.id,
-            "profile"
-         );
-         if (result.fileLocation) {
-            data.reqObj.imageURl = result.fileLocation;
-         }
+      // if (request.file) {
+      //    const result = await commonModel.fileUpload(
+      //       request.file,
+      //       request.params.id,
+      //       "profile"
+      //    );
+      //    if (result.fileLocation) {
+      //       data.reqObj.imageURl = result.fileLocation;
+      //    }
+      // }
+      if (!_isEmpty(request.body.profileImage)) {
+         data.reqObj.imageURl = request.body.profileImage;
       }
       const result = await commonModel.tryBlock(
          data,
@@ -159,7 +165,7 @@ const updateBlockedUsers = async (request, response, next) => {
 const getAuthToken = async (request, response, next) => {
    try {
       const result = await commonModel.tryBlock(
-         { phoneNumber: request.params.phoneNumber},
+         { phoneNumber: request.params.phoneNumber },
          "(User:getAuthToken)",
          usersModel.getOne
       );
