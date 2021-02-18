@@ -22,13 +22,13 @@ const create = async (request, response) => {
          "(User:create)",
          usersModel.create
       );
-      if (!result.error){
+      if (!result.error) {
          responseController.sendSuccessResponse(response, result['data'])
       } else {
          responseController.sendInternalErrorResponse(response)
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      responseController.sendInternalErrorResponse(response, { message: err.toString() })
    }
 };
 
@@ -52,7 +52,7 @@ const getAll = async (request, response, next) => {
 const getOne = async (request, response, next) => {
    try {
       const result = await commonModel.tryBlock(
-         {id: request.params.id},
+         { id: request.params.id },
          "(User:getOne)",
          usersModel.getOne
       );
@@ -159,7 +159,7 @@ const updateBlockedUsers = async (request, response, next) => {
 const getAuthToken = async (request, response, next) => {
    try {
       const result = await commonModel.tryBlock(
-         { phoneNumber: request.params.phoneNumber},
+         { phoneNumber: request.params.phoneNumber },
          "(User:getAuthToken)",
          usersModel.getOne
       );
