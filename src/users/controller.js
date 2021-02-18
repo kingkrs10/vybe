@@ -7,6 +7,7 @@ const _isEmpty = require('lodash/isEmpty');
 const create = async (request, response) => {
    try {
       const userId = uuidv4();
+
       var imagePath = null;
       // if (request.file) {
       //    const result = await commonModel.fileUpload(
