@@ -7,14 +7,18 @@ const _isEmpty = require('lodash/isEmpty');
 const create = async (request, response) => {
    try {
       const userId = uuidv4();
+
       var imagePath = null;
-      if (request.file) {
-         const result = await commonModel.fileUpload(
-            request.file,
-            userId,
-            "profile"
-         );
-         imagePath = result.fileLocation ? result.fileLocation : null;
+      // if (request.file) {
+      //    const result = await commonModel.fileUpload(
+      //       request.file,
+      //       userId,
+      //       "profile"
+      //    );
+      //    imagePath = result.fileLocation ? result.fileLocation : null;
+      // }
+      if (!_isEmpty(request.body.profileImage)) {
+         imagePath = request.body.profileImage;
       }
       const tempBody = { ...request.body, imageURl: imagePath, uid: userId };
       const result = await commonModel.tryBlock(
@@ -72,15 +76,18 @@ const update = async (request, response, next) => {
          reqObj: request.body,
          uid: request.params.id,
       };
-      if (request.file) {
-         const result = await commonModel.fileUpload(
-            request.file,
-            request.params.id,
-            "profile"
-         );
-         if (result.fileLocation) {
-            data.reqObj.imageURl = result.fileLocation;
-         }
+      // if (request.file) {
+      //    const result = await commonModel.fileUpload(
+      //       request.file,
+      //       request.params.id,
+      //       "profile"
+      //    );
+      //    if (result.fileLocation) {
+      //       data.reqObj.imageURl = result.fileLocation;
+      //    }
+      // }
+      if (!_isEmpty(request.body.profileImage)) {
+         data.reqObj.imageURl = request.body.profileImage;
       }
       const result = await commonModel.tryBlock(
          data,
