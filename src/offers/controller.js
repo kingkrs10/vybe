@@ -24,7 +24,7 @@ const create = async (request, response) => {
          offersModel.create
       );
       if (!result.error){
-         responseController.sendSuccessResponse(response, result.data)
+         responseController.sendCreatedesponse(response, result.data)
       } else {
          responseController.sendInternalErrorResponse(response)
       }
@@ -105,8 +105,12 @@ const getAll = async (request, response, next) => {
 
 const getAllOffers = async (request, response, next) => {
    try {
+      const tempObj = {
+         ...request.query,
+         userId: request.currentUser.userId
+      }
       const result = await commonModel.tryBlock(
-         request.query,
+         tempObj,
          "(Offers:getAllOffers)",
          offersModel.getAllOffers
       );
@@ -143,8 +147,11 @@ const getOne = async (request, response, next) => {
          offersModel.getOne
       );
       if (!result.error){
-
-         responseController.sendSuccessResponse(response, result)
+         if (!_isEmpty(result.data)) {
+            responseController.sendSuccessResponse(response, result.data)
+         } else {
+            responseController.sendNoContentResponse(response)
+         }
       } else {
          responseController.sendInternalErrorResponse(response)
       }
