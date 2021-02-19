@@ -254,7 +254,7 @@ var self = module.exports = {
 			if (result.rowCount > 0) {
 				return { error: false, data: result.rows, message: 'Get Data successfully' };
 			} else {
-				return { error: false, message: error.toString()};
+				return { error: false, data: [], message: 'Get Data successfully' };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };
