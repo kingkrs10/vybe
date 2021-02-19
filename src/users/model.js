@@ -145,5 +145,20 @@ module.exports = {
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
+	},
+	updateMobileNumber: async (obj, client) => {
+		try {
+			const { reqObj, uid } = obj;
+			const result = await client.query(`UPDATE users SET "phoneNumber" = $2
+				WHERE "firebaseUId" = $1`, [uid, reqObj.phoneNumber]
+			)
+			if (result) {
+				return { error: false, message: 'Data update successfully' };
+			} else {
+				return { error: true, message: "Data update failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString() };
+		}
 	}
 };

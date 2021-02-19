@@ -4,6 +4,8 @@ const responseController = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _isEmpty = require('lodash/isEmpty');
 
+const { firebaseAdmin } = require("../common/firebase");
+
 const create = async (request, response) => {
    try {
       const userId = uuidv4();
@@ -202,6 +204,34 @@ const getRecentUsers = async (request, response, next) => {
    }
 };
 
+const updateMobileNumber = async (request, response) => {
+   try {
+      firebaseAdmin.auth().updateUser(request.params.id, { phoneNumber: request.body.phoneNumber })
+         .then(async function (userRecord) {
+            const data = {
+               reqObj: request.body,
+               uid: request.params.id,
+            };
+            const result = await commonModel.tryBlock(
+               data,
+               "(User:updateMobileNumber)",
+               usersModel.updateMobileNumber
+            )
+            if (!result.error) {
+               responseController.sendSuccessResponse(response, result['data'])
+            } else {
+               responseController.sendInternalErrorResponse(response)
+            }
+         })
+         .catch(function (error) {
+            responseController.sendInternalErrorResponse(response)
+         });
+   } catch (error) {
+      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+   }
+};
+
+
 module.exports = {
    create,
    getAll,
@@ -211,5 +241,6 @@ module.exports = {
    updateLocation,
    updateBlockedUsers,
    getAuthToken,
-   getRecentUsers
+   getRecentUsers,
+   updateMobileNumber
 };
