@@ -119,10 +119,10 @@ var self = module.exports = {
 						OR LOWER("locationName") like LOWER($5))`;
 				qryValue = [reqObj.userId, true, limit, pageNo, `%${reqObj.searchTerm}%`]
 			} else if (reqObj.uid) {
-				qryText = `${qryText} AND O.uid = $4`;
+				qryText = `${qryText} AND O.uid = $5`;
 				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.uid]
 			} else if (reqObj.favoriteUid) {
-				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $4)`;
+				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $5)`;
 				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.favoriteUid]
 			}
 			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $4 limit $3`, qryValue);
