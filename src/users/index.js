@@ -50,5 +50,10 @@ router.get(
     "/getAuthToken/:phoneNumber",
     usersController.getAuthToken
 );
-
+router.put(
+    "/updateMobileNumber/:id",
+    authMiddleware,
+    upload.none(),
+    usersController.updateMobileNumber
+)
 module.exports = router;
