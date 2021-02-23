@@ -88,15 +88,15 @@ const getAll = async (request, response, next) => {
             );
             const resultData = _map(result.data, (item) =>{
                const hashtagData = resultHashTagData.filter(i => i.offerId === item.offerId);
-                  item.hasTags = hashtagData;
-                  return item;
-               });
+               item.hasTags = hashtagData;
+               return item;
+            });
             responseController.sendSuccessResponse(response, resultData);
          } else {
             responseController.sendNoContentResponse(response)
          }
       } else {
-         responseController.sendInternalErrorResponse(response, { message: result.message })
+         responseController.sendNoContentResponse(response)
       }
    } catch (err) {
       responseController.sendInternalErrorResponse(response, { message: err.toString()})
@@ -124,8 +124,8 @@ const getAllOffers = async (request, response, next) => {
             );
             const resultData = _map(result.data, (item) =>{
                const hashtagData = resultHashTagData.filter(i => i.offerId === item.offerId);
-                  item.hasTags = hashtagData;
-                  return item;
+               item.hasTags = hashtagData;
+               return item;
             });
             responseController.sendSuccessResponse(response, resultData)
          } else {

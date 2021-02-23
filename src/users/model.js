@@ -104,8 +104,13 @@ module.exports = {
 					reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
 					reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession]);
 
+			let data = null;
 			if (result.rowCount > 0) {
-				return { error: false, message: 'Data update successfully' };
+				const result1 = await module.exports.getOne({ uid: uid }, client);
+				data = result1 ? result1 : null;
+			}
+			if (result.rowCount > 0 && data) {
+				return { error: false, data: data['data'], message: 'Data saved successfully' };
 			} else {
 				return { error: true, message: "Data update failed" };
 			}
@@ -130,7 +135,7 @@ module.exports = {
 			if (result.rowCount > 0 && data) {
 				return { error: false, data: data['data'], message: 'Data saved successfully' };
 			} else {
-				return { error: true, message: "Data save failed" };
+				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
 			console.log('error', error);
