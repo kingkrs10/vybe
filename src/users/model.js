@@ -9,11 +9,11 @@ module.exports = {
 				 "currencyCode", "currencySymbol", profession, "firebaseUId")
 					VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING uid`,
 				[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
-				 reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
-				 reqObj.currencyCode,	reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId]);
+				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
+				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId]);
 			let data = null;
 			if (result.rowCount > 0) {
-				const result1 = await module.exports.getOne({ id: reqObj.firebaseUId}, client);
+				const result1 = await module.exports.getOne({ id: reqObj.firebaseUId }, client);
 				data = result1 ? result1 : null;
 			}
 			if (result.rowCount > 0 && data) {
@@ -61,8 +61,8 @@ module.exports = {
 
 	getOne: async (obj, client) => {
 		try {
-			const whereCondition = obj.id ? `WHERE "firebaseUId" = $1` : `WHERE "phoneNumber" = $1`;
-			const val = obj.id ? obj.id : obj.phoneNumber;
+			const whereCondition = obj.uid ? `WHERE uid =$1` : obj.id ? `WHERE "firebaseUId" = $1` : `WHERE "phoneNumber" = $1`;
+			const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
 			const result = await client.query(`SELECT
 			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
 			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid
@@ -101,8 +101,8 @@ module.exports = {
 				profession= $12
 				WHERE "firebaseUId" = $1`,
 				[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
-				reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
-				reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession]);
+					reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
+					reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession]);
 
 			if (result.rowCount > 0) {
 				return { error: false, message: 'Data update successfully' };
@@ -120,12 +120,17 @@ module.exports = {
 			const { reqObj, uid } = Obj;
 			const result = await client.query(`UPDATE users SET latitude = $2, "longitude" = $3
 				WHERE uid = $1`,
-				[uid, reqObj.latitude, reqObj.longitude ]);
+				[uid, reqObj.latitude, reqObj.longitude]);
 
+			let data = null;
 			if (result.rowCount > 0) {
-				return { error: false, message: 'Data update successfully' };
+				const result1 = await module.exports.getOne({ uid: uid }, client);
+				data = result1 ? result1 : null;
+			}
+			if (result.rowCount > 0 && data) {
+				return { error: false, data: data['data'], message: 'Data saved successfully' };
 			} else {
-				return { error: true, message: "Data update failed" };
+				return { error: true, message: "Data save failed" };
 			}
 		} catch (error) {
 			console.log('error', error);
