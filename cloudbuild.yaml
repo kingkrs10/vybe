@@ -1,0 +1,24 @@
+steps:
+   # Build the container image
+   - name: "gcr.io/cloud-builders/docker"
+     args: ["build", "-t", "gcr.io/luhu-dev/api", "."]
+   # Push the container image to Container Registry
+   - name: "gcr.io/cloud-builders/docker"
+     args: ["push", "gcr.io/luhu-dev/api"]
+   # Deploy container image to Cloud Run
+   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+     entrypoint: gcloud
+     args:
+        [
+           "run",
+           "deploy",
+           "luhu-api-development",
+           "--image",
+           "gcr.io/luhu-dev/api",
+           "--region",
+           "us-central1",
+           "--platform",
+           "managed",
+        ]
+images:
+   - gcr.io/luhu-dev/api
