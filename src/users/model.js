@@ -118,7 +118,6 @@ module.exports = {
 				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
-			console.log('error', error);
 			return { error: true, message: error.toString() };
 		}
 	},
@@ -141,7 +140,6 @@ module.exports = {
 				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
-			console.log('error', error);
 			return { error: true, message: error.toString() };
 		}
 	},
@@ -177,7 +175,6 @@ module.exports = {
 	},
 
 	updateBalance: async (reqObj, client) => {
-		console.log('updateBalance', reqObj);
 		try {
 			const result = await client.query(`UPDATE users SET
 				balance = $2, "currencyCode"= $3, "currencySymbol"= $4

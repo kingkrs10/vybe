@@ -20,9 +20,9 @@ module.exports = {
 				SET "receiverUId" = $1, status=$4
 				WHERE "senderUId"= $2  AND "receiverPhoneNumber" = $3`, [uid, reqObj.senderUId, reqObj.receiverPhoneNumber, '1']);
 			if (result.rowCount > 0) {
-				return { error: false, message: 'Data saved successfully' };
+				return { error: false, data: {}, message: 'Data saved successfully' };
 			} else {
-				return { error: true, message: "Data save failed" };
+				return { error: true, data: {}, message: "Data save failed" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };

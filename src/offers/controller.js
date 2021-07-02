@@ -1,6 +1,6 @@
 const offersModel = require("./model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _map = require('lodash/map');
 const _isEmpty = require('lodash/isEmpty');
@@ -15,6 +15,7 @@ const create = async (request, response) => {
       }
       const tempBody = {
          ...request.body,
+         currentUser: request.currentUser,
          imageURl: imagePath,
          offerId: offerId,
       };
@@ -26,12 +27,12 @@ const create = async (request, response) => {
       if (result.error) {
          sendErroresponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
-         sendCreatedesponse(response, result.data)
+         sendCreatedesponse(response, result.data);
       } else {
-         sendInternalErrorResponse(response)
+         sendInternalErrorResponse(response);
       }
    } catch (err) {
-      sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -51,7 +52,7 @@ const fileUploadingProcess = async (filesData, offerId) => {
 const update = async (request, response, next) => {
    try {
       const data = {
-         reqObj: request.body,
+         reqObj: {...request.body,currentUser: request.currentUser},
          offerId: request.params.id,
       };
       // const imagePathArr = await fileUploadingProcess(request.files, offerId);

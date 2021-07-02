@@ -24,7 +24,7 @@ router.get(
 );
 
 router.delete(
-    "/:id/:currency",
+    "/:uid/:currency",
     authMiddleware,
     usersCountryCurrencyController.remove
 );

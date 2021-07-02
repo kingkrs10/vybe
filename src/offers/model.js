@@ -9,7 +9,7 @@ var self = module.exports = {
 			let data = null;
 			if (result.rowCount > 0) {
 				const Obj = { reqObj: reqObj, offerId: reqObj.offerId};
-				const result1 = await module.exports.getOne(reqObj.offerId, client);
+				const result1 = await module.exports.getOne(reqObj, client);
 				data = result1 ? result1.data : null;
 				await self.updateHashTags(Obj, client);
 			}
@@ -33,7 +33,8 @@ var self = module.exports = {
 				[offerId, reqObj.headLine, `{${imageURlData}}`, reqObj.latitude, reqObj.longitude, reqObj.locationName, reqObj.offerDescription]);
 			let data = null;
 			if (result.rowCount > 0) {
-				const result1 = await module.exports.getOne(result.rows[0].offerId, client);
+				const Obj = { reqObj: reqObj, offerId: offerId};
+				const result1 = await module.exports.getOne({...reqObj, offerId: offerId}, client);
 				await self.updateHashTags(Obj, client);
 				data = result1 ? result1.data : null;
 			}
@@ -141,7 +142,8 @@ var self = module.exports = {
 	},
 
 	getOne: async (reqObj, client) => {
-		const { params, currentUser} = reqObj;
+		const { currentUser} = reqObj;
+		const id = reqObj.params ? reqObj.params.id : reqObj.offerId;
 		try {
 			const result = await client.query(`SELECT
 				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid userId, O."isActive",
@@ -151,7 +153,7 @@ var self = module.exports = {
 				( 3959 * acos( cos( radians($2) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( O.latitude ) ) ) ) AS distance
 				FROM offers O
 				INNER JOIN users U ON U.uid = O.uid
-				WHERE O."offerId" = $1`, [params.id, currentUser.latitude, currentUser.longitude]);
+				WHERE O."offerId" = $1`, [id, currentUser.latitude, currentUser.longitude]);
 			const data = result.rows[0];
 			if (result.rowCount > 0) {
 				return {error: false, data};

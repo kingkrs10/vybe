@@ -17,15 +17,15 @@ const create = async (request, response, next) => {
          "(users:updateBalance)",
          userModel.updateBalance
       );
-      if (!result.error){
-            sendErroresponse(response, result.message);
+      if (resUpdateBalance.error){
+            sendErroresponse(response, resUpdateBalance.message);
       } else if (!resUpdateBalance.error){
          const result = await commonModel.tryBlock(
             request.body,
             "(UserCountryCurrency:create)",
             userCountryCurrencyModel.bulkInsert
          );
-         if (!result.error){
+         if (result.error){
             sendErroresponse(response, result.message);
          } else if (!result.error){
             sendSuccessResponse(response, result['data']);
@@ -51,7 +51,8 @@ const update = async (request, response, next) => {
          "(UserCountryCurrency:update)",
          userCountryCurrencyModel.update
       );
-      if (!result.error){
+
+      if (result.error){
          sendErroresponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
@@ -70,15 +71,15 @@ const getUserCountryCurrency = async (request, response, next) => {
          "(UserCountryCurrency:getUserCountryCurrency)",
          userCountryCurrencyModel.getUserCountryCurrency
       );
-      if (!result.error){
+      if (result.error){
          sendErroresponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
-         responseController.sendSuccessResponse(response, result.data);
+         sendSuccessResponse(response, result.data);
       } else {
-         responseController.sendNoContentResponse(response);
+         sendNoContentResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()});
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -89,15 +90,15 @@ const remove = async (request, response, next) => {
          "(UserCountryCurrency:remove)",
          userCountryCurrencyModel.remove
       );
-      if (!result.error){
+      if (result.error){
          sendErroresponse(response, result.message);
-      } else if (!_isEmpty(result.data)) {
-         responseController.sendSuccessResponse(response, result.data);
+      } else if (!result.error) {
+         sendSuccessResponse(response, result.data);
       } else {
-         responseController.sendNoContentResponse(response);
+         sendInternalErrorResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()});
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 

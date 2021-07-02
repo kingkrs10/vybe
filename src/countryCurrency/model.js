@@ -23,7 +23,7 @@ var self = module.exports = {
 				WHERE "uid"= $1  AND currency = $2`, [uid, reqObj.currency, reqObj.amount, reqObj.oppPersonBalance, reqObj.balanceData]);
 			let data = [];
 			if (result.rowCount > 0) {
-				const result1 = await module.exports.getUserCountryCurrency(result.rows[0].uid, client);
+				const result1 = await module.exports.getUserCountryCurrency(uid, client);
 				data = result1 ? result1 : null;
 				return { error: false, data, message: 'Data updated successfully' };
 			} else {
@@ -71,7 +71,7 @@ var self = module.exports = {
 	},
 	remove: async (reqObj, client) => {
 		try {
-			const result = await client.query(`DELETE FROM public."users_countryCurrency"
+			const result = await client.query(`DELETE FROM "users_countryCurrency"
 				WHERE "uid"= $1  AND currency = $2`, [reqObj.uid, reqObj.currency]);
 			if (result.rowCount > 0) {
 				return { error: false, message: 'Deleted data successfully'};
@@ -108,7 +108,6 @@ var self = module.exports = {
 				return { error: false, message: 'Updated data successfully' };
 			}
 		} catch (err) {
-			console.log('err', err)
 			return { error: true, message: err.toString() };
 		}
 	},

@@ -1,13 +1,12 @@
 const usersModel = require("./model");
 const userCountryCurrencyModel = require("../countryCurrency/model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _isEmpty = require('lodash/isEmpty');
 const { firebaseAdmin } = require("../common/firebase");
 
 const create = async (request, response) => {
-   console.log('request.body', request.body);
    try {
       const userId = uuidv4();
       var imagePath = null;
