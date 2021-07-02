@@ -31,20 +31,22 @@ module.exports = {
 		try {
 			const limit = 50;
 			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 0;
+
 			var queryText = `SELECT
-			uid as userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "stripeCustomerId", latitude, longitude,
-			"currencyCode",	"currencySymbol", profession, "isActive", created_at, "phoneNumber", "firebaseUId" as uid
+			uid as userId, balance, "newdata","notificationUnReadcount", "deviceId", "fullName", "imageURl", "stripeCustomerId", latitude, longitude,
+			"currencyCode",	"currencySymbol", profession, "isActive", created_at, "phoneNumber", "firebaseUId" as uid,
+			( 3959 * acos( cos( radians($4) ) * cos( radians( U.latitude ) ) * cos( radians( U.longitude ) - radians($5) ) + sin( radians($4) ) * sin( radians( U.latitude ) ) ) ) AS distance
 			FROM users U
 			WHERE "isActive" = $1`;
-			var qryValue = [true, limit, pageNo]
+			var qryValue = [true, limit, pageNo, reqObj.latitude, reqObj.longitude]
 
 			if (reqObj.recentUsers) {
-				queryText = `${queryText} AND (created_at < current_date - interval '5 days')`;
+				queryText = `${queryText} AND (created_at > current_date - interval '7 days')`;
 			}
 
 			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
-				queryText = `${queryText} AND (LOWER("fullName") like LOWER($4) OR LOWER("profession") like LOWER($4))`;
-				qryValue = [true, limit, pageNo, `%${reqObj.searchTerm}%`];
+				queryText = `${queryText} AND (LOWER("fullName") like LOWER($6) OR LOWER("profession") like LOWER($6))`;
+				qryValue = [true, limit, pageNo, reqObj.latitude, reqObj.longitude, `%${reqObj.searchTerm}%`];
 			}
 
 			const result = await client.query(`${queryText} ORDER BY U.uid offset $3 limit $2 `, qryValue);
@@ -72,7 +74,7 @@ module.exports = {
 			if (result.rowCount > 0) {
 				return { error: false, data, message: 'get data successfully' };
 			} else {
-				return { error: false, message: "get data failed" };
+				return { error: false, data: [], message: "get data failed" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };
@@ -91,6 +93,7 @@ module.exports = {
 			return { error: true, message: error.toString() };
 		}
 	},
+
 	update: async (Obj, client) => {
 		try {
 			const { reqObj, uid } = Obj;
@@ -156,6 +159,7 @@ module.exports = {
 			return { error: true, message: error.toString() };
 		}
 	},
+
 	updateMobileNumber: async (obj, client) => {
 		try {
 			const { reqObj, uid } = obj;
@@ -163,6 +167,23 @@ module.exports = {
 				WHERE "firebaseUId" = $1`, [uid, reqObj.phoneNumber]
 			)
 			if (result) {
+				return { error: false, message: 'Data update successfully' };
+			} else {
+				return { error: true, message: "Data update failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString() };
+		}
+	},
+
+	updateBalance: async (reqObj, client) => {
+		console.log('updateBalance', reqObj);
+		try {
+			const result = await client.query(`UPDATE users SET
+				balance = $2, "currencyCode"= $3, "currencySymbol"= $4
+				where uid = $1`,
+				[reqObj.uid, reqObj.balance, reqObj.currencyCode, reqObj.currencySymbol]);
+			if (result.rowCount > 0) {
 				return { error: false, message: 'Data update successfully' };
 			} else {
 				return { error: true, message: "Data update failed" };

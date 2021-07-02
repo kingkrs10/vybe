@@ -1,6 +1,7 @@
+const _isEmpty = require('lodash/isEmpty');
 const notificationsModel = require("./model");
 const commonModel = require("../common/common");
-const responseController = require("../common/ResponseController");
+const {sendErroresponse, sendSuccessResponse, sendInternalErrorResponse, sendNoContentResponse} = require("../common/ResponseController");
 
 const create = async (request, response, next) => {
    try {
@@ -10,12 +11,14 @@ const create = async (request, response, next) => {
          notificationsModel.create
       );
       if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendSuccessResponse(response, result['data']);
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendInternalErrorResponse(response);
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -26,13 +29,15 @@ const getUsersNotification = async (request, response, next) => {
          "(Notifications:getUsersNotification)",
          notificationsModel.getUsersNotification
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+     if (!result.error){
+         sendErroresponse(response, result.message);
+      } else if(!_isEmpty(result.data)){
+         sendSuccessResponse(response, result['data']);
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendNoContentResponse(response);
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 

@@ -1,27 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const usersInvitesController = require("./controller");
+const usersCountryCurrencyController = require("./controller");
 const { authMiddleware, upload } = require('../common/common');
 
 router.post(
     "/",
     authMiddleware,
     upload.none(),
-    usersInvitesController.create
+    usersCountryCurrencyController.create
 );
 
 router.put(
     "/:id",
     authMiddleware,
     upload.none(),
-    usersInvitesController.update
+    usersCountryCurrencyController.update
 );
 
 router.get(
     "/:id",
     authMiddleware,
-    upload.none(),
-    usersInvitesController.getUserInvites
+    usersCountryCurrencyController.getUserCountryCurrency
+);
+
+router.delete(
+    "/:id/:currency",
+    authMiddleware,
+    usersCountryCurrencyController.remove
 );
 
 module.exports = router;

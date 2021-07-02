@@ -20,7 +20,7 @@ class ResponseController {
     sendInternalErrorResponse(response, resObj = {}) {
         resObj['statusCode'] = STATUS.INTERNAL_ERROR.CODE;
         resObj['statusMessage'] = STATUS.INTERNAL_ERROR.TEXT;
-        response.status(200).json({ data: resObj });
+        response.status(200).json(resObj);
     }
 
     sendNotAuthorizedResponse(response) {
@@ -28,13 +28,19 @@ class ResponseController {
             'statusCode': STATUS.NOT_AUTHORIZED.CODE,
             'statusMessage': STATUS.NOT_AUTHORIZED.TEXT
         };
-        response.status(200).json({ data: resObj });
+        response.status(200).json(resObj);
     }
 
     sendCreatedesponse(response, resObj = {}) {
         resObj['statusCode'] = STATUS.CREATED.CODE;
         resObj['statusMessage'] = STATUS.CREATED.TEXT;
         response.status(200).json({ data: resObj });
+    }
+    sendErroresponse(response, message) {
+        const resObj = {};
+        resObj['statusCode'] = STATUS.INTERNAL_ERROR.CODE;
+        resObj['statusMessage'] = message;
+        response.status(200).json(resObj);
     }
 }
 

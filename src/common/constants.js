@@ -11,6 +11,10 @@ exports.STATUS = {
         "CODE": 200,
         "TEXT": "Success"
     },
+    "NOT_AUTHORIZED": {
+        "CODE": 203,
+        "TEXT": "Not authorized"
+    },
     "NO_CONTENT": {
         "CODE": 204,
         "TEXT": "No content"
@@ -30,10 +34,6 @@ exports.STATUS = {
     "NOT_AUTHENTICATED": {
         "CODE": 401,
         "TEXT": "Invalid or Missing Credentials"
-    },
-    "NOT_AUTHORIZED": {
-        "CODE": 403,
-        "TEXT": "Not authorized"
     },
     "NOT_FOUND": {
         "CODE": 404,
@@ -63,7 +63,6 @@ exports.STATUS = {
         "CODE": 501,
         "TEXT": "Not implemented"
     },
-
     // API specific custome error codes
     "DB_NOT_AVAILABLE": {
         "CODE": 801,

@@ -74,9 +74,11 @@ const decodeJwtToken = async (token) => {
 
 const createJwtToken = async(userData) => {
     const payload = {
-        userId: userData.userId,
+        userId: userData.userid,
         firebaseUId: userData.uid,
         phoneNumber: userData.phoneNumber,
+        latitude: userData.latitude,
+        longitude: userData.longitude,
         logintime: Math.round(new Date().getTime() / 1000)
     };
     const token = jwt.sign(JSON.stringify(payload), config.app.secretKey);

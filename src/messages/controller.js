@@ -1,6 +1,7 @@
+const _isEmpty = require('lodash/isEmpty');
 const messagesModel = require("./model");
 const commonModel = require("../common/common");
-const responseController = require("../common/ResponseController");
+const {sendErroresponse, sendSuccessResponse, sendInternalErrorResponse, sendNoContentResponse} = require("../common/ResponseController");
 
 const create = async (request, response) => {
    try {
@@ -9,13 +10,15 @@ const create = async (request, response) => {
          "(Messages:create)",
          messagesModel.create
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendSuccessResponse(response, result['data']);
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendInternalErrorResponse(response);
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -30,13 +33,15 @@ const update = async (request, response, next) => {
          "(Messages:update)",
          messagesModel.update
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendSuccessResponse(response, result['data']);
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendInternalErrorResponse(response);
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -47,13 +52,15 @@ const getAll = async (request, response, next) => {
          "(Messages:getAll)",
          messagesModel.getAll
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if(!_isEmpty(result.data)){
+         sendSuccessResponse(response, result['data']);
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendNoContentResponse(response);
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -64,13 +71,15 @@ const getOne = async (request, response, next) => {
          "(Messages:getOne)",
          messagesModel.getOne
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendSuccessResponse(response, result['data']);
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendNoContentResponse(response)
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -81,13 +90,15 @@ const updateUnRead = async (request, response, next) => {
          "(Messages:updateUnRead)",
          messagesModel.updateUnRead
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendSuccessResponse(response, result['data']);
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendInternalErrorResponse(response);
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 
@@ -98,13 +109,15 @@ const remove = async (request, response, next) => {
          "(Messages:remove)",
          messagesModel.remove
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendSuccessResponse(response, result['data'])
 		} else {
-			responseController.sendInternalErrorResponse(response)
+			sendInternalErrorResponse(response)
 		}
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()})
    }
 };
 

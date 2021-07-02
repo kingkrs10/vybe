@@ -4,6 +4,7 @@ const config = require("../config/config");
 const userModel = require("../users/model");
 const Stripe = require("stripe");
 const stripe = Stripe(config.stripe_api_key);
+const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
 
 const createCustomer = async (request, response, next) => {
    try {
@@ -21,7 +22,7 @@ const createCustomer = async (request, response, next) => {
                "(Stripe:createNewCustomer)",
                userModel.updateStripeCustomerId
             );
-            response.status(200).send(result);
+            sendSuccessResponse(response, result);
          })
          .catch((err) => {
             console.log(
@@ -29,20 +30,10 @@ const createCustomer = async (request, response, next) => {
                new Date(),
                error
             );
-            response.status(200).send(
-               JSON.stringify({
-                  error: true,
-                  message: err.toString(),
-               })
-            );
+            sendErroresponse(response, err.toString());
          });
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      sendInternalErrorResponse(response);
    }
 };
 
@@ -64,20 +55,10 @@ const createCustomerCard = async (request, response, next) => {
                new Date(),
                error
             );
-            response.status(200).send(
-               JSON.stringify({
-                  error: true,
-                  message: err.toString(),
-               })
-            );
+            sendErroresponse(response, err.toString());
          });
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      sendInternalErrorResponse(response);
    }
 };
 
@@ -91,7 +72,7 @@ const getAllCardDetails = async (request, response, next) => {
                data: res.data,
                message: "Get All Customer's card Details",
             };
-            response.status(200).send(result);
+            sendSuccessResponse(response, result);
          })
          .catch((err) => {
             console.log(
@@ -99,20 +80,10 @@ const getAllCardDetails = async (request, response, next) => {
                new Date(),
                error
             );
-            response.status(200).send(
-               JSON.stringify({
-                  error: true,
-                  message: err.toString(),
-               })
-            );
+            sendErroresponse(response, err.toString());
          });
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      sendInternalErrorResponse(response);
    }
 };
 
@@ -126,7 +97,7 @@ const removeCustomerCard = async (request, response, next) => {
                data: res,
                message: "Removed customer's card successfully",
             };
-            response.status(200).send(result);
+            sendSuccessResponse(response, result);
          })
          .catch((err) => {
             console.log(
@@ -134,20 +105,10 @@ const removeCustomerCard = async (request, response, next) => {
                new Date(),
                error
             );
-            response.status(200).send(
-               JSON.stringify({
-                  error: true,
-                  message: err.toString(),
-               })
-            );
+            sendErroresponse(response, err.toString());
          });
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      sendInternalErrorResponse(response);
    }
 };
 
@@ -163,7 +124,7 @@ const updateDefaultPaymentCard = async (request, response, next) => {
                data: res,
                message: "Updated default payment card successfully",
             };
-            response.status(200).send(result);
+            sendSuccessResponse(response, result);
          })
          .catch((err) => {
             console.log(
@@ -171,20 +132,10 @@ const updateDefaultPaymentCard = async (request, response, next) => {
                new Date(),
                error
             );
-            response.status(200).send(
-               JSON.stringify({
-                  error: true,
-                  message: err.toString(),
-               })
-            );
+            sendErroresponse(response, err.toString());
          });
    } catch (err) {
-      response.status(200).send(
-         JSON.stringify({
-            error: true,
-            message: err.toString(),
-         })
-      );
+      sendInternalErrorResponse(response);
    }
 };
 

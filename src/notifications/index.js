@@ -8,6 +8,7 @@ router.post("/",
     upload.none(),
     notificationsController.create
 );
+
 router.get(
     "/:id",
     authMiddleware,

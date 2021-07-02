@@ -85,45 +85,48 @@ var self = module.exports = {
 				O."imageURl" offerImage,"firebaseOfferId",
 				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
 				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
-				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid
+				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
+				( 3959 * acos( cos( radians($5) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($6) ) + sin( radians($5) ) * sin( radians( O.latitude ) ) ) ) AS distance
 				FROM offers O
 				INNER JOIN users U ON U.uid = O.uid
 				WHERE O."isActive" =  $2
-				AND U."isActive" =  $2`;
-			var qryValue = [reqObj.userId, true, limit, pageNo];
+				AND U."isActive" =  $2
+				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
+				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)`;
+			var qryValue = [reqObj.userId, true, limit, pageNo, reqObj.latitude, reqObj.longitude];
 
 			if ((reqObj.category && !_isEmpty(reqObj.category)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
-					qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($5))`
-					qryText = `${qryText} AND (LOWER("headLine") like LOWER($6)
-						OR LOWER("offerDescription") like LOWER($6)
-						OR LOWER("locationName") like LOWER($6))`
-				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.category, `%${reqObj.searchTerm}%`]
+					qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($7))`
+					qryText = `${qryText} AND (LOWER("headLine") like LOWER($8)
+						OR LOWER("offerDescription") like LOWER($8)
+						OR LOWER("locationName") like LOWER($8))`
+				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.category, `%${reqObj.searchTerm}%`]
 
 			} else if ((reqObj.category && !_isEmpty(reqObj.category)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
-				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($5))`;
-				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.category]
+				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($7))`;
+				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.category]
 
 			}else if ((reqObj.location && !_isEmpty(reqObj.location)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
-				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($5)`;
-					qryText = `${qryText} AND (LOWER("headLine") like LOWER($6)
-						OR LOWER("offerDescription") like LOWER($6)
-						OR LOWER("locationName") like LOWER($6))`
-				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.location, `%${reqObj.searchTerm}%`]
+				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($7)`;
+					qryText = `${qryText} AND (LOWER("headLine") like LOWER($8)
+						OR LOWER("offerDescription") like LOWER($8)
+						OR LOWER("locationName") like LOWER($8))`
+				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.location, `%${reqObj.searchTerm}%`]
 
 			} else if ((reqObj.location && !_isEmpty(reqObj.location)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
-				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($5)`;
-				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.location];
+				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($7)`;
+				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.location];
 			} else if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)){
-				qryText = `${qryText} AND (LOWER("headLine") like LOWER($5)
-						OR LOWER("offerDescription") like LOWER($5)
-						OR LOWER("locationName") like LOWER($5))`;
-				qryValue = [reqObj.userId, true, limit, pageNo, `%${reqObj.searchTerm}%`]
+				qryText = `${qryText} AND (LOWER("headLine") like LOWER($7)
+						OR LOWER("offerDescription") like LOWER($7)
+						OR LOWER("locationName") like LOWER($7))`;
+				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, `%${reqObj.searchTerm}%`]
 			} else if (reqObj.uid) {
-				qryText = `${qryText} AND O.uid = $5`;
-				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.uid]
+				qryText = `${qryText} AND O.uid = $7`;
+				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.uid]
 			} else if (reqObj.favoriteUid) {
-				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $5)`;
-				qryValue = [reqObj.userId, true, limit, pageNo, reqObj.favoriteUid]
+				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $7)`;
+				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.favoriteUid]
 			}
 			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $4 limit $3`, qryValue);
 			const data = result.rows;
@@ -133,21 +136,22 @@ var self = module.exports = {
 				return { error: false, data:[], message: "get all data failed" };
 			}
 		} catch (error) {
-			console.log(error);
-			return { error: true, message: error.toString() };
+			return { error: true, message: error.toString()};
 		}
 	},
 
-	getOne: async (id, client) => {
+	getOne: async (reqObj, client) => {
+		const { params, currentUser} = reqObj;
 		try {
 			const result = await client.query(`SELECT
 				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid userId, O."isActive",
 				O."imageURl" offerImage, "firebaseOfferId",
 				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
-				(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount
+				(select count(uid) from offers_favorites OFS where  OFS."offerId" = $1) as favoriterCount,
+				( 3959 * acos( cos( radians($2) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( O.latitude ) ) ) ) AS distance
 				FROM offers O
 				INNER JOIN users U ON U.uid = O.uid
-				WHERE O."offerId" = $1`, [id]);
+				WHERE O."offerId" = $1`, [params.id, currentUser.latitude, currentUser.longitude]);
 			const data = result.rows[0];
 			if (result.rowCount > 0) {
 				return {error: false, data};
@@ -197,8 +201,8 @@ var self = module.exports = {
 			} else {
 				return [];
 			}
-		} catch (err){
-			console.log('err', err);
+		} catch (error){
+			return { error: true, message: error.toString() };
 		}
 	},
 
@@ -240,17 +244,22 @@ var self = module.exports = {
 			var qry = `SELECT DISTINCT "hashTag" as name,  count(OH."offerId") as length
 			FROM "offers_hashTags" OH
 			INNER JOIN "offers" O on O."offerId" = OH."offerId"
-			WHERE 1 = 1`;
+            INNER JOIN users U ON U.uid = O.uid
+			WHERE O."isActive" = $2
+			AND U."isActive" = $2
+			AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
+			AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)`;
+			var qryValue = [reqObj.userId,true];
 
 			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
-				qry = `${qry} AND (LOWER("hashTag") like LOWER($1)
-					OR LOWER("headLine") like LOWER($1)
-					OR LOWER("offerDescription") like LOWER($1)
-					OR LOWER("locationName") like LOWER($1))`;
-				result = await client.query(`${qry} group by name`, [`%${reqObj.searchTerm}%`]);
-			} else {
-				result = await client.query(`${qry} group by name`);
+				qry = `${qry}
+				AND (LOWER("hashTag") like LOWER($3)
+				OR LOWER("headLine") like LOWER($3)
+				OR LOWER("offerDescription") like LOWER($3)
+				OR LOWER("locationName") like LOWER($3))`;
+				qryValue = [reqObj.userId, true, `%${reqObj.searchTerm}%`];
 			}
+			const result = await client.query(`${qry} group by name`, qryValue);
 			if (result.rowCount > 0) {
 				return { error: false, data: result.rows, message: 'Get Data successfully' };
 			} else {
@@ -263,16 +272,20 @@ var self = module.exports = {
 
 	getAllLocation: async (reqObj, client) => {
 		try {
-			var qry = `SELECT DISTINCT "locationName" as name, count("offerId") as length FROM "offers" WHERE 1 = 1`;
-			var result = {};
+			var qry = `SELECT DISTINCT "locationName" as name, count("offerId") as length
+			FROM "offers" AS O
+            INNER JOIN users U ON U.uid = O.uid
+			WHERE O."isActive" = $1
+            AND U."isActive" = $1`;
+			var qryValue = [true];
+
 			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
-				qry = `${qry} AND (LOWER("locationName") like LOWER($1)
-				OR LOWER("headLine") like LOWER($1)
-				OR LOWER("offerDescription") like LOWER($1))` ;
-				result = await client.query(`${qry} group by "name"`, [`%${reqObj.searchTerm}%`]);
-			} else {
-				result = await client.query(`${qry} group by "name"`);
+				qry = `${qry} AND (LOWER("locationName") like LOWER($2)
+				OR LOWER("headLine") like LOWER($2)
+				OR LOWER("offerDescription") like LOWER($2))` ;
+				qryValue = [true, `%${reqObj.searchTerm}%`];
 			}
+			const result = await client.query(`${qry} group by "name"`, qryValue);
 			if (result.rowCount > 0) {
 				return { error: false, data: result.rows, message: 'Get Data successfully' };
 			} else {

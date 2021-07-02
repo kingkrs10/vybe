@@ -1,6 +1,7 @@
 const userInvitesModel = require("./model");
 const commonModel = require("../common/common");
-const responseController = require("../common/ResponseController");
+const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
+const _isEmpty = require('lodash/isEmpty');
 
 const create = async (request, response, next) => {
    try {
@@ -9,13 +10,15 @@ const create = async (request, response, next) => {
          "(UserInvites:create)",
          userInvitesModel.create
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendCreatedesponse(response, result['data']);
       } else {
-         responseController.sendInternalErrorResponse(response)
+         sendInternalErrorResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -30,13 +33,15 @@ const update = async (request, response, next) => {
          "(UserInvites:update)",
          userInvitesModel.update
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+       if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error){
+         sendSuccessResponse(response, result['data']);
       } else {
-         responseController.sendInternalErrorResponse(response)
+         sendInternalErrorResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 
@@ -47,13 +52,15 @@ const getUserInvites = async (request, response, next) => {
          "(UserInvites:getUserInvites)",
          userInvitesModel.getUserInvites
       );
-      if (!result.error){
-         responseController.sendSuccessResponse(response, result['data'])
+       if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)) {
+         sendSuccessResponse(response, result.data);
       } else {
-         responseController.sendInternalErrorResponse(response)
+         sendNoContentResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString()})
+      sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
 

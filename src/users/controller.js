@@ -1,15 +1,15 @@
 const usersModel = require("./model");
+const userCountryCurrencyModel = require("../countryCurrency/model");
 const commonModel = require("../common/common");
-const responseController = require("../common/ResponseController");
+const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _isEmpty = require('lodash/isEmpty');
-
 const { firebaseAdmin } = require("../common/firebase");
 
 const create = async (request, response) => {
+   console.log('request.body', request.body);
    try {
       const userId = uuidv4();
-
       var imagePath = null;
       // if (request.file) {
       //    const result = await commonModel.fileUpload(
@@ -28,30 +28,39 @@ const create = async (request, response) => {
          "(User:create)",
          usersModel.create
       );
-      if (!result.error) {
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)) {
+         sendCreatedesponse(response, result.data);
       } else {
-         responseController.sendInternalErrorResponse(response)
+         sendInternalErrorResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() });
    }
 };
 
 const getAll = async (request, response, next) => {
+   const reqObj = {
+      ...request.query,
+      ...request.currentUser
+   }
    try {
       const result = await commonModel.tryBlock(
-         request.query,
+         reqObj,
          "(User:getAll)",
          usersModel.getAll
       );
-      if (!_isEmpty(result.data)) {
-         responseController.sendSuccessResponse(response, result.data)
+
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)) {
+         sendSuccessResponse(response, result.data);
       } else {
-         responseController.sendNoContentResponse(response)
+         sendNoContentResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() });
    }
 };
 
@@ -62,47 +71,108 @@ const getOne = async (request, response, next) => {
          "(User:getOne)",
          usersModel.getOne
       );
-      if (!_isEmpty(result.data)) {
-         responseController.sendSuccessResponse(response, result.data)
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)) {
+         const resUserCountryCurrency = await commonModel.tryBlock(
+            result.data.userid,
+            "(Offers:getUserCountryCurrency)",
+            userCountryCurrencyModel.getUserCountryCurrency
+         );
+         const resultData = {
+            ...result.data, countryCurrency: resUserCountryCurrency.data,
+            currencyDetails: { code: result.data.currencyCode, symbol: result.data.currencySymbol }};
+
+         sendSuccessResponse(response, resultData);
       } else {
-         responseController.sendNoContentResponse(response)
+         sendNoContentResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() });
    }
 };
 
+// const updateMobileNumber = async (request, response) => {
+//    try {
+//       firebaseAdmin.auth().updateUser(request.params.id, { phoneNumber: request.body.phoneNumber })
+//          .then(async function (userRecord) {
+//             const data = {
+//                reqObj: request.body,
+//                uid: request.params.id,
+//             };
+//             // if (request.file) {
+//             //    const result = await commonModel.fileUpload(
+//             //       request.file,
+//             //       request.params.id,
+//             //       "profile"
+//             //    );
+//             //    if (result.fileLocation) {
+//             //       data.reqObj.imageURl = result.fileLocation;
+//             //    }
+//             // }
+//             if (!_isEmpty(request.body.profileImage)) {
+//                data.reqObj.imageURl = request.body.profileImage;
+//             }
+//             const result = await commonModel.tryBlock(
+//                data,
+//                "(User:update)",
+//                usersModel.update
+//             );
+//             if (!result.error) {
+//                sendSuccessResponse(response, result['data'])
+//             } else {
+//                sendInternalErrorResponse(response)
+//             }
+//          })
+//          .catch(function (error) {
+//             sendInternalErrorResponse(response)
+//          });
+//    } catch (error) {
+//       sendInternalErrorResponse(response, { message: err.toString() })
+//    }
+// };
+
+
+
 const update = async (request, response, next) => {
    try {
-      const data = {
-         reqObj: request.body,
-         uid: request.params.id,
-      };
-      // if (request.file) {
-      //    const result = await commonModel.fileUpload(
-      //       request.file,
-      //       request.params.id,
-      //       "profile"
-      //    );
-      //    if (result.fileLocation) {
-      //       data.reqObj.imageURl = result.fileLocation;
-      //    }
-      // }
-      if (!_isEmpty(request.body.profileImage)) {
-         data.reqObj.imageURl = request.body.profileImage;
-      }
-      const result = await commonModel.tryBlock(
-         data,
-         "(User:update)",
-         usersModel.update
-      );
-      if (!result.error) {
-         responseController.sendSuccessResponse(response, result['data'])
-      } else {
-         responseController.sendInternalErrorResponse(response)
-      }
-   } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      firebaseAdmin.auth().updateUser(request.params.id, { phoneNumber: request.body.phoneNumber })
+         .then(async function (userRecord) {
+            const data = {
+               reqObj: request.body,
+               uid: request.params.id,
+            };
+            // if (request.file) {
+            //    const result = await commonModel.fileUpload(
+            //       request.file,
+            //       request.params.id,
+            //       "profile"
+            //    );
+            //    if (result.fileLocation) {
+            //       data.reqObj.imageURl = result.fileLocation;
+            //    }
+            // }
+            if (!_isEmpty(request.body.profileImage)) {
+               data.reqObj.imageURl = request.body.profileImage;
+            }
+            const result = await commonModel.tryBlock(
+               data,
+               "(User:update)",
+               usersModel.update
+            );
+            if (result.error) {
+               sendErroresponse(response, result.message);
+            } else if (!result.error) {
+               sendSuccessResponse(response, result['data'])
+            } else {
+               sendInternalErrorResponse(response)
+            }
+         })
+         .catch(function (error) {
+            sendInternalErrorResponse(response)
+         });
+   } catch (error) {
+      sendInternalErrorResponse(response, { message: err.toString() })
    }
 };
 
@@ -113,13 +183,15 @@ const remove = async (request, response, next) => {
          "(User:remove)",
          usersModel.remove
       );
-      if (!result.error) {
-         responseController.sendSuccessResponse(response, result)
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error) {
+         sendSuccessResponse(response, result);
       } else {
-         responseController.sendInternalErrorResponse(response)
+         sendInternalErrorResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() })
    }
 };
 
@@ -134,13 +206,15 @@ const updateLocation = async (request, response, next) => {
          "(User:updateLocation)",
          usersModel.updateLocation
       );
-      if (!result.error) {
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error) {
+         sendSuccessResponse(response, result['data'])
       } else {
-         responseController.sendInternalErrorResponse(response)
+         sendInternalErrorResponse(response)
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() })
    }
 };
 
@@ -155,13 +229,15 @@ const updateBlockedUsers = async (request, response, next) => {
          "(User:updateBlockedUsers)",
          usersModel.updateBlockedUsers
       );
-      if (!result.error) {
-         responseController.sendSuccessResponse(response, result['data'])
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!result.error) {
+         sendSuccessResponse(response, result['data'])
       } else {
-         responseController.sendInternalErrorResponse(response)
+         sendInternalErrorResponse(response)
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() })
    }
 };
 
@@ -172,14 +248,16 @@ const getAuthToken = async (request, response, next) => {
          "(User:getAuthToken)",
          usersModel.getOne
       );
-      const JwtToken = await commonModel.createJwtToken(result.data);
-      if (!_isEmpty(result.data)) {
-         responseController.sendSuccessResponse(response, { authToken: JwtToken })
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)) {
+         const JwtToken = await commonModel.createJwtToken(result.data);
+         sendSuccessResponse(response, { authToken: JwtToken })
       } else {
-         responseController.sendNoContentResponse(response)
+         sendNoContentResponse(response)
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() })
    }
 };
 
@@ -187,6 +265,7 @@ const getRecentUsers = async (request, response, next) => {
    try {
       const reqObj = {
          ...request.query,
+         ...request.currentUser,
          recentUsers: true
       }
       const result = await commonModel.tryBlock(
@@ -194,43 +273,17 @@ const getRecentUsers = async (request, response, next) => {
          "(User:getRecentUsers)",
          usersModel.getAll
       );
-      if (!_isEmpty(result.data)) {
-         responseController.sendSuccessResponse(response, result.data)
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)) {
+         sendSuccessResponse(response, result.data);
       } else {
-         responseController.sendNoContentResponse(response)
+         sendNoContentResponse(response);
       }
    } catch (err) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
+      sendInternalErrorResponse(response, { message: err.toString() });
    }
 };
-
-const updateMobileNumber = async (request, response) => {
-   try {
-      firebaseAdmin.auth().updateUser(request.params.id, { phoneNumber: request.body.phoneNumber })
-         .then(async function (userRecord) {
-            const data = {
-               reqObj: request.body,
-               uid: request.params.id,
-            };
-            const result = await commonModel.tryBlock(
-               data,
-               "(User:updateMobileNumber)",
-               usersModel.updateMobileNumber
-            )
-            if (!result.error) {
-               responseController.sendSuccessResponse(response, result['data'])
-            } else {
-               responseController.sendInternalErrorResponse(response)
-            }
-         })
-         .catch(function (error) {
-            responseController.sendInternalErrorResponse(response)
-         });
-   } catch (error) {
-      responseController.sendInternalErrorResponse(response, { message: err.toString() })
-   }
-};
-
 
 module.exports = {
    create,
@@ -241,6 +294,5 @@ module.exports = {
    updateLocation,
    updateBlockedUsers,
    getAuthToken,
-   getRecentUsers,
-   updateMobileNumber
+   getRecentUsers
 };

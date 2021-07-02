@@ -12,6 +12,7 @@ const notificationsRouter = require("./src/notifications");
 const chatsRouter = require("./src/chats");
 const messagesRouter = require("./src/messages");
 const stripeRouter = require("./src/stripe");
+const countryCurrencyRouter = require("./src/countryCurrency");
 const notification_options = {
    priority: "high",
    timeToLive: 60 * 60 * 24
@@ -28,6 +29,7 @@ app.use("/notifications", notificationsRouter);
 app.use("/chats", chatsRouter);
 app.use("/messages", messagesRouter);
 app.use("/stripe", stripeRouter);
+app.use("/countryCurrency", countryCurrencyRouter);
 
 app.post('/firebase/notification', upload.none(), authMiddleware, (req, res) => {
    const { deviceId, name } = req.body;
