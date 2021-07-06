@@ -1,10 +1,10 @@
-// import Stripe from 'stripe';
 const commonModel = require("../common/common");
 const config = require("../config/config");
 const userModel = require("../users/model");
 const Stripe = require("stripe");
-const stripe = Stripe(config.stripe_api_key);
 const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
+
+const stripe = Stripe(config.stripe_api_key);
 
 const createCustomer = async (request, response, next) => {
    try {
@@ -25,11 +25,6 @@ const createCustomer = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            console.log(
-               `error: 'Stripe: Create a new customer's card'`,
-               new Date(),
-               error
-            );
             sendErroresponse(response, err.toString());
          });
    } catch (err) {
@@ -47,14 +42,9 @@ const createCustomerCard = async (request, response, next) => {
                data: res,
                message: "Created customer's new card successfully",
             };
-            response.status(200).send(result);
+            sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            console.log(
-               `error: 'Stripe: Create a new customer's card`,
-               new Date(),
-               error
-            );
             sendErroresponse(response, err.toString());
          });
    } catch (err) {
@@ -65,21 +55,16 @@ const createCustomerCard = async (request, response, next) => {
 const getAllCardDetails = async (request, response, next) => {
    try {
       await stripe.customers
-         .listSources(request.params.id, { object: "card", limit: 10 })
+         .listSources(request.body.customer_Id, { object: "card", limit: 10 })
          .then((res) => {
             const result = {
                error: false,
                data: res.data,
-               message: "Get All Customer's card Details",
+               message: "Get Customer's all card Details",
             };
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            console.log(
-               `error: 'Stripe: Get All customer's card`,
-               new Date(),
-               error
-            );
             sendErroresponse(response, err.toString());
          });
    } catch (err) {
@@ -100,11 +85,6 @@ const removeCustomerCard = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            console.log(
-               `error: 'Stripe: Remove customer's card`,
-               new Date(),
-               error
-            );
             sendErroresponse(response, err.toString());
          });
    } catch (err) {
@@ -113,11 +93,10 @@ const removeCustomerCard = async (request, response, next) => {
 };
 
 const updateDefaultPaymentCard = async (request, response, next) => {
+   const { customer_Id, customerCard_Id } = request.body;
    try {
       await stripe.customers
-         .update(request.body.customer_Id, {
-            default_source: request.body.customerCard_Id,
-         })
+         .update(customer_Id, { default_source: customerCard_Id})
          .then((res) => {
             const result = {
                error: false,
@@ -127,11 +106,50 @@ const updateDefaultPaymentCard = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            console.log(
-               `error: 'Stripe: Update default payment customer's card`,
-               new Date(),
-               error
-            );
+            sendErroresponse(response, err.toString());
+         });
+   } catch (err) {
+      sendInternalErrorResponse(response);
+   }
+};
+
+const geCustomerDetails = async (request, response, next) => {
+   try {
+      await stripe.customers
+         .retrieve(request.body.customer_Id)
+         .then((res) => {
+            const result = {
+               error: false,
+               data: res,
+               message: "Get Customer's Details",
+            };
+            sendSuccessResponse(response, result);
+         })
+         .catch((err) => {
+            sendErroresponse(response, err.toString());
+         });
+   } catch (err) {
+      sendInternalErrorResponse(response);
+   }
+};
+
+const payWithStripe = async (request, response, next) => {
+   try {
+      let checkData= request.body.cardId === ''?{
+         amount: request.body.amount * 100,
+         currency: request.body.currency,
+         customer: request.body.customer_Id,
+      }:{
+         amount: request.body.amount * 100,
+         currency: request.body.currency,
+         customer: request.body.customer_Id,
+         card:request.body.cardId
+      }
+      await stripe.charges.create(checkData)
+         .then((result) => {
+            sendSuccessResponse(response, result);
+         })
+         .catch((err) => {
             sendErroresponse(response, err.toString());
          });
    } catch (err) {
@@ -145,4 +163,6 @@ module.exports = {
    getAllCardDetails,
    removeCustomerCard,
    updateDefaultPaymentCard,
+   geCustomerDetails,
+   payWithStripe
 };

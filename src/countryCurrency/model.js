@@ -110,5 +110,6 @@ var self = module.exports = {
 		} catch (err) {
 			return { error: true, message: err.toString() };
 		}
-	},
+	}
+
 };

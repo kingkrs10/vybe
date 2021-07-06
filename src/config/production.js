@@ -29,4 +29,8 @@ module.exports = {
       client_x509_cert_url:
          "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-pb4nj%40luhu-production.iam.gserviceaccount.com",
    },
+   twilioTest: {
+      accountSid: 'AC7527c54a4e94b4cf887855d63d55287b',
+      authToken: 'b6f938eeabeaca59a58cf18edc6e9def',
+   }
 };

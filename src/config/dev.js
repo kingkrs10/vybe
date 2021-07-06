@@ -8,7 +8,6 @@ module.exports = {
       cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
 
-
    app: {
       port: 8081,
       secretKey: "luhu-jwt-stuff-secret"
@@ -30,4 +29,8 @@ module.exports = {
       client_x509_cert_url:
          "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-52ar2%40luhu-dev.iam.gserviceaccount.com",
    },
+   twilioTest: {
+      accountSid: 'AC7527c54a4e94b4cf887855d63d55287b',
+      authToken: 'b6f938eeabeaca59a58cf18edc6e9def',
+   }
 };
