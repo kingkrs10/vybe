@@ -24,4 +24,38 @@ router.post(
     controller.sendMail
 );
 
+router.post(
+    "/migration",
+    upload.none(),
+    authMiddleware,
+    controller.migration
+);
+
+router.post(
+    "/firebaseImageDownload/:id",
+    upload.none(),
+    authMiddleware,
+    controller.firebaseImageDownload
+);
+
+router.post(
+    "/firebaseImageResize/:id",
+    upload.none(),
+    authMiddleware,
+    controller.firebaseImageResize
+);
+
+router.post(
+    "/firebaseImageUpload/:id",
+    upload.none(),
+    authMiddleware,
+    controller.firebaseImageUpload
+);
+router.post(
+    "/firebaseImageDelete/:id",
+    upload.none(),
+    authMiddleware,
+    controller.firebaseImageDelete
+);
+
 module.exports = router;

@@ -1,10 +1,31 @@
 const twilio = require("twilio");
 const nodemailer = require("nodemailer");
 const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
-const { firebaseAdmin } = require("../common/firebase");
-const { twilioTest } = require("../config/config");
+const { firebaseAdmin, bucket } = require("../common/firebase");
+const pgHelper = require("../common/pgHelper");
+const {Storage} = require('@google-cloud/storage');
+const isImage = require('is-image');
+
+const {
+   twilioTest,
+   firbaseDatabaseFileName,
+   users_collection_name,
+   offers_collection_name,
+   currency_collection_name,
+   transaction_history_collection_name,
+   firebaseProjectId,
+   firbaseCredentialsFileName
+} = require("../config/config");
 const accountSid = twilioTest.accountSid;
 const authToken = twilioTest.authToken;
+const fs = require('fs');
+var {join, dirname} = require('path');
+const { v4: uuidv4 } = require("uuid");
+const _isEmpty = require('lodash/isEmpty');
+const { tmpdir } = require("os");
+const fse = require('fs-extra');
+const sharp = require("sharp");
+const { replace } = require("lodash");
 
 const client = nodemailer.createTransport({
    host: "smtp.gmail.com",
@@ -24,9 +45,25 @@ const notification_options = {
    timeToLive: 60 * 60 * 24,
 };
 
+const bucketName = firebaseProjectId;
+const credentialsFilePath = join(__dirname,`../../public/backup/${firbaseCredentialsFileName}`);
+// const bucketName = "luhu-production.appspot.com";
+// const credentialsFilePath = join(__dirname,`../../public/backup/serviceAccountKey-production.json`);
+const storage = new Storage({
+   keyFilename: credentialsFilePath,
+   projectId: bucketName
+});
+var myBucket = storage.bucket(bucketName);
+
+// const workingTumpDir = join(tmpdir(), 'thump');
+const workingDir = join(tmpdir(), 'downloadImg');
+const workingTumpDir = join(tmpdir(), 'thump');
+var downloadFilepath = join(workingDir, 'source.png');
+fse.ensureDir(workingDir);
+fse.ensureDir(workingTumpDir);
+
 const pushFirebaseNotification = async (request, response) => {
    try {
-      console.log('pushFirebaseNotification', request.body);
       const { deviceId, name } = request.body;
       var registrationToken = deviceId;
       var message = {
@@ -79,9 +116,8 @@ const sendSMS = async (request, response) => {
 const sendMail = async (request, response) => {
    try {
       const { reportMessage, reportFrom, reportTo, deviceId } = request.body;
-
-      // const destAdd = "luhubusiness@gmail.com";
-      const destAdd = "kannan.d@mitrahsoft.com";
+      const destAdd = "luhubusiness@gmail.com";
+      // const destAdd = "kannan.d@mitrahsoft.com";
 
       const mailOptionsInfo = {
          from: "luhubusiness@gmail.com",
@@ -102,6 +138,7 @@ const sendMail = async (request, response) => {
             sound: "default",
          },
       };
+
       var deviceToken = deviceId;
       firebaseAdmin
          .messaging()
@@ -132,9 +169,473 @@ const sendMail = async (request, response) => {
    }
 }
 
+const migration = async (request, response) => {
+   let qryClient = null;
+   try {
+      qryClient = await pgHelper.getClientFromPool();
+   } catch (err) {
+      throw err;
+   }
+
+   try {
+      const filePath = join(__dirname,`../../public/backup/${firbaseDatabaseFileName}`);
+      let rawdata = fs.readFileSync(filePath);
+      let jsonData = JSON.parse(rawdata)["__collections__"];
+
+      const userData = jsonData[users_collection_name];
+      const OfferData = jsonData[offers_collection_name];
+      const currencyData = jsonData[currency_collection_name];
+      const transactionHistoryData = jsonData[transaction_history_collection_name];
+      // console.log('userData', userData);
+
+      const tempUserData = Object.keys(userData);
+      const tempOfferData = Object.keys(OfferData);
+      const temptransactionHistoryData = Object.keys(transactionHistoryData);
+      // console.log('tempUserData', tempUserData.length);
+      // console.log('tempOfferData', tempOfferData.length);
+      const blockedUsersId = [];
+      const inviteNumbersArr = [];
+      //  Saved Users details
+      await tempUserData.map( async (item, index) =>{
+         const value = userData[item];
+         const checkAvailable = await qryClient.query(`SELECT "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [item] );
+         if(_isEmpty(checkAvailable.rows[0])) {
+            const userId = uuidv4();
+            if(value.blockListID && !_isEmpty(value.blockListID)){
+               blockedUsersId.push({firebaseUId: item,userId: userId, blockListID: value.blockListID});
+            }
+            if(value.inviteNumber && !_isEmpty(value.inviteNumber)){
+               inviteNumbersArr.push({firebaseUId: item, userId: userId, inviteNumber: value.inviteNumber});
+            }
+            const milliseconds = value["registrationDate"]? value["registrationDate"]["value"]["_seconds"] * 1000  : '';
+            const date = milliseconds ? new Date(milliseconds) : new Date;
+            const reqObj = {
+               balance : value["balance"] || 0,
+               notificationUnReadcount: value['count'] || 0,
+               deviceId: value['deviceId'] || null,
+               fullName: value['fullname'],
+               imageURl: value['imageURl'] || null,
+               stripeCustomerId: value["stripeCustomerId"] || '',
+               latitude: value["currentLocation"] ? value["currentLocation"]["latitude"] : '',
+               longitude: value["currentLocation"] ? value["currentLocation"]["longitude"] : '',
+               currencyCode:  value["currencyDetails"] ? value["currencyDetails"]["code"] : '',
+               currencySymbol:  value["currencyDetails"] ? value["currencyDetails"]["symbol"] : '',
+               profession: value['profession'] || null,
+               created_at: date,
+               phoneNumber: value['phoneNumber'] || null,
+               firebaseUId : value["uid"] ? value["uid"] : item
+            }
+            const result = await qryClient.query(`INSERT INTO users(
+				   uid, balance, "notificationUnReadcount", "deviceId",
+				   "fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
+				   "currencyCode", "currencySymbol", profession, created_at, "firebaseUId")
+					VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING uid`,
+				[userId, reqObj.balance, reqObj.notificationUnReadcount, `{${reqObj.deviceId}}`,
+				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
+				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.created_at, reqObj.firebaseUId]);
+
+            if(value.countryCurrency && !_isEmpty(value.countryCurrency)){
+               await value.countryCurrency.map(async items => {
+                  await qryClient.query(`INSERT INTO "users_countryCurrency"(uid, amount, "oppPersonBalance", currency, label, value, "balanceData")
+                  VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING "uid"`,
+                  [userId, items.amount, items.oppPersonBalance, items.currency, items.label, items.value, items.balanceData]);
+               });
+            }
+
+            if(index === tempUserData.length-1) {
+               if(!_isEmpty(blockedUsersId)){
+                  await blockedUsersId.map(async item => {
+                     item.blockListID.map(async bUid => {
+                        const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [bUid] );
+                        const blockedUserId = userData.rows[0]?.uid || null;
+                        if(blockedUserId){
+                           await qryClient.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [item.userId, blockedUserId]);
+                        }
+                     })
+                  })
+               }
+               if(!_isEmpty(inviteNumbersArr)){
+                  await inviteNumbersArr.map(async item => {
+                     item.inviteNumber.map(async phoneNo => {
+                        // const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [phoneNo] );
+                        // const invitedUserId = userData.rows[0].uid;
+                        // if(invitedUserId){
+                        await qryClient.query(`INSERT INTO users_invites("senderUId", "receiverPhoneNumber", status)
+			               VALUES($1, $2, $3)`, [item.userId, phoneNo, 0]);
+                        // }
+                     })
+                  })
+               }
+            }
+         }
+      });
+
+      console.log('done User collection Details');
+
+      //Offer Collection save into DB
+      const notDoneOffers = [];
+      const offerFavoriteList = [];
+      const reportListIDsArr = [];
+
+      const result = await tempOfferData.map( async (item, index) =>{
+         const value = OfferData[item];
+         // console.log('value',value);
+         const checkAvailable = await qryClient.query(`SELECT "firebaseOfferId" FROM offers WHERE "firebaseOfferId" = $1`, [item] );
+         const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['uid']] );
+         if(_isEmpty(checkAvailable.rows[0])) {
+            if(!_isEmpty(userData.rows[0])){
+               const userId = userData.rows[0].uid;
+               const offerId = uuidv4();
+               if(value.tempFavoriteID && !_isEmpty(value.tempFavoriteID)){
+                  offerFavoriteList.push({firebaseOfferId: item, offerId: offerId, tempFavoriteIDs: value.tempFavoriteID});
+               }
+               if(value.reportListID && !_isEmpty(value.reportListID)){
+                  reportListIDsArr.push({firebaseOfferId: item, offerId: offerId, reportListID: value.reportListID});
+               }
+               const transactionTime = value["createdAt"]? value["createdAt"]["value"]["_seconds"] * 1000  : '';
+               const createdAt = transactionTime ? new Date(transactionTime) : new Date();
+               const reqObj = {
+                  headLine : value["headline"] || null,
+                  imageURl: value['offerImage'] || null,
+                  latitude: value["latitude"] || null,
+                  longitude: value["longitude"] || null,
+                  offerDescription: value['offerDescription'] || null,
+                  locationName: value['locationName'],
+                  firebaseOfferId: item
+               }
+               await qryClient.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt")
+                  VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+               [offerId, reqObj.headLine, `{${reqObj.imageURl}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, userId, reqObj.locationName, reqObj.firebaseOfferId, createdAt]);
+
+               if(value['offerHashTag'] && !_isEmpty(value['offerHashTag'])){
+                  qryClient.query(`INSERT INTO "offers_hashTags"("offerId", "hashTag") VALUES ($1, $2)`, [offerId, value['offerHashTag']]);
+               }
+            } else {
+               notDoneOffers.push(item);
+            }
+         }
+
+         if(index === tempOfferData.length-1){
+            if(!_isEmpty(offerFavoriteList)){
+               await offerFavoriteList.map(async item => {
+                  item.tempFavoriteIDs.map(async favoriteID => {
+                     const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [favoriteID] );
+                     const favoriteUId = userData.rows[0]?.uid || null;
+                     if(favoriteUId){
+                        const favoriteData = await qryClient.query(`SELECT "uid", "offerId" FROM offers_favorites WHERE "offerId" = $1 AND uid = $2`, [item.offerId, favoriteUId] );
+                        if(_isEmpty(favoriteData.rows[0])){
+                           await qryClient.query(`INSERT INTO "offers_favorites" ("offerId", uid) VALUES ($1, $2)`, [item.offerId, favoriteUId]);
+                        }
+                     }
+                  })
+               })
+            }
+
+            if(!_isEmpty(reportListIDsArr)){
+               await reportListIDsArr.map(async item => {
+                  item.reportListID.map(async reporterId => {
+                     const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [reporterId] );
+                     const reporterUserId = userData.rows[0]?.uid || null;
+                     if(reporterUserId){
+                        await qryClient.query(`INSERT INTO offers_reports("offerId", "reporterUId") VALUES ($1, $2)`, [item.offerId, reporterUserId]);
+                     }
+                  })
+               })
+            }
+            return true;
+         }
+      });
+      console.log('done Offers collection Details');
+      // Transaction History Data Save Prcess.
+      await temptransactionHistoryData.map( async (item, index) =>{
+         const value = transactionHistoryData[item];
+         // console.log('temptransactionHistoryData', value);
+         const senderUserData = await qryClient.query(`SELECT "uid", "currencyCode", "currencySymbol", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['sender_id']]);
+         const receiverUserData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['receiver_id']]);
+         const checkAvailable = await qryClient.query(`SELECT "firebaseTransactionId" FROM transaction_histories WHERE "firebaseTransactionId" = $1`, [item] );
+         const senderData = senderUserData.rows[0] || null;
+         const transactionTime = value["transaction_date"]? value["transaction_date"]["value"]["_seconds"] * 1000  : '';
+         const createdAt = transactionTime ? new Date(transactionTime) : new Date();
+
+         if(_isEmpty(checkAvailable.rows[0])) {
+            if(!_isEmpty(senderData) && !_isEmpty(receiverUserData.rows[0]) ){
+               const senderID = senderData?.uid ;
+               const receiverID = receiverUserData.rows[0]?.uid;
+               const transactionId = uuidv4();
+               const reqObj = {
+                  amount: value['amount'] || null,
+                  senderUId: senderID || null,
+                  receiverUId: receiverID || null,
+                  senderCurrencyCode: value['senderSymbol'] ? value['senderCurrency'] : senderData.currencyCode ? senderData.currencyCode : null,
+                  senderSymbol: value['senderSymbol'] ? value['senderSymbol'] : senderData["currencySymbol"] ? senderData["currencySymbol"] : null,
+                  firebaseTransactionId: item
+               }
+               await qryClient.query(`INSERT INTO "transaction_histories" ("transactionId", amount, "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt")
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, [transactionId, reqObj.amount, reqObj.senderUId, reqObj.receiverUId, reqObj.senderCurrencyCode, reqObj.senderSymbol, reqObj.firebaseTransactionId, createdAt]);
+            }
+         }
+      });
+      console.log('done Transaction History Data collection Details');
+      //  Saved currency Details
+      delete currencyData.currencyDetails["__collections__"];
+      await qryClient.query(`DELETE FROM "currency"`);
+		await qryClient.query(`INSERT INTO "currency"(id, "currencyDetails") VALUES($1, $2)`, [uuidv4(), [currencyData.currencyDetails]]);
+      console.log('currency Data saved sucessfully');
+
+      sendSuccessResponse(response, {});
+   } catch (error) {
+      sendInternalErrorResponse(response, { message: error.toString() });
+   }
+}
+
+const fetchImages = async (collectionName) => {
+   console.log('fetchCall');
+   const [files] = await myBucket.getFiles();
+   const Images = [];
+   const ResizedImages = []
+
+   await files.map(item => {
+      if(!item.name.includes('_200x200') && !item.name.includes('_400x400') && !item.name.includes('_1080x1080')){
+         Images.push(item.name);
+      } else {
+         ResizedImages.push(item.name);
+      }
+   });
+
+   const checkAvailable = (filename) => {
+      const res = ResizedImages.filter(i => i.includes(filename));
+      return res.length ? true : false;
+   }
+
+   console.log('get file1', files.length, Images.length, ResizedImages.length);
+   const collectionImages = []
+   await Promise.all(
+      Images.map(item => {
+         const tempFilename = item.split('.');
+         if(item.includes(collectionName) && !checkAvailable(`${tempFilename[0]}`)){
+            collectionImages.push(item);
+         }
+      })
+   )
+   return collectionImages;
+}
+
+
+const firebaseImageDownload = async (request, response) => {
+   console.log('firebaseImageDownload');
+   try {
+      const downloadSuccess = [];
+      const downloadFail = [];
+      // const imagesData = await fetchImages(request.params.id);
+      const imagesData = [];
+      console.log('imagesData', imagesData.length);
+      await Promise.all(imagesData.map(async (file, index) => {
+         const fileNameArr = file.split('/');
+         const fileName = fileNameArr.pop();
+         // DownLoad Source File
+         downloadFilepath = join(workingDir, `${fileNameArr[1]}_temp_${fileName}`);
+         try {
+            await myBucket.file(file).download({
+               destination: downloadFilepath
+            });
+            downloadSuccess.push(file);
+         } catch (error) {
+            downloadFail.push(file);
+            console.log('download error', error);
+         }
+      }));
+      console.log('Complete Download Process', imagesData.length, downloadSuccess.length, downloadFail.length);
+      const res = { message: 'Complete Download Process', data: {success: downloadSuccess, fail: downloadFail}};
+      sendSuccessResponse(response, res);
+   } catch (error) {
+      sendInternalErrorResponse(response, { message: error.toString() });
+   }
+}
+
+const firebaseImageResize = async (request, response) => {
+   try {
+      const imagesData = await fetchImages(request.params.id);
+      const resizeSucc = [];
+      const resizeFail = [];
+      // const imagesData = [];
+      await Promise.all(imagesData.map(async (file, index) => {
+         const fileNameArr = file.split('/');
+         const fileName = fileNameArr.pop();
+         await Promise.all([200, 400, 1080].map(async size => {
+            const tempFilename = fileName.split('.');
+            const imageResizename = `${fileNameArr[1]}_temp_${tempFilename[0]}_${size}x${size}.${tempFilename[1]}`;
+            const resizepath = join(workingTumpDir, imageResizename);
+            sourceFilepath = join(workingDir, `${fileNameArr[1]}_temp_${fileName}`);
+            try {
+               if(isImage(sourceFilepath)){
+                  await sharp(sourceFilepath, { failOnError: false })
+                  .rotate()
+                  .resize(size, size,{fit: 'inside'})
+                  .toFile(resizepath);
+                  resizeSucc.push(`${fileNameArr[1]}_temp_${fileName}`);
+               } else {
+                  console.log('resize issue', downloadFilepath);
+               }
+            } catch (error) {
+               console.log('error:resize', `${fileNameArr[1]}_temp_${fileName}`, '::', error);
+               resizeFail.push(`${fileNameArr[1]}_temp_${fileName}`);
+            }
+         }));
+      }));
+      console.log('Complete resize Process', imagesData.length, resizeSucc.length, resizeFail.length);
+      const res = { message: 'done image resize process', data: {success: resizeSucc, failure: resizeFail }};
+      sendSuccessResponse(response, res);
+   } catch (error) {
+      sendInternalErrorResponse(response, { message: error.toString() });
+   }
+}
+
+const firebaseImageUpload = async (request, response) => {
+   try{
+      // const imageData = await fetchImages(request.params.id);
+      const imageData = [];
+      console.log('imageData', imageData.length);
+      const uuid = uuidv4();
+      const uploadSuccess = [];
+      const uploadFail = [];
+      await Promise.all(imageData.map(async (file, index) => {
+         const fileNameArr = file.split('/');
+         const fileName = fileNameArr.pop();
+         await Promise.all([200, 400, 1080].map(async size => {
+            const tempFilename = fileName.split('.');
+            const sourceFileName = `${fileNameArr[1]}_temp_${tempFilename[0]}_${size}x${size}.${tempFilename[1]}`;
+            const uploadImageName = `${tempFilename[0]}_${size}x${size}.${tempFilename[1]}`;
+            const resizepath = join(workingTumpDir, sourceFileName);
+            const uploadFilepath = `photos/${fileNameArr[1]}/${fileNameArr[2]}/${uploadImageName}`
+            const mimeType = tempFilename[1] === 'png' ? 'image/png' : 'image/jpeg'
+            try {
+               if(isImage(resizepath)){
+                  await myBucket.upload(resizepath, {
+                     gzip: true,
+                     destination: uploadFilepath,
+                     metadata: {
+                        contentType: mimeType,
+                        metadata: {
+                           firebaseStorageDownloadTokens: uuid
+                        }
+                     },
+
+                  })
+                  uploadSuccess.push(file);
+               } else {
+                  uploadFail.push(uploadImageName);
+               }
+
+            } catch (error) {
+               uploadFail.push(file);
+            }
+         }));
+      }));
+
+      console.log('Done Upload process', imageData.length, uploadSuccess.length, uploadFail.length);
+      const res = { message: 'Done Upload process', data: {uploadSuccess, uploadFail}};
+      sendSuccessResponse(response, res);
+   } catch (error) {
+      sendInternalErrorResponse(response, { message: error.toString() });
+   }
+}
+
+const firebaseImageDelete = async (request, response) => {
+   console.log('firebaseImageDelete');
+   const success = [];
+   const failure = [
+
+   ];
+   try {
+      const imageData = []
+      await Promise.all(imageData.map(async (file, index) => {
+         const fileNameArr = file.split('/');
+         const fileName = fileNameArr.pop();
+         const tempFilename = fileName.split('.');
+         await Promise.all([200, 400, 1080].map(async size => {
+            const deleteFileName = `${tempFilename[0]}_${size}x${size}.${tempFilename[1]}`;
+            const deletePath = `photos/${fileNameArr[1]}/${fileNameArr[2]}/${deleteFileName}`
+            try {
+               await myBucket.file(deletePath).delete();
+               success.push(file)
+            } catch (error) {
+               failure.push(file);
+            }
+         }));
+      }));
+      const res = { message: 'Done delete process', data: {success: success, failure: failure }};
+      sendSuccessResponse(response, res);
+   } catch (error) {
+       sendInternalErrorResponse(response, { message: error.toString() });
+   }
+}
+
+const firebaseImageResize1 = async (request, response) => {
+   try {
+      const [files] = await myBucket.getFiles();
+      const workingDir = join(tmpdir(), 'thump');
+      const tempFilepath = join(workingDir, 'source.png');
+      // Ensure image resize directory
+      await fse.ensureDir(workingDir);
+
+      // await Promise.all(files.map(async file => {
+         const filePath = file.name;
+         const fileNameArr = filePath.split('/');
+         const fileName = fileNameArr.pop();
+
+         if(!fileName.includes('_200x200') && !fileName.includes('_400x400') && !fileName.includes('_1080x1080') ){
+            // DownLoad Source File
+            await bucket.file(filePath).download({
+               destination: tempFilepath
+            });
+
+            // Resize the images
+            const sizes = [200, 400, 1080];
+            const uploadPromises = sizes.map(async size => {
+               const tempFilename = fileName.split('.');
+               const imageResizename = `${tempFilename[0]}_${size}x${size}.${tempFilename[1]}`;
+               const resizepath = join(workingDir, imageResizename);
+               const uploadFilepath = `photos/${fileNameArr[1]}/${fileNameArr[2]}/${imageResizename}`
+               const uuid = uuidv4();
+
+               //  Resize the source Image
+               await sharp(tempFilepath)
+               .resize(size, size)
+               .toFile(resizepath)
+               .then(async (info, err) => {
+                  if(!_isEmpty(info)){
+                     await  storage.bucket(bucketName).upload(resizepath, {
+                        gzip: true,
+                        destination: uploadFilepath,
+                        metadata: {
+                           contentType: tempFilename[1],
+                           metadata: {
+                              firebaseStorageDownloadTokens: uuid
+                           }
+                        },
+                     });
+                  }
+               });
+               // Run upload operation
+            })
+            await Promise.all(uploadPromises);
+            // CleanUp remove the temp/thumbs from file system
+            // return fse.remove(workingDir)
+         }
+      // });
+      sendSuccessResponse(response, {});
+   } catch (error) {
+      console.log('catch', error);
+   }
+}
 
 module.exports = {
    pushFirebaseNotification,
    sendSMS,
-   sendMail
+   sendMail,
+   migration,
+   firebaseImageResize,
+   firebaseImageDownload,
+   firebaseImageUpload,
+   firebaseImageDelete
 };

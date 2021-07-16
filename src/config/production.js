@@ -32,5 +32,11 @@ module.exports = {
    twilioTest: {
       accountSid: 'AC7527c54a4e94b4cf887855d63d55287b',
       authToken: 'b6f938eeabeaca59a58cf18edc6e9def',
-   }
+   },
+   firbaseDatabaseFileName: "luhu-production-firebase-database.json",
+   firbaseCredentialsFileName: "serviceAccountKey-production.json",
+   users_collection_name: "users",
+   offers_collection_name: "offers",
+   currency_collection_name: "currency",
+   transaction_history_collection_name: "transaction_history",
 };
