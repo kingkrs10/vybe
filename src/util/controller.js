@@ -179,145 +179,167 @@ const migration = async (request, response) => {
 
    try {
       const filePath = join(__dirname,`../../public/backup/${firbaseDatabaseFileName}`);
-      let rawdata = fs.readFileSync(filePath);
-      let jsonData = JSON.parse(rawdata)["__collections__"];
 
-      const userData = jsonData[users_collection_name];
-      const OfferData = jsonData[offers_collection_name];
-      const currencyData = jsonData[currency_collection_name];
-      const transactionHistoryData = jsonData[transaction_history_collection_name];
-      // console.log('userData', userData);
+      // Production DB collection Data
+      // const filePath = join(__dirname,`../../public/backup/luhu-production-firebase-database.json`);
 
-      const tempUserData = Object.keys(userData);
-      const tempOfferData = Object.keys(OfferData);
-      const temptransactionHistoryData = Object.keys(transactionHistoryData);
-      // console.log('tempUserData', tempUserData.length);
-      // console.log('tempOfferData', tempOfferData.length);
-      const blockedUsersId = [];
-      const inviteNumbersArr = [];
-      //  Saved Users details
-      await tempUserData.map( async (item, index) =>{
-         const value = userData[item];
-         const checkAvailable = await qryClient.query(`SELECT "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [item] );
-         if(_isEmpty(checkAvailable.rows[0])) {
-            const userId = uuidv4();
-            if(value.blockListID && !_isEmpty(value.blockListID)){
-               blockedUsersId.push({firebaseUId: item,userId: userId, blockListID: value.blockListID});
-            }
-            if(value.inviteNumber && !_isEmpty(value.inviteNumber)){
-               inviteNumbersArr.push({firebaseUId: item, userId: userId, inviteNumber: value.inviteNumber});
-            }
-            const milliseconds = value["registrationDate"]? value["registrationDate"]["value"]["_seconds"] * 1000  : '';
-            const date = milliseconds ? new Date(milliseconds) : new Date;
-            const reqObj = {
-               balance : value["balance"] || 0,
-               notificationUnReadcount: value['count'] || 0,
-               deviceId: value['deviceId'] || null,
-               fullName: value['fullname'],
-               imageURl: value['imageURl'] || null,
-               stripeCustomerId: value["stripeCustomerId"] || '',
-               latitude: value["currentLocation"] ? value["currentLocation"]["latitude"] : '',
-               longitude: value["currentLocation"] ? value["currentLocation"]["longitude"] : '',
-               currencyCode:  value["currencyDetails"] ? value["currencyDetails"]["code"] : '',
-               currencySymbol:  value["currencyDetails"] ? value["currencyDetails"]["symbol"] : '',
-               profession: value['profession'] || null,
-               created_at: date,
-               phoneNumber: value['phoneNumber'] || null,
-               firebaseUId : value["uid"] ? value["uid"] : item
-            }
-            const result = await qryClient.query(`INSERT INTO users(
-				   uid, balance, "notificationUnReadcount", "deviceId",
-				   "fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
-				   "currencyCode", "currencySymbol", profession, created_at, "firebaseUId")
-					VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING uid`,
-				[userId, reqObj.balance, reqObj.notificationUnReadcount, `{${reqObj.deviceId}}`,
-				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
-				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.created_at, reqObj.firebaseUId]);
+      fs.readFile(filePath, "utf8", async(err, rawdata) => {
+         if (err) {
+            console.log("Error reading file from disk:", err);
+            return;
+         }
+         try {
+            const jsonData = JSON.parse(rawdata)["__collections__"];
+            const userData = jsonData[users_collection_name] || [];
+            const OfferData = jsonData[offers_collection_name]|| [];
+            // const OfferData = jsonData['offers']|| [];
+            const currencyData = jsonData[currency_collection_name] || [];
+            const transactionHistoryData = jsonData[transaction_history_collection_name] || [];
+            const blockedUsersId = [];
+            const inviteNumbersArr = [];
+            const tempUserData = Object.keys(userData);
+            const tempOfferData = Object.keys(OfferData);
+            const temptransactionHistoryData = Object.keys(transactionHistoryData);
+            console.log('Start the users data save process',tempUserData.length);
+            // Currency Data Save pr
+            console.log('start Currency migration process');
+            delete currencyData.currencyDetails["__collections__"];
+            await qryClient.query(`DELETE FROM "currency"`);
+            await qryClient.query(`INSERT INTO "currency"(id, "currencyDetails") VALUES($1, $2)`, [uuidv4(), [currencyData.currencyDetails]]);
+            console.log('Done Currency saved sucessfully');
 
-            if(value.countryCurrency && !_isEmpty(value.countryCurrency)){
-               await value.countryCurrency.map(async items => {
-                  await qryClient.query(`INSERT INTO "users_countryCurrency"(uid, amount, "oppPersonBalance", currency, label, value, "balanceData")
-                  VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING "uid"`,
-                  [userId, items.amount, items.oppPersonBalance, items.currency, items.label, items.value, items.balanceData]);
-               });
+            await Promise.all(tempUserData.map( async(item, index) => {
+               try {
+                  const value = userData[item];
+                  const checkAvailable = await qryClient.query(`SELECT "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [item]);
+                  if(_isEmpty(checkAvailable.rows[0])) {
+                     const userId = uuidv4();
+                     if(value.blockListID && !_isEmpty(value.blockListID)){
+                        blockedUsersId.push({firebaseUId: item,userId: userId, blockListID: value.blockListID});
+                     }
+                     if(value.inviteNumber && !_isEmpty(value.inviteNumber)){
+                        inviteNumbersArr.push({firebaseUId: item, userId: userId, inviteNumber: value.inviteNumber});
+                     }
+                     const milliseconds = value["registrationDate"]? value["registrationDate"]["value"]["_seconds"] * 1000  : '';
+                     const date = milliseconds ? new Date(milliseconds) : new Date;
+                     const reqObj = {
+                        balance : value["balance"] || 0,
+                        notificationUnReadcount: value['count'] || 0,
+                        deviceId: value['deviceId'] || null,
+                        fullName: value['fullname'],
+                        imageURl: value['imageURl'] || null,
+                        thump_imageURL: value['userTempImage'] || null,
+                        medium_imageURL: value['userTempImage'] || null,
+                        stripeCustomerId: value["stripeCustomerId"] || '',
+                        latitude: value["currentLocation"] ? value["currentLocation"]["latitude"] : '',
+                        longitude: value["currentLocation"] ? value["currentLocation"]["longitude"] : '',
+                        currencyCode:  value["currencyDetails"] ? value["currencyDetails"]["code"] : '',
+                        currencySymbol:  value["currencyDetails"] ? value["currencyDetails"]["symbol"] : '',
+                        profession: value['profession'] || null,
+                        created_at: date,
+                        phoneNumber: value['phoneNumber'] || null,
+                        firebaseUId : value["uid"] ? value["uid"] : item
+                     }
+                     await qryClient.query(`INSERT INTO users(
+                        uid, balance, "notificationUnReadcount", "deviceId",
+                        "fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
+                        "currencyCode", "currencySymbol", profession, created_at, "firebaseUId", "thump_imageURL", "medium_imageURL")
+                        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING uid`,
+                     [userId, reqObj.balance, reqObj.notificationUnReadcount, `{${reqObj.deviceId}}`,
+                     reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
+                     reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.created_at, reqObj.firebaseUId, reqObj.thump_imageURL, reqObj.medium_imageURL]);
+
+                     if(value.countryCurrency && !_isEmpty(value.countryCurrency)){
+                        await value.countryCurrency.map(async items => {
+                           await qryClient.query(`INSERT INTO "users_countryCurrency"(uid, amount, "oppPersonBalance", currency, label, value, "balanceData")
+                           VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING "uid"`,
+                           [userId, items.amount, items.oppPersonBalance, items.currency, items.label, items.value, items.balanceData]);
+                        });
+                     }
+                  }
+               } catch (error) {
+                  console.log('error', error);
+               }
+            }));
+            console.log('done User Data && start blocked Users');
+            if(!_isEmpty(blockedUsersId)){
+               await Promise.all(blockedUsersId.map(async item => {
+                  item.blockListID.map(async bUid => {
+                     const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [bUid] );
+                     const blockedUserId = userData.rows[0]?.uid || null;
+                     if(blockedUserId){
+                        await qryClient.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [item.userId, blockedUserId]);
+                     }
+                  })
+               }));
             }
 
-            if(index === tempUserData.length-1) {
-               if(!_isEmpty(blockedUsersId)){
-                  await blockedUsersId.map(async item => {
-                     item.blockListID.map(async bUid => {
-                        const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [bUid] );
-                        const blockedUserId = userData.rows[0]?.uid || null;
-                        if(blockedUserId){
-                           await qryClient.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [item.userId, blockedUserId]);
+            if(!_isEmpty(inviteNumbersArr)){
+                await Promise.all(inviteNumbersArr.map(async item => {
+                  item.inviteNumber.map(async phoneNo => {
+                     // const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [phoneNo] );
+                     // const invitedUserId = userData.rows[0].uid;
+                     // if(invitedUserId){
+                     await qryClient.query(`INSERT INTO users_invites("senderUId", "receiverPhoneNumber", status)
+                     VALUES($1, $2, $3)`, [item.userId, phoneNo, 0]);
+                     // }
+                  })
+               }));
+            }
+
+            console.log('Completed the users data save process');
+            console.log('users_blockedUsers: total Records', blockedUsersId.length);
+            console.log('Start Offer data save process', tempOfferData.length);
+
+            const notDoneOffers = [];
+            const offerFavoriteList = [];
+            const reportListIDsArr = [];
+            await Promise.all(tempOfferData.map( async(item, index) =>{
+               try {
+                  const value = OfferData[item];
+                  // console.log('value',value);
+                  const checkAvailable = await qryClient.query(`SELECT "firebaseOfferId" FROM offers WHERE "firebaseOfferId" = $1`, [item] );
+                  const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['uid']] );
+                  if(_isEmpty(checkAvailable.rows[0])) {
+                     if(!_isEmpty(userData.rows[0])){
+                        const userId = userData.rows[0].uid;
+                        const offerId = uuidv4();
+                        if(value.tempFavoriteID && !_isEmpty(value.tempFavoriteID)){
+                           offerFavoriteList.push({firebaseOfferId: item, offerId: offerId, tempFavoriteIDs: value.tempFavoriteID});
                         }
-                     })
-                  })
-               }
-               if(!_isEmpty(inviteNumbersArr)){
-                  await inviteNumbersArr.map(async item => {
-                     item.inviteNumber.map(async phoneNo => {
-                        // const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [phoneNo] );
-                        // const invitedUserId = userData.rows[0].uid;
-                        // if(invitedUserId){
-                        await qryClient.query(`INSERT INTO users_invites("senderUId", "receiverPhoneNumber", status)
-			               VALUES($1, $2, $3)`, [item.userId, phoneNo, 0]);
-                        // }
-                     })
-                  })
-               }
-            }
-         }
-      });
+                        if(value.reportListID && !_isEmpty(value.reportListID)){
+                           reportListIDsArr.push({firebaseOfferId: item, offerId: offerId, reportListID: value.reportListID});
+                        }
+                        const transactionTime = value["createdAt"]? value["createdAt"]["value"]["_seconds"] * 1000  : '';
+                        const createdAt = transactionTime ? new Date(transactionTime) : new Date();
+                        const reqObj = {
+                           headLine : value["headline"] || null,
+                           imageURl: value['offerImage'] || null,
+                           thump_imageURL: value['offerTempImage'] || null,
+                           medium_imageURL: value['offerTempImage'] || null,
+                           latitude: value["latitude"] || null,
+                           longitude: value["longitude"] || null,
+                           offerDescription: value['offerDescription'] || null,
+                           locationName: value['locationName'],
+                           firebaseOfferId: item
+                        }
+                        await qryClient.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt", "thump_imageURL", "medium_imageURL")
+                           VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+                        [offerId, reqObj.headLine, `{${reqObj.imageURl}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, userId, reqObj.locationName, reqObj.firebaseOfferId, createdAt, reqObj.thump_imageURL, reqObj.medium_imageURL]);
 
-      console.log('done User collection Details');
-
-      //Offer Collection save into DB
-      const notDoneOffers = [];
-      const offerFavoriteList = [];
-      const reportListIDsArr = [];
-
-      const result = await tempOfferData.map( async (item, index) =>{
-         const value = OfferData[item];
-         // console.log('value',value);
-         const checkAvailable = await qryClient.query(`SELECT "firebaseOfferId" FROM offers WHERE "firebaseOfferId" = $1`, [item] );
-         const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['uid']] );
-         if(_isEmpty(checkAvailable.rows[0])) {
-            if(!_isEmpty(userData.rows[0])){
-               const userId = userData.rows[0].uid;
-               const offerId = uuidv4();
-               if(value.tempFavoriteID && !_isEmpty(value.tempFavoriteID)){
-                  offerFavoriteList.push({firebaseOfferId: item, offerId: offerId, tempFavoriteIDs: value.tempFavoriteID});
+                        if(value['offerHashTag'] && !_isEmpty(value['offerHashTag'])){
+                           qryClient.query(`INSERT INTO "offers_hashTags"("offerId", "hashTag") VALUES ($1, $2)`, [offerId, value['offerHashTag']]);
+                        }
+                     } else {
+                        notDoneOffers.push(item);
+                     }
+                  }
+               } catch (error) {
+                  console.log('error Offers', error, OfferData[item], item);
                }
-               if(value.reportListID && !_isEmpty(value.reportListID)){
-                  reportListIDsArr.push({firebaseOfferId: item, offerId: offerId, reportListID: value.reportListID});
-               }
-               const transactionTime = value["createdAt"]? value["createdAt"]["value"]["_seconds"] * 1000  : '';
-               const createdAt = transactionTime ? new Date(transactionTime) : new Date();
-               const reqObj = {
-                  headLine : value["headline"] || null,
-                  imageURl: value['offerImage'] || null,
-                  latitude: value["latitude"] || null,
-                  longitude: value["longitude"] || null,
-                  offerDescription: value['offerDescription'] || null,
-                  locationName: value['locationName'],
-                  firebaseOfferId: item
-               }
-               await qryClient.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt")
-                  VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-               [offerId, reqObj.headLine, `{${reqObj.imageURl}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, userId, reqObj.locationName, reqObj.firebaseOfferId, createdAt]);
-
-               if(value['offerHashTag'] && !_isEmpty(value['offerHashTag'])){
-                  qryClient.query(`INSERT INTO "offers_hashTags"("offerId", "hashTag") VALUES ($1, $2)`, [offerId, value['offerHashTag']]);
-               }
-            } else {
-               notDoneOffers.push(item);
-            }
-         }
-
-         if(index === tempOfferData.length-1){
+            }));
             if(!_isEmpty(offerFavoriteList)){
-               await offerFavoriteList.map(async item => {
+               await Promise.all(offerFavoriteList.map(async item => {
                   item.tempFavoriteIDs.map(async favoriteID => {
                      const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [favoriteID] );
                      const favoriteUId = userData.rows[0]?.uid || null;
@@ -328,11 +350,11 @@ const migration = async (request, response) => {
                         }
                      }
                   })
-               })
+               }))
             }
 
             if(!_isEmpty(reportListIDsArr)){
-               await reportListIDsArr.map(async item => {
+               await Promise.all(reportListIDsArr.map(async item => {
                   item.reportListID.map(async reporterId => {
                      const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [reporterId] );
                      const reporterUserId = userData.rows[0]?.uid || null;
@@ -340,49 +362,55 @@ const migration = async (request, response) => {
                         await qryClient.query(`INSERT INTO offers_reports("offerId", "reporterUId") VALUES ($1, $2)`, [item.offerId, reporterUserId]);
                      }
                   })
-               })
+               }))
             }
-            return true;
-         }
-      });
-      console.log('done Offers collection Details');
-      // Transaction History Data Save Prcess.
-      await temptransactionHistoryData.map( async (item, index) =>{
-         const value = transactionHistoryData[item];
-         // console.log('temptransactionHistoryData', value);
-         const senderUserData = await qryClient.query(`SELECT "uid", "currencyCode", "currencySymbol", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['sender_id']]);
-         const receiverUserData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['receiver_id']]);
-         const checkAvailable = await qryClient.query(`SELECT "firebaseTransactionId" FROM transaction_histories WHERE "firebaseTransactionId" = $1`, [item] );
-         const senderData = senderUserData.rows[0] || null;
-         const transactionTime = value["transaction_date"]? value["transaction_date"]["value"]["_seconds"] * 1000  : '';
-         const createdAt = transactionTime ? new Date(transactionTime) : new Date();
 
-         if(_isEmpty(checkAvailable.rows[0])) {
-            if(!_isEmpty(senderData) && !_isEmpty(receiverUserData.rows[0]) ){
-               const senderID = senderData?.uid ;
-               const receiverID = receiverUserData.rows[0]?.uid;
-               const transactionId = uuidv4();
-               const reqObj = {
-                  amount: value['amount'] || null,
-                  senderUId: senderID || null,
-                  receiverUId: receiverID || null,
-                  senderCurrencyCode: value['senderSymbol'] ? value['senderCurrency'] : senderData.currencyCode ? senderData.currencyCode : null,
-                  senderSymbol: value['senderSymbol'] ? value['senderSymbol'] : senderData["currencySymbol"] ? senderData["currencySymbol"] : null,
-                  firebaseTransactionId: item
+            console.log('Completed the Offer data save process');
+            console.log('offers_favorites: total Records', offerFavoriteList.length);
+            console.log('offers_reports: total Records', reportListIDsArr.length);
+
+            // Transaction History Data Save Prcess.
+            console.log('Start Transaction data save process', temptransactionHistoryData.length);
+            await Promise.all(temptransactionHistoryData.map( async(item, index) =>{
+               try {
+                  const value = transactionHistoryData[item];
+                  // console.log('temptransactionHistoryData', value);
+                  const senderUserData = await qryClient.query(`SELECT "uid", "currencyCode", "currencySymbol", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['sender_id']]);
+                  const receiverUserData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['receiver_id']]);
+                  const checkAvailable = await qryClient.query(`SELECT "firebaseTransactionId" FROM transaction_histories WHERE "firebaseTransactionId" = $1`, [item] );
+                  const senderData = senderUserData.rows[0] || null;
+                  const transactionTime = value["transaction_date"]? value["transaction_date"]["value"]["_seconds"] * 1000  : '';
+                  const createdAt = transactionTime ? new Date(transactionTime) : new Date();
+                  if(_isEmpty(checkAvailable.rows[0])) {
+                     if(!_isEmpty(senderData) && !_isEmpty(receiverUserData.rows[0]) ){
+                        const senderID = senderData?.uid ;
+                        const receiverID = receiverUserData.rows[0]?.uid;
+                        const transactionId = uuidv4();
+                        const reqObj = {
+                           amount: value['amount'] || null,
+                           senderUId: senderID || null,
+                           receiverUId: receiverID || null,
+                           senderCurrencyCode: value['senderSymbol'] ? value['senderCurrency'] : senderData.currencyCode ? senderData.currencyCode : null,
+                           senderSymbol: value['senderSymbol'] ? value['senderSymbol'] : senderData["currencySymbol"] ? senderData["currencySymbol"] : null,
+                           firebaseTransactionId: item
+                        }
+                        await qryClient.query(`INSERT INTO "transaction_histories" ("transactionId", amount, "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt")
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, [transactionId, reqObj.amount, reqObj.senderUId, reqObj.receiverUId, reqObj.senderCurrencyCode, reqObj.senderSymbol, reqObj.firebaseTransactionId, createdAt]);
+                     }
+                  } else {
+                     console.log('traction Fail ', item);
+                  }
+
+               } catch (error) {
+                 console.log('error Offers', error, index);
                }
-               await qryClient.query(`INSERT INTO "transaction_histories" ("transactionId", amount, "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt")
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, [transactionId, reqObj.amount, reqObj.senderUId, reqObj.receiverUId, reqObj.senderCurrencyCode, reqObj.senderSymbol, reqObj.firebaseTransactionId, createdAt]);
-            }
+            }));
+            console.log('done Transaction History Data collection Details');
+            sendSuccessResponse(response, {});
+         } catch (err) {
+           sendInternalErrorResponse(response, { message: err.toString() });
          }
       });
-      console.log('done Transaction History Data collection Details');
-      //  Saved currency Details
-      delete currencyData.currencyDetails["__collections__"];
-      await qryClient.query(`DELETE FROM "currency"`);
-		await qryClient.query(`INSERT INTO "currency"(id, "currencyDetails") VALUES($1, $2)`, [uuidv4(), [currencyData.currencyDetails]]);
-      console.log('currency Data saved sucessfully');
-
-      sendSuccessResponse(response, {});
    } catch (error) {
       sendInternalErrorResponse(response, { message: error.toString() });
    }
@@ -534,6 +562,7 @@ const firebaseImageUpload = async (request, response) => {
 
       console.log('Done Upload process', imageData.length, uploadSuccess.length, uploadFail.length);
       const res = { message: 'Done Upload process', data: {uploadSuccess, uploadFail}};
+      // return fse.remove(workingDir)
       sendSuccessResponse(response, res);
    } catch (error) {
       sendInternalErrorResponse(response, { message: error.toString() });
