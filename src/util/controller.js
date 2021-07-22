@@ -116,8 +116,8 @@ const sendSMS = async (request, response) => {
 const sendMail = async (request, response) => {
    try {
       const { reportMessage, reportFrom, reportTo, deviceId } = request.body;
-      const destAdd = "luhubusiness@gmail.com";
-      // const destAdd = "kannan.d@mitrahsoft.com";
+      // const destAdd = "luhubusiness@gmail.com";
+      const destAdd = "kannan.d@mitrahsoft.com";
 
       const mailOptionsInfo = {
          from: "luhubusiness@gmail.com",
