@@ -24,7 +24,7 @@ router.post(
 );
 
 router.post(
-    "/customerInfo",
+    "/customerDetails",
     authMiddleware,
     stripeController.geCustomerDetails
 );
