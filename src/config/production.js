@@ -8,7 +8,7 @@ module.exports = {
       cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
    app: {
-      port: 8081,
+      port: 8080,
       secretKey: "luhu-jwt-stuff-secret"
    },
    stripe_api_key:

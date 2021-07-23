@@ -1,4 +1,11 @@
 module.exports = {
+   // relational_db: {
+   //    host: "local",
+   //    port: 5432,
+   //    user: "postgres",
+   //    pass: "password",
+   //    name: "luhu-development",
+   // },
    relational_db: {
       host: "35.202.0.126",
       port: 5432,
@@ -9,7 +16,7 @@ module.exports = {
    },
 
    app: {
-      port: 8081,
+      port: 8080,
       secretKey: "luhu-jwt-stuff-secret"
    },
    stripe_api_key:
