@@ -4,7 +4,7 @@ module.exports = {
         port: 5432,
         user: "postgres",
         pass: "n9Lyi5Eboh1O3KKt",
-        name: "Luhu"
+        name: "luhu-production"
     },
     app: {
         port: 8081
