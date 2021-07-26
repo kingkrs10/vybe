@@ -6,7 +6,6 @@ module.exports = {
       pass: "n9Lyi5Eboh1O3KKt",
       name: "luhu-production",
       cloudpath: "/cloudsql/luhu-production:us-central1:luhu-development-db-postgres",
-
    },
    app: {
       port: 8081,

@@ -7,12 +7,12 @@ module.exports = {
    //    name: "luhu-development",
    // },
    relational_db: {
-      host: "35.202.0.126",
+      host: "34.133.84.36",
       port: 5432,
       user: "postgres",
       pass: "n9Lyi5Eboh1O3KKt",
-      name: "Luhu",
-      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
+      name: "luhu-production",
+      cloudpath: "/cloudsql/luhu-production:us-central1:luhu-development-db-postgres",
    },
 
    app: {
