@@ -1,0 +1,20 @@
+steps:
+   # Build the container image
+   - name: "gcr.io/cloud-builders/docker"
+     args: ["build", "-t", "us.gcr.io/luhu-production/api/luhu-api-production:$SHORT_SHA", "."]
+   # Push the container image to Container Registry
+   - name: "gcr.io/cloud-builders/docker"
+     args: ["push", "us.gcr.io/luhu-production/api/luhu-api-production:$SHORT_SHA"]
+   # Deploy container image to Cloud Run
+   - name: "gcr.io/cloud-builders/gcloud"
+     args:
+        [
+           "run",
+           "deploy",
+           "luhu-api-development",
+           "--image=us.gcr.io/luhu-production/api/luhu-api-production",
+           "--region=us-central1",
+           "--platform=managed",
+        ]
+images:
+  - us.gcr.io/luhu-production/api/luhu-api-production
