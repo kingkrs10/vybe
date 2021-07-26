@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 
 web.config
+cloud_sql_proxy
+*.sql

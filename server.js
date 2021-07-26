@@ -1,30 +1,45 @@
 const express = require("express");
-// const bodyParser = require("body-parser");
 const cors = require("cors");
 const config = require("./src/config/config");
 const app = express();
+const router = require("./router");
+var schedule = require("node-schedule");
+const axios = require("axios");
+const { v4: uuidv4 } = require('uuid');
 
-const userRouter = require('./src/users');
-const offersRouter = require('./src/offers');
-const userInvitesRouter = require('./src/userInvites');
-const notificationsRouter = require('./src/notifications');
-const chatsRouter = require('./src/chats');
-const messagesRouter = require('./src/messages');
-const stripeRouter = require('./src/stripe');
-
+const currencyModel = require("./src/currency/model");
+const commonModel = require("./src/common/common");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
+app.use("/", router);
 
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/offers', offersRouter);
-app.use('/api/v1/userInvites', userInvitesRouter);
-app.use('/api/v1/notifications', notificationsRouter);
-app.use('/api/v1/chats', chatsRouter);
-app.use('/api/v1/messages', messagesRouter);
-app.use('/api/v1/stripe', stripeRouter);
-app.listen(config.app.port, () => {
-    console.log(`Example app listening on port ${config.app.port}!`)
+const rule = new schedule.RecurrenceRule();
+rule.hour = 12;
+
+schedule.scheduleJob(rule, () => {
+   axios
+   .get(
+      "http://api.currencylayer.com/live?access_key=b4eb98e1646afb0b3acfd691c2974dc9"
+   )
+   .then(async (response) => {
+      const data = {
+         id: uuidv4(),
+         currencyDetails: [response.data.quotes],
+      }
+      await commonModel.tryBlock(
+         data,
+         "(UserCountryCurrency:update)",
+         currencyModel.updateCurrency
+      );
+      return true;
+   })
+   .catch((err) => {
+      console.log("err", err);
+   });
 });
 
+app.listen(config.app.port, () => {
+   console.log(`Example app listening on port ${config.app.port}!`);
+});
