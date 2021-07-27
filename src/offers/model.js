@@ -91,6 +91,36 @@ var self = module.exports = {
 		}
 	},
 
+	getUserfavorites: async (reqObj, client) => {
+		try {
+			const limit =  50;
+			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
+			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
+				O."imageURl" offerImage,"firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
+				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
+				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
+				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
+				( 3959 * acos( cos( radians($5) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($6) ) + sin( radians($5) ) * sin( radians( O.latitude ) ) ) ) AS distance
+				FROM offers O
+				INNER JOIN users U ON U.uid = O.uid
+				INNER JOIN offers_favorites fav ON  O."offerId" = fav."offerId"
+				WHERE O."isActive" =  $2
+				AND U."isActive" =  $2
+				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
+				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)`;
+
+			var qryValue = [reqObj.favoriteUid, true, limit, pageNo, reqObj.latitude, reqObj.longitude];
+			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC offset $4 limit $3`, qryValue);
+			const data = result.rows;
+			if (result.rowCount > 0) {
+				return { error: false, data, message: 'get all data successfully' };
+			} else {
+				return { error: false, data:[], message: "get all data failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString()};
+		}
+	},
 	getAllOffers: async (reqObj, client) => {
 		try {
 			const limit =  50;

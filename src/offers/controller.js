@@ -306,13 +306,14 @@ const getUserOffers = async (request, response, next) => {
 const getUserfavorites = async (request, response, next) => {
    const data = {
       ...request.currentUser,
+      pageNo: request.query?.pageNo || 1,
       favoriteUid: request.params.id
    }
    try {
       const result = await commonModel.tryBlock(
          data,
          "(Offers:getUserfavorites)",
-         offersModel.getAllOffers
+         offersModel.getUserfavorites
       );
 
       if (result.error) {
