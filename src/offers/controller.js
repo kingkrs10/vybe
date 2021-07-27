@@ -9,14 +9,24 @@ const create = async (request, response) => {
    try {
       const offerId = uuidv4();
       var imagePath = null;
+      var thumpImagePath = null;
+      var mediumImagePath = null;
       // const imagePathArr = await fileUploadingProcess(request.files, offerId);
       if (!_isEmpty(request.body.offerImage)) {
          imagePath = request.body.offerImage;
+      }
+      if (!_isEmpty(request.body.offerThumpImage)) {
+         thumpImagePath = request.body.offerThumpImageURL;
+      }
+      if (!_isEmpty(request.body.offerMediumImage)) {
+         mediumImagePath = request.body.offerMediumImageURL;
       }
       const tempBody = {
          ...request.body,
          currentUser: request.currentUser,
          imageURl: imagePath,
+         thumpImageURL: thumpImagePath,
+         mediumImageURL: mediumImagePath,
          offerId: offerId,
       };
       const result = await commonModel.tryBlock(
@@ -51,14 +61,29 @@ const fileUploadingProcess = async (filesData, offerId) => {
 
 const update = async (request, response, next) => {
    try {
-      const data = {
-         reqObj: {...request.body,currentUser: request.currentUser},
-         offerId: request.params.id,
-      };
+      var imagePath = null;
+      var thumpImagePath = null;
+      var mediumImagePath = null;
       // const imagePathArr = await fileUploadingProcess(request.files, offerId);
       if (!_isEmpty(request.body.offerImage)) {
-         data.reqObj.imageURl = request.body.offerImage;
+         imagePath = request.body.offerImage;
       }
+      if (!_isEmpty(request.body.offerThumpImage)) {
+         thumpImagePath = request.body.offerThumpImageURL;
+      }
+      if (!_isEmpty(request.body.offerMediumImage)) {
+         mediumImagePath = request.body.offerMediumImageURL;
+      }
+      const data = {
+         reqObj: {
+            ...request.body,
+            imageURl: imagePath,
+            thumpImageURL: thumpImagePath,
+            mediumImageURL: mediumImagePath,
+            currentUser: request.currentUser,
+         },
+         offerId: request.params.id,
+      };
       const result = await commonModel.tryBlock(
          data,
          "(Offers:update)",

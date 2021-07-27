@@ -2,18 +2,19 @@ const _isEmpty = require('lodash/isEmpty');
 var self = module.exports = {
 	create: async (reqObj, client) => {
 		const imageURlData = Array.isArray(reqObj.imageURl) ? reqObj.imageURl : JSON.parse(reqObj.imageURl);
-		const thump_imageURLData = Array.isArray(reqObj.thump_imageURl) ? reqObj.thump_imageURl : JSON.parse(reqObj.thump_imageURL);
-		const medium_imageURLData = Array.isArray(reqObj.medium_imageURL) ? reqObj.medium_imageURL : JSON.parse(reqObj.medium_imageURL);
+		const thumpImageURLData = Array.isArray(reqObj.thumpImageURL) ? reqObj.thumpImageURL : JSON.parse(reqObj.thumpImageURL);
+		const mediumImageURLData = Array.isArray(reqObj.mediumImageURL) ? reqObj.mediumImageURL : JSON.parse(reqObj.mediumImageURL);
+
 		try {
 			const result = await client.query(`INSERT INTO offers("offerId", "headLine", "imageURl",  latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "thump_imageURL", "medium_imageURL")
-					VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-				[reqObj.offerId, reqObj.headLine, `{${imageURlData}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, reqObj.uid, reqObj.locationName, reqObj.firebaseOfferId,`{${thump_imageURLData}}`, `{${medium_imageURLData}}`]);
+					VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING "offerId"`,
+				[reqObj.offerId, reqObj.headLine, `{${imageURlData}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, reqObj.uid, reqObj.locationName, reqObj.firebaseOfferId,`{${thumpImageURLData}}`, `{${mediumImageURLData}}`]);
 			let data = null;
 			if (result.rowCount > 0) {
 				const Obj = { reqObj: reqObj, offerId: reqObj.offerId};
 				const result1 = await module.exports.getOne(reqObj, client);
 				data = result1 ? result1.data : null;
-				await self.updateHashTags(Obj, client);
+			var resHashTag = await self.updateHashTags(Obj, client);
 			}
 			if (result.rowCount > 0 && data) {
 				return { error: false, data, message: 'Data saved successfully' };
@@ -29,8 +30,8 @@ var self = module.exports = {
 		try {
 			const { reqObj, offerId } = Obj;
 			const imageURlData = Array.isArray(reqObj.imageURl) ? reqObj.imageURl : JSON.parse(reqObj.imageURl);
-			const thump_imageURLData = Array.isArray(reqObj.thump_imageURL) ? reqObj.thump_imageURL : JSON.parse(reqObj.thump_imageURL);
-			const medium_imageURLData = Array.isArray(reqObj.medium_imageURL) ? reqObj.medium_imageURL : JSON.parse(reqObj.medium_imageURL);
+			const thumpImageURLData = Array.isArray(reqObj.thumpImageURL) ? reqObj.thumpImageURL : JSON.parse(reqObj.thumpImageURL);
+			const mediumImageURLData = Array.isArray(reqObj.mediumImageURL) ? reqObj.mediumImageURL : JSON.parse(reqObj.mediumImageURL);
 
 			const result = await client.query(`UPDATE offers SET
 				"headLine" = $2,
@@ -43,12 +44,12 @@ var self = module.exports = {
 				"medium_imageURL" = $9,
 				"updatedAt" = now()
 				WHERE "offerId" = $1 RETURNING "offerId"`,
-				[offerId, reqObj.headLine, `{${imageURlData}}`, reqObj.latitude, reqObj.longitude, reqObj.locationName, reqObj.offerDescription, `{${thump_imageURLData}}`, `{${medium_imageURLData}}`]);
+				[offerId, reqObj.headLine, `{${imageURlData}}`, reqObj.latitude, reqObj.longitude, reqObj.locationName, reqObj.offerDescription, `{${thumpImageURLData}}`, `{${mediumImageURLData}}`]);
 			let data = null;
 			if (result.rowCount > 0) {
 				const Obj = { reqObj: reqObj, offerId: offerId};
 				const result1 = await module.exports.getOne({...reqObj, offerId: offerId}, client);
-				await self.updateHashTags(Obj, client);
+				var resHashTag = await self.updateHashTags(Obj, client);
 				data = result1 ? result1.data : null;
 			}
 			if (result.rowCount > 0) {

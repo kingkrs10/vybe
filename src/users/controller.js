@@ -73,14 +73,24 @@ const getOne = async (request, response, next) => {
       if (result.error) {
          sendErroresponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
+
+         const resultBlockedUsers = await commonModel.tryBlock(
+            { uid:  result.data.userid },
+            "(User:getBlockedUsers)",
+            usersModel.getBlockedUsers
+         );
+
          const resUserCountryCurrency = await commonModel.tryBlock(
             result.data.userid,
             "(Offers:getUserCountryCurrency)",
             userCountryCurrencyModel.getUserCountryCurrency
          );
-         const resultData = {
-            ...result.data, countryCurrency: resUserCountryCurrency.data,
-            currencyDetails: { code: result.data.currencyCode, symbol: result.data.currencySymbol }};
+
+      const resultData = {
+         ...result.data, countryCurrency: resUserCountryCurrency.data,
+         currencyDetails: { code: result.data.currencyCode, symbol: result.data.currencySymbol },
+         blockListID: resultBlockedUsers.data
+      };
 
          sendSuccessResponse(response, resultData);
       } else {

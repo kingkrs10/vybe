@@ -51,7 +51,6 @@ module.exports = {
 				queryText = `${queryText} AND (LOWER("fullName") like LOWER($6) OR LOWER("profession") like LOWER($6))`;
 				qryValue = [true, limit, pageNo, reqObj.latitude, reqObj.longitude, `%${reqObj.searchTerm}%`];
 			}
-
 			const result = await client.query(`${queryText} ORDER BY U.uid offset $3 limit $2 `, qryValue);
 			const data = result.rows;
 			if (result.rowCount > 0) {
@@ -122,7 +121,6 @@ module.exports = {
 				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
-			console.log('update', error);
 			return { error: true, message: error.toString() };
 		}
 	},
@@ -193,5 +191,19 @@ module.exports = {
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
-	}
+	},
+	getBlockedUsers: async (obj, client) => {
+		try {
+			var data = [];
+			const result = await client.query(`SELECT "blockedUserId" from "users_blockedUsers" where uid = $1`, [obj.uid]);
+			if (result.rowCount > 0) {
+				data = result.rows.map(item => item.blockedUserId);
+				return { error: false, data: data, message: 'Data update successfully' };
+			} else {
+				return { error: true, data: data, message: "Data update failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString() };
+		}
+	},
 };
