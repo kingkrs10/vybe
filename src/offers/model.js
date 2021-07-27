@@ -107,7 +107,8 @@ var self = module.exports = {
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
 				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)`;
+				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)
+				AND fav."uid"=$1 `;
 
 			var qryValue = [reqObj.favoriteUid, true, limit, pageNo, reqObj.latitude, reqObj.longitude];
 			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC offset $4 limit $3`, qryValue);
