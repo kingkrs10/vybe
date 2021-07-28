@@ -195,12 +195,12 @@ module.exports = {
 	getBlockedUsers: async (obj, client) => {
 		try {
 			var data = [];
-			const result = await client.query(`SELECT "blockedUserId" from "users_blockedUsers" where uid = $1`, [obj.uid]);
+			const result = await client.query(`SELECT "blockedUserId" from "users_blockedUsers" where uid = $1`, [obj.id]);
 			if (result.rowCount > 0) {
 				data = result.rows.map(item => item.blockedUserId);
-				return { error: false, data: data, message: 'Data update successfully' };
+				return { error: false, data: data, message: 'Data fetched successfully' };
 			} else {
-				return { error: true, data: data, message: "Data update failed" };
+				return { error: true, data: data, message: "Data fetched failed" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };

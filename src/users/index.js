@@ -55,6 +55,12 @@ router.put(
 );
 
 router.get(
+    "/blockedUsers/:id",
+    authMiddleware,
+    usersController.getBlockedUsers
+);
+
+router.get(
     "/getAuthToken/:phoneNumber",
     usersController.getAuthToken
 );

@@ -294,6 +294,30 @@ const getRecentUsers = async (request, response, next) => {
    }
 };
 
+const getBlockedUsers = async (request, response, next) => {
+   try {
+      const reqObj = {
+         ...request.params,
+         ...request.currentUser,
+         recentUsers: true
+      }
+      const result = await commonModel.tryBlock(
+         reqObj,
+         "(User:getBlockedUsers)",
+         usersModel.getBlockedUsers
+      );
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)) {
+         sendSuccessResponse(response, result.data);
+      } else {
+         sendNoContentResponse(response);
+      }
+   } catch (err) {
+      sendInternalErrorResponse(response, { message: err.toString() });
+   }
+};
+
 module.exports = {
    create,
    getAll,
@@ -303,5 +327,6 @@ module.exports = {
    updateLocation,
    updateBlockedUsers,
    getAuthToken,
-   getRecentUsers
+   getRecentUsers,
+   getBlockedUsers
 };
