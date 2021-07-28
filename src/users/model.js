@@ -2,17 +2,18 @@ const _isEmpty = require('lodash/isEmpty');
 
 module.exports = {
 	create: async (reqObj, client) => {
+		const date = new Date;
 		try {
 			const result = await client.query(`INSERT INTO users(
 				uid, balance, "notificationUnReadcount", "deviceId",
 				"fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
 				"currencyCode", "currencySymbol", profession, "firebaseUId",
-				"thump_imageURL", "medium_imageURL")
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING uid`,
+				"thumpImageURL", "mediumImageURL", "createdAt")
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING uid`,
 				[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
 				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
 				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId,
-				reqObj.thump_imageURL, reqObj.medium_imageURL
+				reqObj.thump_imageURL, reqObj.medium_imageURL, date
 			]);
 			let data = null;
 			if (result.rowCount > 0) {
@@ -37,14 +38,14 @@ module.exports = {
 
 			var queryText = `SELECT
 			uid as userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "stripeCustomerId", latitude, longitude,
-			"currencyCode",	"currencySymbol", profession, "isActive", created_at, "phoneNumber", "firebaseUId" as uid, "thump_imageURL", "medium_imageURL",
+			"currencyCode",	"currencySymbol", profession, "isActive", "createdAt", "phoneNumber", "firebaseUId" as uid, "thumpImageURL", "mediumImageURL",
 			( 3959 * acos( cos( radians($4) ) * cos( radians( U.latitude ) ) * cos( radians( U.longitude ) - radians($5) ) + sin( radians($4) ) * sin( radians( U.latitude ) ) ) ) AS distance
 			FROM users U
 			WHERE "isActive" = $1`;
 			var qryValue = [true, limit, pageNo, reqObj.latitude, reqObj.longitude]
 
 			if (reqObj.recentUsers) {
-				queryText = `${queryText} AND (created_at > current_date - interval '7 days')`;
+				queryText = `${queryText} AND ("createdAt" > current_date - interval '7 days')`;
 			}
 
 			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
@@ -68,8 +69,8 @@ module.exports = {
 			const whereCondition = obj.uid ? `WHERE uid =$1` : obj.id ? `WHERE "firebaseUId" = $1` : `WHERE "phoneNumber" = $1`;
 			const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
 			const result = await client.query(`SELECT
-			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
-			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid, "thump_imageURL", "medium_imageURL"
+			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
+			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid, "thumpImageURL", "mediumImageURL"
 			FROM users
 			${whereCondition}`, [val]);
 			const data = result.rows[0];
@@ -103,7 +104,7 @@ module.exports = {
 				balance = $2, "deviceId" = $3, "fullName" = $4,	"imageURl" = $5,
 				"phoneNumber" = $6, "stripeCustomerId" = $7, latitude = $8, longitude= $9,
 				"currencyCode"= $10, "currencySymbol"= $11, profession= $12,
-				"thump_imageURL"= $13, "medium_imageURL"= $14
+				"thumpImageURL"= $13, "mediumImageURL"= $14
 				WHERE "firebaseUId" = $1`,
 				[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
 				reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
@@ -196,9 +197,12 @@ module.exports = {
 	getBlockedUsers: async (obj, client) => {
 		try {
 			var data = [];
-			const result = await client.query(`SELECT "blockedUserId" from "users_blockedUsers" where uid = $1`, [obj.id]);
+			const result = await client.query(`
+			SELECT "blockedUserId", U."firebaseUId"
+			FROM "users_blockedUsers" BU
+			INNER JOIN users U ON U.uid = BU."blockedUserId" where BU.uid = $1`, [obj.id]);
 			if (result.rowCount > 0) {
-				data = result.rows.map(item => item.blockedUserId);
+				data = result.rows.map(item => item.firebaseUId);
 				return { error: false, data: data, message: 'Data fetched successfully' };
 			} else {
 				return { error: true, data: data, message: "Data fetched failed" };
@@ -211,7 +215,7 @@ module.exports = {
 	getOfferFavoritersDetails: async (ids, client) => {
 		try{
 			const result = await client.query(`
-			SELECT u."uid" userid, "imageURl" as userImage, "thump_imageURL" as userThumpImage, "medium_imageURL" as userMediumImage,"offerId"
+			SELECT u."uid" userid, "imageURl" as userImage, "thumpImageURL" as userThumpImage, "mediumImageURL" as userMediumImage,"offerId"
 			FROM "users" u
 			INNER join offers_favorites fav on fav."uid" = u."uid"
 			WHERE "offerId" = ANY(ARRAY[$1::uuid[]])`, [ids]);

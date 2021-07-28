@@ -243,7 +243,7 @@ const migration = async (request, response) => {
                      await qryClient.query(`INSERT INTO users(
                         uid, balance, "notificationUnReadcount", "deviceId",
                         "fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
-                        "currencyCode", "currencySymbol", profession, created_at, "firebaseUId", "thump_imageURL", "medium_imageURL")
+                        "currencyCode", "currencySymbol", profession, createdAt, "firebaseUId", "thumpImageURL", "mediumImageURL")
                         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING uid`,
                      [userId, reqObj.balance, reqObj.notificationUnReadcount, `{${reqObj.deviceId}}`,
                      reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
@@ -323,7 +323,7 @@ const migration = async (request, response) => {
                            locationName: value['locationName'],
                            firebaseOfferId: item
                         }
-                        await qryClient.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt", "thump_imageURL", "medium_imageURL")
+                        await qryClient.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt", "thumpImageURL", "mediumImageURL")
                            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
                         [offerId, reqObj.headLine, `{${reqObj.imageURl}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, userId, reqObj.locationName, reqObj.firebaseOfferId, createdAt, reqObj.thump_imageURL, reqObj.medium_imageURL]);
 
