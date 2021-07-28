@@ -77,4 +77,12 @@ router.post(
    upload.none(),
    offersController.saveReport
 );
+
+router.get(
+   "/offerFavoriter/:id",
+   authMiddleware,
+   upload.none(),
+   offersController.getOfferFavoriters
+);
+
 module.exports = router;

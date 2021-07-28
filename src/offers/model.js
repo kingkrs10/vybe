@@ -66,7 +66,7 @@ var self = module.exports = {
 		try {
 			const limit = reqObj.limit ? reqObj.limit : 50;
 			const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
-			const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid userId, O."isActive",
+			const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
 				O."imageURl" offerImage,"firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
 				(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
 				(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
@@ -77,9 +77,7 @@ var self = module.exports = {
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
 				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)
-				ORDER BY O."createdAt" DESC) as tbl
-				WHERE tbl.distance < 100
+				AND O."of
 				offset $4 limit $3`, [reqObj.uid, true, limit, pageNo, reqObj.latitude, reqObj.longitude]);
 			const data = result.rows;
 			if (result.rowCount > 0) {
@@ -94,8 +92,8 @@ var self = module.exports = {
 
 	getUserfavorites: async (reqObj, client) => {
 		try {
-			const limit =  50;
-			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
+			// const limit =  250;
+			// const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
 			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
 				O."imageURl" offerImage,"firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
 				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
@@ -112,7 +110,8 @@ var self = module.exports = {
 				AND fav."uid"=$1 `;
 
 			var qryValue = [reqObj.favoriteUid, true, limit, pageNo, reqObj.latitude, reqObj.longitude];
-			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC offset $4 limit $3`, qryValue);
+			// const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC offset $4 limit $3`, qryValue);
+			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC`, qryValue);
 			const data = result.rows;
 			if (result.rowCount > 0) {
 				return { error: false, data, message: 'get all data successfully' };
@@ -186,12 +185,40 @@ var self = module.exports = {
 		}
 	},
 
+	getOfferFavoriters: async (reqObj, client) => {
+		try {
+			var qryText = `SELECT distinct O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
+				O."imageURl" offerImage,"firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
+				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
+				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid = $1) as isFavorites,
+				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
+				fav."createdAt" as createdAtOffersFavorites,
+				( 3959 * acos( cos( radians($3) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($4) ) + sin( radians($3) ) * sin( radians( O.latitude ) ) ) ) AS distance
+				FROM offers O
+				INNER JOIN users U ON U.uid = O.uid
+				INNER JOIN offers_favorites fav ON  O."offerId" = fav."offerId"
+				WHERE O."isActive" =  $2
+				AND U."isActive" =  $2
+				AND O."uid" = $1`;
+			var qryValue = [reqObj.uid, true, reqObj.latitude, reqObj.longitude];
+			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC`, qryValue);
+			const data = result.rows;
+			if (result.rowCount > 0) {
+				return { error: false, data, message: 'get all data successfully' };
+			} else {
+				return { error: false, data:[], message: "get all data failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString()};
+		}
+	},
+
 	getOne: async (reqObj, client) => {
 		const { currentUser} = reqObj;
 		const id = reqObj.params ? reqObj.params.id : reqObj.offerId;
 		try {
 			const result = await client.query(`SELECT
-				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName" "offerDescription", O.uid userId, O."isActive",
+				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
 				O."imageURl" offerImage, "firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
 				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
 				(select count(uid) from offers_favorites OFS where  OFS."offerId" = $1) as favoriterCount,

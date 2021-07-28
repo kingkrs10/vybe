@@ -192,6 +192,7 @@ module.exports = {
 			return { error: true, message: error.toString() };
 		}
 	},
+
 	getBlockedUsers: async (obj, client) => {
 		try {
 			var data = [];
@@ -203,6 +204,24 @@ module.exports = {
 				return { error: true, data: data, message: "Data fetched failed" };
 			}
 		} catch (error) {
+			return { error: true, message: error.toString() };
+		}
+	},
+
+	getOfferFavoritersDetails: async (ids, client) => {
+		try{
+			const result = await client.query(`
+			SELECT u."uid" userid, "imageURl" as userImage, "thump_imageURL" as userThumpImage, "medium_imageURL" as userMediumImage,"offerId"
+			FROM "users" u
+			INNER join offers_favorites fav on fav."uid" = u."uid"
+			WHERE "offerId" = ANY(ARRAY[$1::uuid[]])`, [ids]);
+			const data = result.rows;
+			if (result.rowCount > 0) {
+				return data;
+			} else {
+				return [];
+			}
+		} catch (error){
 			return { error: true, message: error.toString() };
 		}
 	},

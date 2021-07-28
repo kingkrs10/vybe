@@ -1,4 +1,5 @@
 const offersModel = require("./model");
+const userModel = require("../users/model");
 const commonModel = require("../common/common");
 const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
@@ -364,6 +365,49 @@ const getUserfavorites = async (request, response, next) => {
    }
 };
 
+const getOfferFavoriters = async (request, response, next) => {
+   const data = {
+      ...request.currentUser,
+      uid: request.params.id
+   }
+   try {
+      const result = await commonModel.tryBlock(
+         data,
+         "(Offers:getOfferFavoriters)",
+         offersModel.getOfferFavoriters
+      );
+
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else if(!_isEmpty(result.data)){
+         const resData = []
+         const offerIds = []
+         await Promise.all(result.data.map(item => {
+            offerIds.push(item.offerId);
+            var checkData = resData.filter(i => i.offerId === item.offerId);
+            if(checkData.length === 0){
+               resData.push(item);
+            }
+         }));
+         const resultOfferFavoritersData = await commonModel.tryBlock(
+            offerIds,
+            "(Offers:getOfferFavoritersDetails)",
+            userModel.getOfferFavoritersDetails
+         );
+         const resultData = _map(resData, (item) => {
+            const offerData = resultOfferFavoritersData.filter(i => i.offerId === item.offerId);
+            item.offerFavoriters = offerData;
+            return item;
+         });
+         sendSuccessResponse(response, resultData);
+      } else {
+         sendNoContentResponse(response);
+      }
+   } catch (err) {
+      sendInternalErrorResponse(response, { message: err.toString() });
+   }
+};
+
 module.exports = {
    create,
    getAll,
@@ -376,5 +420,6 @@ module.exports = {
    getCategories,
    getAllLocation,
    getUserOffers,
-   getUserfavorites
+   getUserfavorites,
+   getOfferFavoriters
 };
