@@ -7,7 +7,7 @@ module.exports = {
    //    name: "luhu-development",
    // },
    relational_db: {
-      host: "35.224.173.132",
+      host: "34.139.179.163",
       port: 5432,
       user: "postgres",
       pass: "3xuhKwoEaKCJNIde",
