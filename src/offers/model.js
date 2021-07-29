@@ -77,7 +77,9 @@ var self = module.exports = {
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
 				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-				AND O."of
+				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)
+				ORDER BY O."createdAt" DESC) as tbl
+				WHERE tbl.distance < 100
 				offset $4 limit $3`, [reqObj.uid, true, limit, pageNo, reqObj.latitude, reqObj.longitude]);
 			const data = result.rows;
 			if (result.rowCount > 0) {
