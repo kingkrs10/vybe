@@ -13,7 +13,7 @@ module.exports = {
 				[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
 				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
 				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId,
-				reqObj.thump_imageURL, reqObj.medium_imageURL, date
+				reqObj.thumpImagePath, reqObj.mediumImagePath, date
 			]);
 			let data = null;
 			if (result.rowCount > 0) {
@@ -109,7 +109,7 @@ module.exports = {
 				[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
 				reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
 				reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession,
-				reqObj.thump_imageURL, reqObj.medium_imageURL]);
+				reqObj.thumpImagePath, reqObj.mediumImagePath]);
 
 			let data = null;
 			if (result.rowCount > 0) {
@@ -206,7 +206,7 @@ module.exports = {
 				data = result.rows.map(item => item.firebaseUId);
 				return { error: false, data: data, message: 'Data fetched successfully' };
 			} else {
-				return { error: true, data: data, message: "Data fetched failed" };
+				return { error: false, data: [], message: "Data fetched failed" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };

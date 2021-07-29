@@ -9,7 +9,6 @@ const { firebaseAdmin } = require("../common/firebase");
 const create = async (request, response) => {
    try {
       const userId = uuidv4();
-      var imagePath = null;
       // if (request.file) {
       //    const result = await commonModel.fileUpload(
       //       request.file,
@@ -18,10 +17,24 @@ const create = async (request, response) => {
       //    );
       //    imagePath = result.fileLocation ? result.fileLocation : null;
       // }
+      var imagePath = null;
+      var thumpImagePath = null;
+      var mediumImagePath = null;
       if (!_isEmpty(request.body.profileImage)) {
          imagePath = request.body.profileImage;
       }
-      const tempBody = { ...request.body, imageURl: imagePath, uid: userId };
+      if (!_isEmpty(request.body.profileThumpImageURL)) {
+         thumpImagePath = request.body.profileThumpImageURL;
+      }
+      if (!_isEmpty(request.body.profileMediumImageURL)) {
+         mediumImagePath = request.body.profileMediumImageURL;
+      }
+
+      const tempBody = { ...request.body,
+         imageURl: imagePath,
+         thumpImageURL: thumpImagePath,
+         mediumImageURL: mediumImagePath,
+         uid: userId };
       const result = await commonModel.tryBlock(
          tempBody,
          "(User:create)",
@@ -147,10 +160,30 @@ const update = async (request, response, next) => {
    try {
       firebaseAdmin.auth().updateUser(request.params.id, { phoneNumber: request.body.phoneNumber })
          .then(async function (userRecord) {
+            var imagePath = null;
+            var thumpImagePath = null;
+            var mediumImagePath = null;
+            // const imagePathArr = await fileUploadingProcess(request.files, offerId);
+            if (!_isEmpty(request.body.offerImage)) {
+               imagePath = request.body.offerImage;
+            }
+            if (!_isEmpty(request.body.offerThumpImage)) {
+               thumpImagePath = request.body.offerThumpImageURL;
+            }
+            if (!_isEmpty(request.body.offerMediumImage)) {
+               mediumImagePath = request.body.offerMediumImageURL;
+            }
             const data = {
-               reqObj: request.body,
+               reqObj: {
+                  ...request.body,
+                  imageURl: imagePath,
+                  thumpImageURL: thumpImagePath,
+                  mediumImageURL: mediumImagePath,
+                  currentUser: request.currentUser,
+               },
                uid: request.params.id,
             };
+
             // if (request.file) {
             //    const result = await commonModel.fileUpload(
             //       request.file,
@@ -161,9 +194,6 @@ const update = async (request, response, next) => {
             //       data.reqObj.imageURl = result.fileLocation;
             //    }
             // }
-            if (!_isEmpty(request.body.profileImage)) {
-               data.reqObj.imageURl = request.body.profileImage;
-            }
             const result = await commonModel.tryBlock(
                data,
                "(User:update)",
