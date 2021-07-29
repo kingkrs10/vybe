@@ -1,5 +1,4 @@
 const offersModel = require("./model");
-const userModel = require("../users/model");
 const commonModel = require("../common/common");
 const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
@@ -380,26 +379,7 @@ const getOfferFavoriters = async (request, response, next) => {
       if (result.error) {
          sendErroresponse(response, result.message);
       } else if(!_isEmpty(result.data)){
-         const resData = []
-         const offerIds = []
-         await Promise.all(result.data.map(item => {
-            offerIds.push(item.offerId);
-            var checkData = resData.filter(i => i.offerId === item.offerId);
-            if(checkData.length === 0){
-               resData.push(item);
-            }
-         }));
-         const resultOfferFavoritersData = await commonModel.tryBlock(
-            offerIds,
-            "(Offers:getOfferFavoritersDetails)",
-            userModel.getOfferFavoritersDetails
-         );
-         const resultData = _map(resData, (item) => {
-            const offerData = resultOfferFavoritersData.filter(i => i.offerId === item.offerId);
-            item.offerFavoriters = offerData;
-            return item;
-         });
-         sendSuccessResponse(response, resultData);
+         sendSuccessResponse(response, result.data);
       } else {
          sendNoContentResponse(response);
       }

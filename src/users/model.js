@@ -151,7 +151,8 @@ module.exports = {
 	updateBlockedUsers: async (Obj, client) => {
 		try {
 			const { reqObj, uid } = Obj;
-			const result = client.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [uid, reqObj.blockedUserId]);
+			const userInfo = await client.query(` SELECT uid FROM users U where U."firebaseUId" = $1`, [reqObj.blockedUserId]);
+			const result = client.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [uid, userInfo.rows[0].uid]);
 			if (result) {
 				return { error: false, message: 'Data update successfully' };
 			} else {
@@ -210,23 +211,5 @@ module.exports = {
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
-	},
-
-	getOfferFavoritersDetails: async (ids, client) => {
-		try{
-			const result = await client.query(`
-			SELECT u."uid" userid, "imageURl" as userImage, "thumpImageURL" as userThumpImage, "mediumImageURL" as userMediumImage,"offerId"
-			FROM "users" u
-			INNER join offers_favorites fav on fav."uid" = u."uid"
-			WHERE "offerId" = ANY(ARRAY[$1::uuid[]])`, [ids]);
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return data;
-			} else {
-				return [];
-			}
-		} catch (error){
-			return { error: true, message: error.toString() };
-		}
-	},
+	}
 };

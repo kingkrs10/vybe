@@ -189,20 +189,17 @@ var self = module.exports = {
 
 	getOfferFavoriters: async (reqObj, client) => {
 		try {
-			var qryText = `SELECT distinct O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."imageURl" offerImage,"firebaseOfferId", O."thumpImageURL" as offerThumpImage, O."mediumImageURL" as offerMediumImage,
-				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
-				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid = $1) as isFavorites,
-				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
-				fav."createdAt" as createdAtOffersFavorites,
-				( 3959 * acos( cos( radians($3) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($4) ) + sin( radians($3) ) * sin( radians( O.latitude ) ) ) ) AS distance
+			var qryText = `SELECT O."offerId", O."createdAt" as "offerCreatedAt", O."headLine", O."offerDescription",
+				O."imageURl" as "offerImage", O."thumpImageURL" as "offerThumpImage", O."mediumImageURL" as "offerMediumImage",
+				U."firebaseUId" uid, U."fullName", U.profession, U."imageURl" as "userImage", U."thumpImageURL" as "userThumpImage", U."mediumImageURL" as "userMediumImage",
+				fav."createdAt" as "createdAtOffersFavorites"
 				FROM offers O
-				INNER JOIN users U ON U.uid = O.uid
 				INNER JOIN offers_favorites fav ON  O."offerId" = fav."offerId"
+				INNER JOIN users U ON U.uid = fav.uid
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
 				AND O."uid" = $1`;
-			var qryValue = [reqObj.uid, true, reqObj.latitude, reqObj.longitude];
+			var qryValue = [reqObj.uid, true];
 			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC`, qryValue);
 			const data = result.rows;
 			if (result.rowCount > 0) {
