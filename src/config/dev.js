@@ -10,10 +10,9 @@ module.exports = {
       host: "35.224.173.132",
       port: 5432,
       user: "postgres",
-      // pass: "n9Lyi5Eboh1O3KKt",
-      pass: "LM4q0MLDPer09B14",
+      pass: "3xuhKwoEaKCJNIde",
       name: "luhu-production",
-      cloudpath: "/cloudsql/luhu-production:us-central1:luhu-development-db-postgres",
+      cloudpath: "/cloudsql/luhu-production:us-east1:luhu-production-postgres-db",
    },
 
    app: {
