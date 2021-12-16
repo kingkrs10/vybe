@@ -16,10 +16,11 @@ router.use("/users", userRouter);
 router.use("/offers", offersRouter);
 router.use("/userInvites", userInvitesRouter);
 router.use("/notifications", notificationsRouter);
+router.use("/countryCurrency", countryCurrencyRouter);
+router.use("/currency", currencyRouter);
+
 router.use("/chats", chatsRouter);
 router.use("/messages", messagesRouter);
 router.use("/stripe", stripeRouter);
-router.use("/countryCurrency", countryCurrencyRouter);
-router.use("/currency", currencyRouter);
 
 module.exports = router;

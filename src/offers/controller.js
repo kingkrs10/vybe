@@ -8,15 +8,18 @@ const _isEmpty = require('lodash/isEmpty');
 const create = async (request, response) => {
    try {
       const offerId = uuidv4();
-      var imagePath = null;
+      var imagePath = request.body.offerImage ? request.body.offerImage : null;;
+      var mediumImagePath = request.body.offerMediumImage ? request.body.offerMediumImage : null;
+      var thumpImagePath =  request.body.offerThumpImage ? request.body.offerThumpImage : null;
+
       // const imagePathArr = await fileUploadingProcess(request.files, offerId);
-      if (!_isEmpty(request.body.offerImage)) {
-         imagePath = request.body.offerImage;
-      }
+
       const tempBody = {
          ...request.body,
          currentUser: request.currentUser,
          imageURl: imagePath,
+         thump_imageURl: thumpImagePath,
+         medium_imageURL: mediumImagePath,
          offerId: offerId,
       };
       const result = await commonModel.tryBlock(
@@ -57,8 +60,12 @@ const update = async (request, response, next) => {
       };
       // const imagePathArr = await fileUploadingProcess(request.files, offerId);
       if (!_isEmpty(request.body.offerImage)) {
-         data.reqObj.imageURl = request.body.offerImage;
+         data.reqObj.imageURL = request.body.offerImage;
       }
+
+      data.reqObj.medium_imageURL = request.body.offerMediumImage ? request.body.offerMediumImage : null;
+      data.reqObj.thump_imageURL =  request.body.offerThumpImage ? request.body.offerThumpImage : null;
+
       const result = await commonModel.tryBlock(
          data,
          "(Offers:update)",

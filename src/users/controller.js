@@ -10,6 +10,9 @@ const create = async (request, response) => {
    try {
       const userId = uuidv4();
       var imagePath = null;
+      var mediumImagePath = null;
+      var thumpImagePath = null;
+
       // if (request.file) {
       //    const result = await commonModel.fileUpload(
       //       request.file,
@@ -18,10 +21,20 @@ const create = async (request, response) => {
       //    );
       //    imagePath = result.fileLocation ? result.fileLocation : null;
       // }
+
       if (!_isEmpty(request.body.profileImage)) {
          imagePath = request.body.profileImage;
       }
-      const tempBody = { ...request.body, imageURl: imagePath, uid: userId };
+
+      if (request.body.profileMediumImage && !_isEmpty(request.body.profileMediumImage)) {
+         mediumImagePath = request.body.profileMediumImage;
+      }
+
+      if (request.body.profileThumpImage && !_isEmpty(request.body.profileThumpImage)) {
+         thumpImagePath = request.body.profileThumpImage;
+      }
+
+      const tempBody = { ...request.body, imageURl: imagePath, medium_imageURL:mediumImagePath, thump_imageURL: thumpImagePath, uid: userId };
       const result = await commonModel.tryBlock(
          tempBody,
          "(User:create)",
@@ -154,6 +167,15 @@ const update = async (request, response, next) => {
             if (!_isEmpty(request.body.profileImage)) {
                data.reqObj.imageURl = request.body.profileImage;
             }
+
+            if (request.body.profileMediumImage && !_isEmpty(request.body.profileMediumImage)) {
+               data.reqObj.medium_imageURL = request.body.profileMediumImage;
+            }
+
+            if (request.body.profileThumpImage && !_isEmpty(request.body.profileThumpImage)) {
+               data.reqObj.thump_imageURL = request.body.profileThumpImage;
+            }
+
             const result = await commonModel.tryBlock(
                data,
                "(User:update)",
@@ -284,6 +306,28 @@ const getRecentUsers = async (request, response, next) => {
    }
 };
 
+const updateStripeId = async (request, response, next) => {
+   try {
+      const reqObj = {
+         ...request.body,
+         uid: request.params.id,
+         currentUser:request.currentUser,
+      }
+      const result = await commonModel.tryBlock(
+         reqObj,
+         "(User:updateStripeId)",
+         usersModel.updateStripeId
+      );
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else {
+         sendSuccessResponse(response, {});
+      }
+   } catch (err) {
+      sendInternalErrorResponse(response, { message: err.toString() });
+   }
+};
+
 module.exports = {
    create,
    getAll,
@@ -293,5 +337,6 @@ module.exports = {
    updateLocation,
    updateBlockedUsers,
    getAuthToken,
-   getRecentUsers
+   getRecentUsers,
+   updateStripeId
 };

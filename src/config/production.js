@@ -3,14 +3,12 @@ module.exports = {
       host: "34.139.179.163",
       port: 5432,
       user: "postgres",
-      // pass: "n9Lyi5Eboh1O3KKt",
       pass: "3xuhKwoEaKCJNIde",
       name: "luhu-production",
       cloudpath: "/cloudsql/luhu-production:us-east1:luhu-production-postgres-db",
-      // cloudpath: "/cloudsql/luhu-development:us-central1:luhu-development-db-postgres",
    },
    app: {
-      port: 8081,
+      port: 4000,
       secretKey: "luhu-jwt-stuff-secret"
    },
    stripe_api_key:
