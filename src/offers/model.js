@@ -6,7 +6,7 @@ var self = module.exports = {
 		const mediumImageURLData = Array.isArray(reqObj.mediumImageURL) ? reqObj.mediumImageURL : JSON.parse(reqObj.mediumImageURL);
 
 		try {
-			const result = await client.query(`INSERT INTO offers("offerId", "headLine", "imageURl",  latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "thumpImageURL", "mediumImageURL")
+			const result = await client.query(`INSERT INTO offers("offerId", "headLine", "imageURl",  latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "thump_imageURL", "medium_imageURL")
 					VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING "offerId"`,
 				[reqObj.offerId, reqObj.headLine, `{${imageURlData}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, reqObj.uid, reqObj.locationName, reqObj.firebaseOfferId,`{${thumpImageURLData}}`, `{${mediumImageURLData}}`]);
 			let data = null;
@@ -40,8 +40,8 @@ var self = module.exports = {
 				longitude = $5,
 				"locationName" = $6,
 				"offerDescription" = $7,
-				"thumpImageURL" = $8,
-				"mediumImageURL" = $9,
+				"thump_imageURL" = $8,
+				"medium_imageURL" = $9,
 				"updatedAt" = now()
 				WHERE "offerId" = $1 RETURNING "offerId"`,
 				[offerId, reqObj.headLine, `{${imageURlData}}`, reqObj.latitude, reqObj.longitude, reqObj.locationName, reqObj.offerDescription, `{${thumpImageURLData}}`, `{${mediumImageURLData}}`]);
@@ -67,7 +67,7 @@ var self = module.exports = {
 			const limit = reqObj.limit ? reqObj.limit : 50;
 			const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
 			const result = await client.query(`SELECT * FROM (SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."imageURl" offerImage,"firebaseOfferId", O."thumpImageURL" as offerThumpImage, O."mediumImageURL" as offerMediumImage,
+				O."imageURl" offerImage,"firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
 				(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
 				(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
@@ -97,7 +97,7 @@ var self = module.exports = {
 			// const limit =  250;
 			// const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
 			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."imageURl" offerImage,"firebaseOfferId", O."thumpImageURL" as offerThumpImage, O."mediumImageURL" as offerMediumImage,
+				O."imageURl" offerImage,"firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
 				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
 				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
@@ -131,7 +131,7 @@ var self = module.exports = {
 			const userId = reqObj.favoriteUid ? reqObj.favoriteUid : reqObj.userId;
 
 			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."imageURl" offerImage,"firebaseOfferId", O."thumpImageURL" as offerThumpImage, O."mediumImageURL" as offerMediumImage,
+				O."imageURl" offerImage,"firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
 				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
 				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
 				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
@@ -192,8 +192,8 @@ var self = module.exports = {
 	getOfferFavoriters: async (reqObj, client) => {
 		try {
 			var qryText = `SELECT O."offerId", O."createdAt" as "offerCreatedAt", O."headLine", O."offerDescription",
-				O."imageURl" as "offerImage", O."thumpImageURL" as "offerThumpImage", O."mediumImageURL" as "offerMediumImage",
-				U."firebaseUId" uid, U."fullName", U.profession, U."imageURl" as "userImage", U."thumpImageURL" as "userThumpImage", U."mediumImageURL" as "userMediumImage",
+				O."imageURl" as "offerImage", O."thump_imageURL" as "offerThumpImage", O."medium_imageURL" as "offerMediumImage",
+				U."firebaseUId" uid, U."fullName", U.profession, U."imageURl" as "userImage", U."thump_imageURL" as "userThumpImage", U."medium_imageURL" as "userMediumImage",
 				fav."createdAt" as "createdAtOffersFavorites"
 				FROM offers O
 				INNER JOIN offers_favorites fav ON  O."offerId" = fav."offerId"
@@ -220,7 +220,7 @@ var self = module.exports = {
 		try {
 			const result = await client.query(`SELECT
 				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."imageURl" offerImage, "firebaseOfferId", O."thumpImageURL" as offerThumpImage, O."mediumImageURL" as offerMediumImage,
+				O."imageURl" offerImage, "firebaseOfferId", O."thump_imageURL" as offerThumpImage, O."medium_imageURL" as offerMediumImage,
 				U.profession, U."imageURl" userImage, U."fullName",U."firebaseUId" uid,
 				(select count(uid) from offers_favorites OFS where  OFS."offerId" = $1) as favoriterCount,
 				( 3959 * acos( cos( radians($2) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( O.latitude ) ) ) ) AS distance

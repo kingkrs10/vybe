@@ -8,7 +8,7 @@ module.exports = {
 				uid, balance, "notificationUnReadcount", "deviceId",
 				"fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
 				"currencyCode", "currencySymbol", profession, "firebaseUId",
-				"thumpImageURL", "mediumImageURL", "createdAt")
+				"thump_imageURL", "medium_imageURL", "createdAt")
 				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING uid`,
 				[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
 				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
@@ -38,7 +38,7 @@ module.exports = {
 
 			var queryText = `SELECT
 			uid as userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "stripeCustomerId", latitude, longitude,
-			"currencyCode",	"currencySymbol", profession, "isActive", "createdAt", "phoneNumber", "firebaseUId" as uid, "thumpImageURL", "mediumImageURL",
+			"currencyCode",	"currencySymbol", profession, "isActive", "createdAt", "phoneNumber", "firebaseUId" as uid, "thump_imageURL", "medium_imageURL",
 			( 3959 * acos( cos( radians($4) ) * cos( radians( U.latitude ) ) * cos( radians( U.longitude ) - radians($5) ) + sin( radians($4) ) * sin( radians( U.latitude ) ) ) ) AS distance
 			FROM users U
 			WHERE "isActive" = $1`;
@@ -70,7 +70,7 @@ module.exports = {
 			const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
 			const result = await client.query(`SELECT
 			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
-			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid, "thumpImageURL", "mediumImageURL"
+			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid, "thump_imageURL", "medium_imageURL"
 			FROM users
 			${whereCondition}`, [val]);
 			const data = result.rows[0];
@@ -104,7 +104,7 @@ module.exports = {
 				balance = $2, "deviceId" = $3, "fullName" = $4,	"imageURl" = $5,
 				"phoneNumber" = $6, "stripeCustomerId" = $7, latitude = $8, longitude= $9,
 				"currencyCode"= $10, "currencySymbol"= $11, profession= $12,
-				"thumpImageURL"= $13, "mediumImageURL"= $14
+				"thump_imageURL"= $13, "medium_imageURL"= $14
 				WHERE "firebaseUId" = $1`,
 				[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
 				reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
