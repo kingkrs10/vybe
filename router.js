@@ -10,16 +10,21 @@ const messagesRouter = require("./src/messages");
 const stripeRouter = require("./src/stripe");
 const countryCurrencyRouter = require("./src/countryCurrency");
 const currencyRouter = require("./src/currency");
+const shopsRouter = require("./src/shops");
+const categoriesRouter = require("./src/categories");
 
 router.use("/", utilRouter);
 router.use("/users", userRouter);
 router.use("/offers", offersRouter);
 router.use("/userInvites", userInvitesRouter);
 router.use("/notifications", notificationsRouter);
+router.use("/countryCurrency", countryCurrencyRouter);
+router.use("/currency", currencyRouter);
+router.use("/categories", categoriesRouter);
+router.use("/shops", shopsRouter);
+
 router.use("/chats", chatsRouter);
 router.use("/messages", messagesRouter);
 router.use("/stripe", stripeRouter);
-router.use("/countryCurrency", countryCurrencyRouter);
-router.use("/currency", currencyRouter);
 
 module.exports = router;

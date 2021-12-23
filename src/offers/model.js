@@ -128,6 +128,8 @@ var self = module.exports = {
 		try {
 			const limit =  50;
 			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
+			const userId = reqObj.favoriteUid ? reqObj.favoriteUid : reqObj.userId;
+
 			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
 				O."imageURl" offerImage,"firebaseOfferId", O."thumpImageURL" as offerThumpImage, O."mediumImageURL" as offerMediumImage,
 				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
@@ -140,40 +142,40 @@ var self = module.exports = {
 				AND U."isActive" =  $2
 				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
 				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)`;
-			var qryValue = [reqObj.userId, true, limit, pageNo, reqObj.latitude, reqObj.longitude];
+			var qryValue = [userId, true, limit, pageNo, reqObj.latitude, reqObj.longitude];
 
 			if ((reqObj.category && !_isEmpty(reqObj.category)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
 					qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($7))`
 					qryText = `${qryText} AND (LOWER("headLine") like LOWER($8)
 						OR LOWER("offerDescription") like LOWER($8)
 						OR LOWER("locationName") like LOWER($8))`
-				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.category, `%${reqObj.searchTerm}%`]
+				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.category, `%${reqObj.searchTerm}%`]
 
 			} else if ((reqObj.category && !_isEmpty(reqObj.category)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
 				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_hashTags" WHERE LOWER("hashTag") = LOWER($7))`;
-				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.category]
+				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.category]
 
 			}else if ((reqObj.location && !_isEmpty(reqObj.location)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
 				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($7)`;
 					qryText = `${qryText} AND (LOWER("headLine") like LOWER($8)
 						OR LOWER("offerDescription") like LOWER($8)
 						OR LOWER("locationName") like LOWER($8))`
-				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.location, `%${reqObj.searchTerm}%`]
+				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.location, `%${reqObj.searchTerm}%`]
 
 			} else if ((reqObj.location && !_isEmpty(reqObj.location)) && (!reqObj.searchTerm || _isEmpty(reqObj.searchTerm))){
 				qryText = `${qryText} AND LOWER(O."locationName") = LOWER($7)`;
-				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.location];
+				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.location];
 			} else if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)){
 				qryText = `${qryText} AND (LOWER("headLine") like LOWER($7)
 						OR LOWER("offerDescription") like LOWER($7)
 						OR LOWER("locationName") like LOWER($7))`;
-				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, `%${reqObj.searchTerm}%`]
+				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, `%${reqObj.searchTerm}%`]
 			} else if (reqObj.uid) {
 				qryText = `${qryText} AND O.uid = $7`;
-				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.uid]
+				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.uid]
 			} else if (reqObj.favoriteUid) {
 				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $7)`;
-				qryValue = [reqObj.userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.favoriteUid]
+				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.favoriteUid]
 			}
 			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $4 limit $3`, qryValue);
 			const data = result.rows;

@@ -8,19 +8,12 @@ const _isEmpty = require('lodash/isEmpty');
 const create = async (request, response) => {
    try {
       const offerId = uuidv4();
-      var imagePath = null;
-      var thumpImagePath = null;
-      var mediumImagePath = null;
+      var imagePath = request.body.offerImage ? request.body.offerImage : null;;
+      var mediumImagePath = request.body.offerMediumImage ? request.body.offerMediumImage : null;
+      var thumpImagePath =  request.body.offerThumpImage ? request.body.offerThumpImage : null;
+
       // const imagePathArr = await fileUploadingProcess(request.files, offerId);
-      if (!_isEmpty(request.body.offerImage)) {
-         imagePath = request.body.offerImage;
-      }
-      if (!_isEmpty(request.body.offerThumpImage)) {
-         thumpImagePath = request.body.offerThumpImageURL;
-      }
-      if (!_isEmpty(request.body.offerMediumImage)) {
-         mediumImagePath = request.body.offerMediumImageURL;
-      }
+
       const tempBody = {
          ...request.body,
          currentUser: request.currentUser,

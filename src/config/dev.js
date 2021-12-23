@@ -1,18 +1,20 @@
 module.exports = {
    // relational_db: {
-   //    host: "local",
+   //    host: "localhost",
    //    port: 5432,
    //    user: "postgres",
    //    pass: "password",
    //    name: "luhu-development",
    // },
+
    relational_db: {
       host: "35.202.0.126",
       port: 5432,
       user: "postgres",
       pass: "n9Lyi5Eboh1O3KKt",
-      name: "Luhu",
-      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
+      name: "luhu-development",
+      // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
+      cloudpath: "/cloudsql/luhu-development:us-central1:luhu-development-db-postgres"
    },
 
    app: {
@@ -46,4 +48,4 @@ module.exports = {
    offers_collection_name: "staticOffers",
    currency_collection_name: "currency",
    transaction_history_collection_name: "transaction_history",
-};
+}

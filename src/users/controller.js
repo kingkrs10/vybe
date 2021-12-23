@@ -9,6 +9,10 @@ const { firebaseAdmin } = require("../common/firebase");
 const create = async (request, response) => {
    try {
       const userId = uuidv4();
+      var imagePath = null;
+      var mediumImagePath = null;
+      var thumpImagePath = null;
+
       // if (request.file) {
       //    const result = await commonModel.fileUpload(
       //       request.file,
@@ -17,24 +21,20 @@ const create = async (request, response) => {
       //    );
       //    imagePath = result.fileLocation ? result.fileLocation : null;
       // }
-      var imagePath = null;
-      var thumpImagePath = null;
-      var mediumImagePath = null;
+
       if (!_isEmpty(request.body.profileImage)) {
          imagePath = request.body.profileImage;
       }
-      if (!_isEmpty(request.body.profileThumpImageURL)) {
-         thumpImagePath = request.body.profileThumpImageURL;
-      }
-      if (!_isEmpty(request.body.profileMediumImageURL)) {
-         mediumImagePath = request.body.profileMediumImageURL;
+
+      if (request.body.profileMediumImage && !_isEmpty(request.body.profileMediumImage)) {
+         mediumImagePath = request.body.profileMediumImage;
       }
 
-      const tempBody = { ...request.body,
-         imageURl: imagePath,
-         thumpImageURL: thumpImagePath,
-         mediumImageURL: mediumImagePath,
-         uid: userId };
+      if (request.body.profileThumpImage && !_isEmpty(request.body.profileThumpImage)) {
+         thumpImagePath = request.body.profileThumpImage;
+      }
+
+      const tempBody = { ...request.body, imageURl: imagePath, medium_imageURL:mediumImagePath, thump_imageURL: thumpImagePath, uid: userId };
       const result = await commonModel.tryBlock(
          tempBody,
          "(User:create)",
@@ -194,6 +194,18 @@ const update = async (request, response, next) => {
             //       data.reqObj.imageURl = result.fileLocation;
             //    }
             // }
+            if (!_isEmpty(request.body.profileImage)) {
+               data.reqObj.imageURl = request.body.profileImage;
+            }
+
+            if (request.body.profileMediumImage && !_isEmpty(request.body.profileMediumImage)) {
+               data.reqObj.medium_imageURL = request.body.profileMediumImage;
+            }
+
+            if (request.body.profileThumpImage && !_isEmpty(request.body.profileThumpImage)) {
+               data.reqObj.thump_imageURL = request.body.profileThumpImage;
+            }
+
             const result = await commonModel.tryBlock(
                data,
                "(User:update)",
@@ -348,6 +360,28 @@ const getBlockedUsers = async (request, response, next) => {
    }
 };
 
+const updateStripeId = async (request, response, next) => {
+   try {
+      const reqObj = {
+         ...request.body,
+         uid: request.params.id,
+         currentUser:request.currentUser,
+      }
+      const result = await commonModel.tryBlock(
+         reqObj,
+         "(User:updateStripeId)",
+         usersModel.updateStripeId
+      );
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else {
+         sendSuccessResponse(response, {});
+      }
+   } catch (err) {
+      sendInternalErrorResponse(response, { message: err.toString() });
+   }
+};
+
 module.exports = {
    create,
    getAll,
@@ -358,5 +392,6 @@ module.exports = {
    updateBlockedUsers,
    getAuthToken,
    getRecentUsers,
-   getBlockedUsers
+   getBlockedUsers,
+   updateStripeId
 };

@@ -11,6 +11,7 @@ admin.initializeApp({
 // Cloud storage
 const bucket = admin.storage().bucket();
 const firebaseAdmin = admin;
+
 module.exports = {
     bucket,
     firebaseAdmin

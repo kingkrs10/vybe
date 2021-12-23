@@ -113,7 +113,7 @@ module.exports = {
 
 			let data = null;
 			if (result.rowCount > 0) {
-				const result1 = await module.exports.getOne({ uid: uid }, client);
+				const result1 = await module.exports.getOne({ id: uid }, client);
 				data = result1 ? result1 : null;
 			}
 			if (result.rowCount > 0 && data) {
@@ -207,6 +207,21 @@ module.exports = {
 				return { error: false, data: data, message: 'Data fetched successfully' };
 			} else {
 				return { error: false, data: [], message: "Data fetched failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString() };
+		}
+	},
+	updateStripeId: async (reqObj, client) => {
+		try {
+			const result = await client.query(`UPDATE users SET
+				"stripeCustomerId" = $2
+				where uid = $1`,
+				[reqObj.uid, reqObj.stripeCustomerId]);
+			if (result.rowCount > 0) {
+				return { error: false, message: 'Data update successfully' };
+			} else {
+				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };

@@ -65,6 +65,12 @@ router.get(
     usersController.getAuthToken
 );
 
+router.put(
+    "/updateStripeId/:id",
+    authMiddleware,
+    usersController.updateStripeId
+);
+
 // router.put(
 //     "/updateMobileNumber/:id",
 //     authMiddleware,

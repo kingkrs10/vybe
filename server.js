@@ -1,14 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const config = require("./src/config/config");
-const app = express();
-const router = require("./router");
-var schedule = require("node-schedule");
 const axios = require("axios");
+var schedule = require("node-schedule");
 const { v4: uuidv4 } = require('uuid');
 
+const config = require("./src/config/config");
+const router = require("./router");
 const currencyModel = require("./src/currency/model");
 const commonModel = require("./src/common/common");
+const app = express();
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
