@@ -14,7 +14,7 @@ module.exports = {
       pass: "n9Lyi5Eboh1O3KKt",
       name: "luhu-development",
       // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
-      cloudpath: "/cloudsql/luhu-development:us-central1:luhu-development-db-postgres"
+      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
 
    app: {
