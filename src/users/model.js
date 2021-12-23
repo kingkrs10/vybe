@@ -2,18 +2,17 @@ const _isEmpty = require('lodash/isEmpty');
 
 module.exports = {
 	create: async (reqObj, client) => {
-		const date = new Date;
 		try {
 			const result = await client.query(`INSERT INTO users(
 				uid, balance, "notificationUnReadcount", "deviceId",
 				"fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
 				"currencyCode", "currencySymbol", profession, "firebaseUId",
-				"thump_imageURL", "medium_imageURL", "createdAt")
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING uid`,
+				"thump_imageURL", "medium_imageURL")
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING uid`,
 				[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
 				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
 				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId,
-				reqObj.thumpImagePath, reqObj.mediumImagePath, date
+				reqObj.thump_imageURL, reqObj.medium_imageURL
 			]);
 			let data = null;
 			if (result.rowCount > 0) {
@@ -38,20 +37,21 @@ module.exports = {
 
 			var queryText = `SELECT
 			uid as userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "stripeCustomerId", latitude, longitude,
-			"currencyCode",	"currencySymbol", profession, "isActive", "createdAt", "phoneNumber", "firebaseUId" as uid, "thump_imageURL", "medium_imageURL",
+			"currencyCode",	"currencySymbol", profession, "isActive", created_at, "phoneNumber", "firebaseUId" as uid, "thump_imageURL", "medium_imageURL",
 			( 3959 * acos( cos( radians($4) ) * cos( radians( U.latitude ) ) * cos( radians( U.longitude ) - radians($5) ) + sin( radians($4) ) * sin( radians( U.latitude ) ) ) ) AS distance
 			FROM users U
 			WHERE "isActive" = $1`;
 			var qryValue = [true, limit, pageNo, reqObj.latitude, reqObj.longitude]
 
 			if (reqObj.recentUsers) {
-				queryText = `${queryText} AND ("createdAt" > current_date - interval '7 days')`;
+				queryText = `${queryText} AND (created_at > current_date - interval '7 days')`;
 			}
 
 			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
 				queryText = `${queryText} AND (LOWER("fullName") like LOWER($6) OR LOWER("profession") like LOWER($6))`;
 				qryValue = [true, limit, pageNo, reqObj.latitude, reqObj.longitude, `%${reqObj.searchTerm}%`];
 			}
+
 			const result = await client.query(`${queryText} ORDER BY U.uid offset $3 limit $2 `, qryValue);
 			const data = result.rows;
 			if (result.rowCount > 0) {
@@ -69,7 +69,7 @@ module.exports = {
 			const whereCondition = obj.uid ? `WHERE uid =$1` : obj.id ? `WHERE "firebaseUId" = $1` : `WHERE "phoneNumber" = $1`;
 			const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
 			const result = await client.query(`SELECT
-			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
+			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
 			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid, "thump_imageURL", "medium_imageURL"
 			FROM users
 			${whereCondition}`, [val]);
@@ -109,7 +109,7 @@ module.exports = {
 				[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
 				reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
 				reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession,
-				reqObj.thumpImagePath, reqObj.mediumImagePath]);
+				reqObj.thump_imageURL, reqObj.medium_imageURL]);
 
 			let data = null;
 			if (result.rowCount > 0) {
@@ -122,6 +122,7 @@ module.exports = {
 				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
+			console.log('update', error);
 			return { error: true, message: error.toString() };
 		}
 	},
@@ -151,8 +152,7 @@ module.exports = {
 	updateBlockedUsers: async (Obj, client) => {
 		try {
 			const { reqObj, uid } = Obj;
-			const userInfo = await client.query(` SELECT uid FROM users U where U."firebaseUId" = $1`, [reqObj.blockedUserId]);
-			const result = client.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [uid, userInfo.rows[0].uid]);
+			const result = client.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [uid, reqObj.blockedUserId]);
 			if (result) {
 				return { error: false, message: 'Data update successfully' };
 			} else {
@@ -195,6 +195,22 @@ module.exports = {
 		}
 	},
 
+	updateStripeId: async (reqObj, client) => {
+		try {
+			const result = await client.query(`UPDATE users SET
+				"stripeCustomerId" = $2
+				where uid = $1`,
+				[reqObj.uid, reqObj.stripeCustomerId]);
+			if (result.rowCount > 0) {
+				return { error: false, message: 'Data update successfully' };
+			} else {
+				return { error: true, message: "Data update failed" };
+			}
+		} catch (error) {
+			return { error: true, message: error.toString() };
+		}
+	},
+
 	getBlockedUsers: async (obj, client) => {
 		try {
 			var data = [];
@@ -207,21 +223,6 @@ module.exports = {
 				return { error: false, data: data, message: 'Data fetched successfully' };
 			} else {
 				return { error: false, data: [], message: "Data fetched failed" };
-			}
-		} catch (error) {
-			return { error: true, message: error.toString() };
-		}
-	},
-	updateStripeId: async (reqObj, client) => {
-		try {
-			const result = await client.query(`UPDATE users SET
-				"stripeCustomerId" = $2
-				where uid = $1`,
-				[reqObj.uid, reqObj.stripeCustomerId]);
-			if (result.rowCount > 0) {
-				return { error: false, message: 'Data update successfully' };
-			} else {
-				return { error: true, message: "Data update failed" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };

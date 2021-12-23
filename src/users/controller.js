@@ -86,24 +86,14 @@ const getOne = async (request, response, next) => {
       if (result.error) {
          sendErroresponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
-
-         const resultBlockedUsers = await commonModel.tryBlock(
-            { uid:  result.data.userid },
-            "(User:getBlockedUsers)",
-            usersModel.getBlockedUsers
-         );
-
          const resUserCountryCurrency = await commonModel.tryBlock(
             result.data.userid,
             "(Offers:getUserCountryCurrency)",
             userCountryCurrencyModel.getUserCountryCurrency
          );
-
-      const resultData = {
-         ...result.data, countryCurrency: resUserCountryCurrency.data,
-         currencyDetails: { code: result.data.currencyCode, symbol: result.data.currencySymbol },
-         blockListID: resultBlockedUsers.data
-      };
+         const resultData = {
+            ...result.data, countryCurrency: resUserCountryCurrency.data,
+            currencyDetails: { code: result.data.currencyCode, symbol: result.data.currencySymbol }};
 
          sendSuccessResponse(response, resultData);
       } else {
@@ -160,30 +150,10 @@ const update = async (request, response, next) => {
    try {
       firebaseAdmin.auth().updateUser(request.params.id, { phoneNumber: request.body.phoneNumber })
          .then(async function (userRecord) {
-            var imagePath = null;
-            var thumpImagePath = null;
-            var mediumImagePath = null;
-            // const imagePathArr = await fileUploadingProcess(request.files, offerId);
-            if (!_isEmpty(request.body.offerImage)) {
-               imagePath = request.body.offerImage;
-            }
-            if (!_isEmpty(request.body.offerThumpImage)) {
-               thumpImagePath = request.body.offerThumpImageURL;
-            }
-            if (!_isEmpty(request.body.offerMediumImage)) {
-               mediumImagePath = request.body.offerMediumImageURL;
-            }
             const data = {
-               reqObj: {
-                  ...request.body,
-                  imageURl: imagePath,
-                  thumpImageURL: thumpImagePath,
-                  mediumImageURL: mediumImagePath,
-                  currentUser: request.currentUser,
-               },
+               reqObj: request.body,
                uid: request.params.id,
             };
-
             // if (request.file) {
             //    const result = await commonModel.fileUpload(
             //       request.file,
@@ -336,6 +306,29 @@ const getRecentUsers = async (request, response, next) => {
    }
 };
 
+const updateStripeId = async (request, response, next) => {
+   try {
+      const reqObj = {
+         ...request.body,
+         uid: request.params.id,
+         currentUser:request.currentUser,
+      }
+      const result = await commonModel.tryBlock(
+         reqObj,
+         "(User:updateStripeId)",
+         usersModel.updateStripeId
+      );
+      if (result.error) {
+         sendErroresponse(response, result.message);
+      } else {
+         sendSuccessResponse(response, {});
+      }
+   } catch (err) {
+      sendInternalErrorResponse(response, { message: err.toString() });
+   }
+};
+
+
 const getBlockedUsers = async (request, response, next) => {
    try {
       const reqObj = {
@@ -360,28 +353,6 @@ const getBlockedUsers = async (request, response, next) => {
    }
 };
 
-const updateStripeId = async (request, response, next) => {
-   try {
-      const reqObj = {
-         ...request.body,
-         uid: request.params.id,
-         currentUser:request.currentUser,
-      }
-      const result = await commonModel.tryBlock(
-         reqObj,
-         "(User:updateStripeId)",
-         usersModel.updateStripeId
-      );
-      if (result.error) {
-         sendErroresponse(response, result.message);
-      } else {
-         sendSuccessResponse(response, {});
-      }
-   } catch (err) {
-      sendInternalErrorResponse(response, { message: err.toString() });
-   }
-};
-
 module.exports = {
    create,
    getAll,
@@ -392,6 +363,6 @@ module.exports = {
    updateBlockedUsers,
    getAuthToken,
    getRecentUsers,
-   getBlockedUsers,
-   updateStripeId
+   updateStripeId,
+   getBlockedUsers
 };
