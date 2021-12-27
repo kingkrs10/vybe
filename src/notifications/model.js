@@ -18,7 +18,7 @@ module.exports = {
 	getUsersNotification: async (id, client) => {
 		try {
 			const result = await client.query(`SELECT "notificationId", "offerId", "senderUId", "receiverUId", "createdAt",
-				U.profession, U."imageURl" userImage, U."fullName"
+				U.profession, U."userImage", U."fullName"
 				FROM notifications N
 				INNER JOIN users U ON U.uid = N."senderUId"
 			WHERE U.uid = $1`, [id]);

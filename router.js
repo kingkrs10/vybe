@@ -12,6 +12,8 @@ const countryCurrencyRouter = require("./src/countryCurrency");
 const currencyRouter = require("./src/currency");
 const shopsRouter = require("./src/shops");
 const categoriesRouter = require("./src/categories");
+const shopCollectionsRouter = require("./src/shopCollections");
+const productsRouter = require("./src/products");
 
 router.use("/", utilRouter);
 router.use("/users", userRouter);
@@ -22,6 +24,8 @@ router.use("/countryCurrency", countryCurrencyRouter);
 router.use("/currency", currencyRouter);
 router.use("/categories", categoriesRouter);
 router.use("/shops", shopsRouter);
+router.use("/shopCollections", shopCollectionsRouter);
+router.use("/products", productsRouter);
 
 router.use("/chats", chatsRouter);
 router.use("/messages", messagesRouter);

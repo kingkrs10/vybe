@@ -40,8 +40,8 @@ module.exports = {
 		// const limit = 5
 		// const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
 		const result = await client.query(`SELECT "chatId", "lastMessage", "messageFromUId", "messageToUId", "lastModified",ch."isActive",
-			U."fullName" as messageFromName, U."imageURl" as messageFromURI,
-			U1."fullName" as messageToName, U1."imageURl" as messageToURI
+			U."fullName" as messageFromName, U."userImage" as messageFromURI,
+			U1."fullName" as messageToName, U1."userImage" as messageToURI
 			FROM chats Ch
 			INNER JOIN users U ON U.uid = ch."messageFromUId"
 			INNER JOIN users U1 ON U1.uid = ch."messageToUId"
@@ -61,8 +61,8 @@ module.exports = {
 
 	getOne: async (id, client) => {
 		const result = await client.query(`SELECT "chatId", "lastMessage", "messageFromUId", "messageToUId", "lastModified", Ch."isActive",
-			U."fullName" as messageFromName, U."imageURl" as messageFromURI,
-			U1."fullName" as messageToName, U1."imageURl" as messageToURI
+			U."fullName" as messageFromName, U."userImage" as messageFromURI,
+			U1."fullName" as messageToName, U1."userImage" as messageToURI
 			FROM chats Ch
 			INNER JOIN users U ON U.uid = Ch."messageFromUId"
 			INNER JOIN users U1 ON U1.uid = Ch."messageToUId"

@@ -5,14 +5,14 @@ module.exports = {
 		try {
 			const result = await client.query(`INSERT INTO users(
 				uid, balance, "notificationUnReadcount", "deviceId",
-				"fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
+				"fullName",	"phoneNumber", "stripeCustomerId",
 				"currencyCode", "currencySymbol", profession, "firebaseUId",
-				"thump_imageURL", "medium_imageURL")
+				"userImage", "userThumpImage", "userMediumImage")
 				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING uid`,
 				[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
-				reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
+				reqObj.fullName, reqObj.phoneNumber, reqObj.stripeCustomerId,
 				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId,
-				reqObj.thump_imageURL, reqObj.medium_imageURL
+				reqObj.imageURl, reqObj.thump_imageURL, reqObj.medium_imageURL
 			]);
 			let data = null;
 			if (result.rowCount > 0) {
@@ -36,15 +36,15 @@ module.exports = {
 			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 0;
 
 			var queryText = `SELECT
-			uid as userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "stripeCustomerId", latitude, longitude,
-			"currencyCode",	"currencySymbol", profession, "isActive", created_at, "phoneNumber", "firebaseUId" as uid, "thump_imageURL", "medium_imageURL",
+			uid as userId, balance, "notificationUnReadcount", "deviceId", "fullName", "stripeCustomerId", latitude, longitude,
+			"currencyCode",	"currencySymbol", profession, "isActive", "createdAt", "phoneNumber", "firebaseUId" as uid, "userImage", "userThumpImage", "userMediumImage",
 			( 3959 * acos( cos( radians($4) ) * cos( radians( U.latitude ) ) * cos( radians( U.longitude ) - radians($5) ) + sin( radians($4) ) * sin( radians( U.latitude ) ) ) ) AS distance
 			FROM users U
 			WHERE "isActive" = $1`;
 			var qryValue = [true, limit, pageNo, reqObj.latitude, reqObj.longitude]
 
 			if (reqObj.recentUsers) {
-				queryText = `${queryText} AND (created_at > current_date - interval '7 days')`;
+				queryText = `${queryText} AND ("createdAt" > current_date - interval '7 days')`;
 			}
 
 			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
@@ -69,8 +69,8 @@ module.exports = {
 			const whereCondition = obj.uid ? `WHERE uid =$1` : obj.id ? `WHERE "firebaseUId" = $1` : `WHERE "phoneNumber" = $1`;
 			const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
 			const result = await client.query(`SELECT
-			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "imageURl", "phoneNumber", created_at, "stripeCustomerId", latitude,
-			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid, "thump_imageURL", "medium_imageURL"
+			uid userId, balance, "notificationUnReadcount", "deviceId", "fullName", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
+			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" uid, "userImage", "userThumpImage", "userMediumImage"
 			FROM users
 			${whereCondition}`, [val]);
 			const data = result.rows[0];
@@ -101,15 +101,36 @@ module.exports = {
 		try {
 			const { reqObj, uid } = Obj;
 			const result = await client.query(`UPDATE users SET
-				balance = $2, "deviceId" = $3, "fullName" = $4,	"imageURl" = $5,
-				"phoneNumber" = $6, "stripeCustomerId" = $7, latitude = $8, longitude= $9,
-				"currencyCode"= $10, "currencySymbol"= $11, profession= $12,
-				"thump_imageURL"= $13, "medium_imageURL"= $14
+				balance = $2,
+				"deviceId" = $3,
+				"fullName" = $4,
+				"phoneNumber" = $5,
+				"stripeCustomerId" = $6,
+				latitude = $7,
+				longitude= $8,
+				"currencyCode"= $9,
+				"currencySymbol"= $10,
+				profession= $11,
+				"userImage" = $12,
+				"userThumpImage"= $13,
+				"userMediumImage"= $14
 				WHERE "firebaseUId" = $1`,
-				[uid, reqObj.balance, `{${reqObj.deviceId}}`, reqObj.fullName,
-				reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId, reqObj.latitude,
-				reqObj.longitude, reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession,
-				reqObj.thump_imageURL, reqObj.medium_imageURL]);
+				[
+					uid,
+					reqObj.balance,
+					`{${reqObj.deviceId}}`,
+					reqObj.fullName,
+					reqObj.phoneNumber,
+					reqObj.stripeCustomerId,
+					reqObj.latitude,
+					reqObj.longitude,
+					reqObj.currencyCode,
+					reqObj.currencySymbol,
+					reqObj.profession,
+					reqObj.imageURl,
+					reqObj.thump_imageURL,
+					reqObj.medium_imageURL
+				]);
 
 			let data = null;
 			if (result.rowCount > 0) {

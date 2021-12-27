@@ -2,7 +2,6 @@ const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
    create: async (reqObj , client) => {
-      // console.log('object', reqObj);
       const shopCategoryItemId = uuidv4();
       try{
          const result = await client.query(`INSERT INTO "shop_categoryItems"(
@@ -16,11 +15,7 @@ module.exports = {
             reqObj.shopId,
             reqObj.categoryItemId
          ])
-         if(result.rowCount > 0) {
-            return { error: false, messsge: 'Created successfully'}
-         } else{
-            return { error: true, messsge: 'Created failed'}
-         }
+         return { error: false, messsge: 'Created successfully'}
       } catch (error){
          console.log('error.toString()', error.toString());
          return { error: true, messsge: error.toString()}
@@ -35,11 +30,8 @@ module.exports = {
             INNER JOIN "categoryItems" as CI ON CI."categoryItemId" = SCI."categoryItemId"
          WHERE SCI."shopId" = $1`,
          [reqObj.id])
-         if(result.rowCount > 0){
-            return { error: false, data: result.rows, messsge: 'Read successfully'}
-         } else{
-            return { error: true, messsge: 'Read failed'}
-         }
+         return { error: false, data: result.rows, messsge: 'Read successfully'}
+
        } catch (error){
          return { error: true, messsge: error.toString()}
        }
@@ -63,11 +55,8 @@ module.exports = {
          WHERE "shopId" = $1`,
          [reqObj.shopId, false])
 
-         if(result.rowCount > 0){
-            return { error: false, data: data['data'], messsge: 'Updated successfully'}
-         } else{
-            return { error: true, messsge: 'Updated failed'}
-         }
+         return { error: false, messsge: 'Updated successfully'}
+
       } catch (error){
          return { error: true, messsge: error.toString()}
       }

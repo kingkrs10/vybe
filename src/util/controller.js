@@ -236,14 +236,14 @@ const migration = async (request, response) => {
                         currencyCode:  value["currencyDetails"] ? value["currencyDetails"]["code"] : '',
                         currencySymbol:  value["currencyDetails"] ? value["currencyDetails"]["symbol"] : '',
                         profession: value['profession'] || null,
-                        created_at: date,
+                        createdAt: date,
                         phoneNumber: value['phoneNumber'] || null,
                         firebaseUId : value["uid"] ? value["uid"] : item
                      }
                      await qryClient.query(`INSERT INTO users(
                         uid, balance, "notificationUnReadcount", "deviceId",
-                        "fullName",	"imageURl", "phoneNumber", "stripeCustomerId",
-                        "currencyCode", "currencySymbol", profession, createdAt, "firebaseUId", "thumpImageURL", "mediumImageURL")
+                        "fullName",	"userImage", "phoneNumber", "stripeCustomerId",
+                        "currencyCode", "currencySymbol", profession, createdAt, "firebaseUId", "userThumpImage", "userMediumImage")
                         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING uid`,
                      [userId, reqObj.balance, reqObj.notificationUnReadcount, `{${reqObj.deviceId}}`,
                      reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
@@ -323,7 +323,7 @@ const migration = async (request, response) => {
                            locationName: value['locationName'],
                            firebaseOfferId: item
                         }
-                        await qryClient.query(`INSERT INTO offers("offerId", "headLine", "imageURl", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt", "thumpImageURL", "mediumImageURL")
+                        await qryClient.query(`INSERT INTO offers("offerId", "headLine", "offerImage", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt", "offerThumpImage", "offerMediumImage")
                            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
                         [offerId, reqObj.headLine, `{${reqObj.imageURl}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, userId, reqObj.locationName, reqObj.firebaseOfferId, createdAt, reqObj.thump_imageURL, reqObj.medium_imageURL]);
 

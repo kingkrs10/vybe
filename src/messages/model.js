@@ -57,8 +57,8 @@ module.exports = {
 	getAll: async (chatId, client) => {
 		try {
 			const result = await client.query(`SELECT "messageId", "chatId", message, "messageFromUId", "messageToUid", "messageType", "unreadMessage",
-				U."fullName" as messageFromName, U."imageURl" as messageFromURI,
-				U1."fullName" as messageToName, U1."imageURl" as messageToURI
+				U."fullName" as messageFromName, U."userImage" as messageFromURI,
+				U1."fullName" as messageToName, U1."userImage" as messageToURI
 				FROM messages Msg
 				INNER JOIN users U ON U.uid = Msg."messageFromUId"
 				INNER JOIN users U1 ON U1.uid = Msg."messageToUid"
@@ -82,8 +82,8 @@ module.exports = {
 	getOne: async (id, client) => {
 		try {
 			const result = await client.query(`SELECT "messageId", Msg."chatId" MsgChatId, message, Msg."messageFromUId", Msg."messageToUId", "messageType", "unreadMessage",
-				U."fullName" as messageFromName, U."imageURl" as messageFromURI,
-				U1."fullName" as messageToName, U1."imageURl" as messageToURI
+				U."fullName" as messageFromName, U."userImage" as messageFromURI,
+				U1."fullName" as messageToName, U1."userImage" as messageToURI
 				FROM messages Msg
 				INNER JOIN users U ON U.uid = Msg."messageFromUId"
 				INNER JOIN users U1 ON U1.uid = Msg."messageToUId"

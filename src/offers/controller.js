@@ -8,9 +8,9 @@ const _isEmpty = require('lodash/isEmpty');
 const create = async (request, response) => {
    try {
       const offerId = uuidv4();
-      var imagePath = request.body.offerImage ? request.body.offerImage : null;;
-      var mediumImagePath = request.body.offerMediumImage ? request.body.offerMediumImage : null;
-      var thumpImagePath =  request.body.offerThumpImage ? request.body.offerThumpImage : null;
+      var imagePath = request.body.offerImage && request.body.offerImage !== '' ? request.body.offerImage : null;
+      var mediumImagePath = request.body.offerMediumImage && request.body.offerMediumImage !== '' ? request.body.offerMediumImage : null;
+      var thumpImagePath =  request.body.offerThumpImage  && request.body.offerThumpImage !== ''? request.body.offerThumpImage : null;
 
       // const imagePathArr = await fileUploadingProcess(request.files, offerId);
 

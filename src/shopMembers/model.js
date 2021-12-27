@@ -16,11 +16,8 @@ module.exports = {
             reqObj.userId,
             reqObj.designation
          ])
-         if(result.rowCount > 0 && data) {
-            return { error: false, messsge: 'Created successfully'}
-         } else{
-            return { error: true, messsge: 'Created failed'}
-         }
+         return { error: false, messsge: 'Created successfully'}
+
       } catch (error){
          return { error: true, messsge: error.toString()}
       }
@@ -37,16 +34,7 @@ module.exports = {
          reqObj.isActive,
          reqObj.shopMemberId
          ])
-         let data =null;
-         if(result.rowCount > 0){
-            const result1 = await module.exports.getOne({id:reqObj.shopMemberId}, client);
-            data = result1 ? result1 : null;
-         }
-         if(result.rowCount > 0 && data) {
-            return { error: false, data: data['data'], messsge: 'Updated successfully'}
-         } else{
-            return { error: true, messsge: 'Updated failed'}
-         }
+         return { error: false, messsge: 'Updated successfully'}
       } catch (error){
          return { error: true, messsge: error.toString()}
       }
@@ -59,11 +47,8 @@ module.exports = {
          WHERE "shopId" = $1`,
          [reqObj.shopId, false])
 
-         if(result.rowCount > 0){
-            return { error: false, data: data['data'], messsge: 'Updated successfully'}
-         } else{
-            return { error: true, messsge: 'Updated failed'}
-         }
+         return { error: false, messsge: 'Updated successfully'}
+
       } catch (error){
          return { error: true, messsge: error.toString()}
       }
@@ -78,11 +63,7 @@ module.exports = {
          INNER JOIN users U ON SM."userId" = U.uid
          WHERE SM."shopId" = $1`,
          [reqObj.id])
-         if(result.rowCount > 0){
-            return { error: false, data: result.rows, messsge: 'Read successfully'}
-         } else{
-            return { error: true, messsge: 'Read failed'}
-         }
+         return { error: false, data: result.rows, messsge: 'Read successfully'}
       } catch (error){
          return { error: true, messsge: error.toString()}
       }
