@@ -1,23 +1,15 @@
 module.exports = {
    relational_db: {
-      host: "localhost",
+      host: "35.202.0.126",
       port: 5432,
       user: "postgres",
-      pass: "password",
+      pass: "n9Lyi5Eboh1O3KKt",
       name: "luhu-development",
+      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
 
-   // relational_db: {
-   //    host: "35.202.0.126",
-   //    port: 5432,
-   //    user: "postgres",
-   //    pass: "n9Lyi5Eboh1O3KKt",
-   //    name: "luhu-development",
-   //    cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
-   // },
-
    app: {
-      port: 4000,
+      port: 8081,
       secretKey: "luhu-jwt-stuff-secret"
    },
    stripe_api_key:
