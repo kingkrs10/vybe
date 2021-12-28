@@ -14,6 +14,8 @@ const shopsRouter = require("./src/shops");
 const categoriesRouter = require("./src/categories");
 const shopCollectionsRouter = require("./src/shopCollections");
 const productsRouter = require("./src/products");
+const ordersRouter = require("./src/orders");
+const orderItemsRouter = require("./src/orderItems");
 
 router.use("/", utilRouter);
 router.use("/users", userRouter);
@@ -26,6 +28,8 @@ router.use("/categories", categoriesRouter);
 router.use("/shops", shopsRouter);
 router.use("/shopCollections", shopCollectionsRouter);
 router.use("/products", productsRouter);
+router.use("/orders", ordersRouter);
+router.use("/orderItems", orderItemsRouter);
 
 router.use("/chats", chatsRouter);
 router.use("/messages", messagesRouter);
