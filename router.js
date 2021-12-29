@@ -16,6 +16,9 @@ const shopCollectionsRouter = require("./src/shopCollections");
 const productsRouter = require("./src/products");
 const ordersRouter = require("./src/orders");
 const orderItemsRouter = require("./src/orderItems");
+const paymentMethodsRouter = require("./src/paymentMethods");
+const statusRouter = require("./src/status");
+
 
 router.use("/", utilRouter);
 router.use("/users", userRouter);
@@ -30,6 +33,8 @@ router.use("/shopCollections", shopCollectionsRouter);
 router.use("/products", productsRouter);
 router.use("/orders", ordersRouter);
 router.use("/orderItems", orderItemsRouter);
+router.use("/paymentMethods", paymentMethodsRouter);
+router.use("/status", statusRouter);
 
 router.use("/chats", chatsRouter);
 router.use("/messages", messagesRouter);

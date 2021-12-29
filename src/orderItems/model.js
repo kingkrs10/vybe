@@ -94,11 +94,9 @@ module.exports ={
          "isActive"= $1
          WHERE "orderItemId" = $2`,
          [false, reqObj.orderItemId])
-         if(result.rowCount > 0){
-            return{ error: false, message:'Deleted successfully'}
-         } else{
-            return{ error: true, message: 'Deleted Failed'}
-         }
+
+         return{ error: false, message:'Deleted successfully'}
+
       } catch(error){
          return{ error: true, message: error.toString()}
       }

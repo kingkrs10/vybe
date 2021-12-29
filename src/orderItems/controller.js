@@ -58,7 +58,7 @@ const update = async (request, response) => {
 
 const getAll = async (request, response) => {
    try{
-      const tempBody = { userId: request.params.userId }
+      const tempBody = { userId: request.currentUser.userId }
       const result = await commonModel.tryBlock(
          tempBody,
          "(orderItems:getAll)",

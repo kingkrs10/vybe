@@ -32,15 +32,8 @@ module.exports = {
             reqObj.orderPaymentTransactionId
          ])
          let data =[];
-         if(result.rowCount > 0){
-            const result1 = await module.exports.getOne({orderId:reqObj.orderId, shopId:reqObj.shopId}, client);
-            data = result1 ? result1 : null;
-         }
-         if(result.rowCount > 0 && data){
-            return{ error: false, data: data['data'], message:'Created successfully'}
-         } else{
-            return{ error: true, message: 'Created Failed'}
-         }
+         return{ error: false, message:'Created successfully'}
+
       } catch(error){
          return { error: true, message: error.toString()}
       }
@@ -60,11 +53,9 @@ module.exports = {
             INNER JOIN "users" U ON U."uid" = O."userId"
             WHERE O."shopId" = $1
          `,[reqObj.shopId])
-         if(result.rowCount > 0){
-            return { error: false, data: result.rows, message: 'Read Successfully'}
-         } else{
-            return { error: true, message: 'Read failed'}
-         }
+
+         return { error: false, data: result.rows, message: 'Read Successfully'}
+
       } catch(error){
          return{ error: true, message:error.toString()}
       }
@@ -85,11 +76,8 @@ module.exports = {
             AND O."orderId" = $2
          `,[reqObj.shopId, reqObj.orderId])
 
-         if(result.rowCount > 0){
-            return { error: false, data: result.rows, message: 'Read Successfully'}
-         } else{
-            return { error: true, message: 'Read failed'}
-         }
+         return { error: false, data: result.rows, message: 'Read Successfully'}
+
       } catch(error){
          return{ error: true, message:error.toString()}
       }

@@ -16,7 +16,7 @@ router.put(
 );
 
 router.get(
-   "/:userId",
+   "/",
    authMiddleware,
    orderItemsController.getAll
 );

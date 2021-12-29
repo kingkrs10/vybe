@@ -10,6 +10,12 @@ router.post(
    productsController.create
 )
 
+router.get(
+   "/shopProducts/:shopId",
+   authMiddleware,
+   productsController.getShopProducts
+)
+
 router.put(
    "/:id",
    authMiddleware,

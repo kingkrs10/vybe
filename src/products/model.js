@@ -87,16 +87,30 @@ module.exports = {
 
    getAll : async (reqObj ,client) => {
       try{
-         const result = await client.query(`SELECT
+         const limit =  250;
+			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
+
+         var qryText = `SELECT
          "productId", "productName", "productDescription", "productPrice",
          "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty",
          "productImageURL", "productThumpImageURL", "productMediumImageURL",
-         "productCategoryItemId", "productShopId","productCollectionIds","productOptions",
-         "createdAt","updatedAt","isActive"
-         FROM "products"
-         WHERE "isActive" =$1`,
-         [true])
+         "productCollectionIds","productOptions", P."productShopId",S."shopName",
+         P."productCategoryItemId", CI."categoryItemName",
+         P."createdAt", P."updatedAt", P."isActive"
+         FROM "products" as P
+         INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  P."productCategoryItemId"
+         INNER JOIN "shops" S ON S."shopId" = P."productShopId"
+         WHERE P."isActive" =$1`
+         var qryValues = [true];
+
+         if(reqObj.shopId){
+            qryText += `AND  P."productShopId" = $2`;
+            qryValues = [true, reqObj.shopId];
+         }
+
+         const result = await client.query(qryText, qryValues);
          return {error: false , data: result.rows , message: 'Read successfully'}
+
       } catch (error) {
          return {error: true , message: error.toString()}
       }
@@ -108,10 +122,13 @@ module.exports = {
          "productId", "productName", "productDescription", "productPrice",
          "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty",
          "productImageURL", "productThumpImageURL", "productMediumImageURL",
-         "productCategoryItemId", "productShopId","productCollectionIds","productOptions",
-         "createdAt","updatedAt","isActive"
-         FROM "products"
-         WHERE "productId" =$1`,
+         "productCollectionIds","productOptions", P."productShopId",S."shopName",
+         P."productCategoryItemId", CI."categoryItemName",
+         P."createdAt", P."updatedAt", P."isActive"
+         FROM "products" as P
+         INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  P."productCategoryItemId"
+         INNER JOIN "shops" S ON S."shopId" = P."productShopId"
+         WHERE P."productId" =$1`,
          [reqObj.id])
          return {error: false , data: result.rows, message: 'Read successfully'}
 

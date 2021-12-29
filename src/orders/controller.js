@@ -100,8 +100,6 @@ const updateStatus = async (request, response) => {
    }
 };
 
-
-
 module.exports ={
    create,
    getOne,

@@ -61,7 +61,7 @@ const getAll = async (request, response) => {
          "(Products:getAll)",
          productsModel.getAll
       )
-      console.log(result);
+
       if(result.error){
          sendErroresponse(response,result.message);
       } else if (!_isEmpty(result.data)){
@@ -81,6 +81,25 @@ const getOne = async (request, response) => {
          tempBody,
          "(Products:getOne)",
          productsModel.getOne
+      )
+      if(result.error){
+         sendErroresponse(response,result.message);
+      } else if (!_isEmpty(result.data)){
+         sendSuccessResponse(response, result.data);
+      } else{
+         sendNoContentResponse(response);
+      }
+   } catch (error){
+      sendInternalErrorResponse(response, { message: err.toString()});
+   }
+};
+
+const getShopProducts = async (request, response) => {
+   try{
+      const result = await commonModel.tryBlock (
+         {shopId: request.params.shopId},
+         "(Products:getOne)",
+         productsModel.getAll
       )
       if(result.error){
          sendErroresponse(response,result.message);
@@ -114,10 +133,12 @@ const remove = async (request, response) => {
    }
 };
 
+
 module.exports = {
    create,
    update,
    getAll,
    getOne,
-   remove
+   remove,
+   getShopProducts
 }
