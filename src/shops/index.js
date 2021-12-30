@@ -17,6 +17,12 @@ router.put(
     shopsController.update
 );
 
+router.post(
+    "/dashboard",
+    authMiddleware,
+    shopsController.dashboard
+);
+
 router.get(
     "/",
     authMiddleware,

@@ -135,7 +135,7 @@ module.exports = {
             errorMsg = 'Data saved failed error';
             success = false;
          }
-         console.log('errorMsg',errorMsg);
+
          if(success && !errorMsg){
             return {error: false, message: 'Data saved successfully'};
          } else{
@@ -166,19 +166,24 @@ module.exports = {
 
    getAll: async (reqObj ,client) => {
       try{
-         var queryText = `SELECT
-         "shopId","shopName","shopDescription","shopShortDescription","locationName",
-         "latitude","longitude","shopImageURL","shopThumpImageURL","shopMediumImageURL",
-         "socialMedia","shipping_processing_time","shipping_processing_time",
-         "isActive","createdAt", "updatedAt"
-         FROM shops
+         var queryText = `SELECT * FROM (SELECT
+            S."shopId","shopName","shopDescription","shopShortDescription","locationName",
+            "latitude","longitude","shopImageURL","shopThumpImageURL","shopMediumImageURL",
+            CI."categoryId", CI."categoryItemName",CI."groupName", S."isActive",
+            ( 3959 * acos( cos( radians($2) ) * cos( radians( S.latitude ) ) * cos( radians( S.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( S.latitude) ) ) ) AS distance
+            FROM shops AS S
+            INNER JOIN "shop_categoryItems" AS SCI ON SCI."shopId" = S."shopId"
+            INNER JOIN "categoryItems" AS CI On SCI."categoryItemId" = CI."categoryItemId") AS tbl
          WHERE "isActive" = $1`
-         const result = await client.query(`${queryText}`,[true])
-         if(result.rowCount > 0){
-            return {error: false, data: result.rows, message:'Read successfully'}
-         } else{
-            return { error: true, message: 'Read failed'}
+         var qryValue = [true,  reqObj.latitude, reqObj.longitude]
+
+         if(reqObj.isNearby){
+            queryText += ` AND distance < $4`
+            qryValue = [true,  reqObj.latitude, reqObj.longitude, 100]
          }
+         const result = await client.query(`${queryText}`, qryValue);
+
+         return {error: false, data: result.rows, message:'Read successfully'}
       } catch (error){
          return { error : true,  message : error.toString()}
       }
@@ -200,6 +205,8 @@ module.exports = {
       } catch (error){
          return { error: true, message: error.toString()}
       }
-   }
+   },
+
+
 }
 

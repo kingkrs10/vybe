@@ -123,6 +123,41 @@ const getOne = async (request, response) =>{
    }
 }
 
+const dashboard = async (request, response) =>{
+   try{
+      const tempBody = {...request.body, isNearby: true};
+      const NearbyResult = await commonModel.tryBlock(
+         tempBody,
+         "(Shop:dashboard)",
+         shopsModel.getAll
+      );
+
+      const result = await commonModel.tryBlock(
+        {...request.body},
+         "(Shop:dashboard)",
+         shopsModel.getAll
+      );
+
+      if (result.error || NearbyResult.error) {
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data) || !_isEmpty(NearbyResult.data)) {
+         const resultData = [];
+         resultData.push({shopCategory: 'Nearby', shopList: NearbyResult.data.slice(0, 4)});
+         const groupname = [...new Set(result.data.map(item => item.groupName))];
+
+         await Promise.all(groupname.map( async (item) =>{
+            const tempData = result.data.filter(data => data.groupName === item).slice(0, 4);
+            resultData.push({shopCategory: item, shopList: tempData});
+         }));
+         sendSuccessResponse(response, resultData)
+      } else {
+         sendNoContentResponse(response);
+      }
+   } catch (error) {
+      sendInternalErrorResponse(response, { message: error.toString() });
+   }
+}
+
 const remove = async (request, response) =>{
    try{
       const tempBody = {
@@ -171,5 +206,6 @@ module.exports = {
    update,
    getAll,
    getOne,
-   remove
+   remove,
+   dashboard
 }
