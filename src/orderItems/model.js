@@ -47,6 +47,26 @@ module.exports ={
       }
    },
 
+   getCardDetails: async (reqObj, client) =>{
+      try{
+         const result = await client.query(`SELECT
+         OI."orderItemId",OI."orderId",OI."userId",OI."productId",OI."productName",
+         P."productImageURL", OI."orderItemQty",P."productPrice" as "orderItemPrice", P."productDiscount" as
+         "orderItemDiscount",(P."productPrice"-P."productDiscount") * OI."orderItemQty" as "orderItemTotalPrice"
+         FROM "orderItems" OI
+         INNER JOIN "products" P ON P."productId" = OI."productId"
+         WHERE OI."userId" = $1
+         AND OI."orderId" IS NULL
+         AND OI."isActive" = $2`,
+         [reqObj.userId, true]);
+
+         return{ error: false, data: result.rows, message:'Read successfully'};
+
+      } catch(error){
+         return{ error: true, message: error.toString()}
+      }
+   },
+
    getOne: async (reqObj, client) =>{
       console.log(reqObj);
       try{

@@ -16,6 +16,12 @@ router.put(
 );
 
 router.get(
+   "/getCardDetails",
+   authMiddleware,
+   orderItemsController.getCardDetails
+);
+
+router.get(
    "/",
    authMiddleware,
    orderItemsController.getAll

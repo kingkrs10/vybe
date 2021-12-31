@@ -29,7 +29,7 @@ router.use("/countryCurrency", countryCurrencyRouter);
 router.use("/currency", currencyRouter);
 router.use("/categories", categoriesRouter);
 router.use("/shops", shopsRouter);
-router.use("/shopCollections", shopCollectionsRouter);
+router.use("/collections", shopCollectionsRouter);
 router.use("/products", productsRouter);
 router.use("/orders", ordersRouter);
 router.use("/orderItems", orderItemsRouter);

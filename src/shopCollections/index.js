@@ -9,17 +9,23 @@ router.post(
    shopCollectionsController.create
 );
 
-router.put(
-   "/:id",
-   authMiddleware,
-   shopCollectionsController.update
-)
-
 router.get(
    "/",
    authMiddleware,
    shopCollectionsController.getAll
 );
+
+router.get(
+   "/shop/:shopId",
+   authMiddleware,
+   shopCollectionsController.getShopCollections
+);
+
+router.put(
+   "/:id",
+   authMiddleware,
+   shopCollectionsController.update
+)
 
 router.get(
    "/:id",

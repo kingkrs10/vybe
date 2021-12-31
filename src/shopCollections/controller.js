@@ -101,6 +101,26 @@ const getOne = async (request, response) =>{
    }
 }
 
+const getShopCollections = async (request, response) =>{
+   try{
+      const tempBody = {shopId: request.params.shopId}
+      const result = await commonModel.tryBlock(
+         tempBody,
+         "(ShopCollections:getShopCollections)",
+         shopCollectionsModel.getAll
+      )
+      if(result.error){
+         sendErroresponse(response, result.message);
+      } else if (!_isEmpty(result.data)){
+         sendSuccessResponse(response, result.data)
+      } else{
+         sendNoContentResponse(response)
+      }
+   } catch(error){
+      sendInternalErrorResponse(response, {message: error.toString()})
+   }
+}
+
 const remove = async(request, response) =>{
    try{
       const tempBody = {id:request.params.id}
@@ -124,5 +144,6 @@ module.exports = {
    update,
    getAll,
    getOne,
+   getShopCollections,
    remove
 }

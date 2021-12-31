@@ -33,11 +33,18 @@ module.exports = {
 
    getAll:  async (reqObj, client) => {
       try{
-         const result = await client.query(`SELECT
-            "shopCollectionId", "shopId", "collectionName", "collectionDescription", "isActive", "createdAt", "updatedAt"
+         var qryText = `SELECT
+            "shopCollectionId", "shopId", "collectionName", "collectionDescription", "isActive"
          FROM shop_collections
-         WHERE "isActive" = $1`,
-         [true])
+         WHERE "isActive" = $1`;
+         var qryValues = [true];
+
+         if(reqObj.shopId){
+            qryText = qryText + ` AND "shopId" = $2`;
+           qryValue = [true, reqObj.shopId];
+         }
+
+         const result = await client.query(qryText, qryValue)
 
          if(result.rowCount > 0){
             return {error: false, data: result.rows, message: 'Read successfully'}

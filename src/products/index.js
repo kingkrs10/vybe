@@ -11,7 +11,7 @@ router.post(
 )
 
 router.get(
-   "/shopProducts/:shopId",
+   "/shop/:shopId",
    authMiddleware,
    productsController.getShopProducts
 )
@@ -39,6 +39,12 @@ router.delete(
    "/:id",
    authMiddleware,
    productsController.remove
+)
+
+router.post(
+   "/productAvailabilty",
+   authMiddleware,
+   productsController.productAvailabilty
 )
 
 module.exports = router;

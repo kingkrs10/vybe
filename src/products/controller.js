@@ -1,8 +1,13 @@
-const productsModel = require("./model");
-const commonModel = require("../common/common");
-const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _isEmpty = require('lodash/isEmpty');
+
+const productsModel = require("./model");
+const CollectionsModel = require("../shopCollections/model");
+const commonModel = require("../common/common");
+const {
+   sendErroresponse, sendCreatedesponse, sendInternalErrorResponse,
+   sendNoContentResponse, sendSuccessResponse
+} = require("../common/ResponseController");
 
 const create = async (request, response) => {
    try{
@@ -101,10 +106,26 @@ const getShopProducts = async (request, response) => {
          "(Products:getOne)",
          productsModel.getAll
       )
+
       if(result.error){
          sendErroresponse(response,result.message);
       } else if (!_isEmpty(result.data)){
-         sendSuccessResponse(response, result.data);
+         const colectionResult = await commonModel.tryBlock (
+            {shopId: request.params.shopId},
+            "(Products:getOne)",
+            CollectionsModel.getAll
+         )
+         var resultData = [];
+
+         if(!colectionResult.error){
+            colectionResult.data.map(item => {
+               const tempArr = result.data.filter(i => i.shopCollectionId === item.shopCollectionId);
+               resultData.push({collectionName: item.collectionName, products: tempArr});
+            })
+         } else {
+            resultData = [...result.data];
+         }
+         sendSuccessResponse(response, resultData);
       } else{
          sendNoContentResponse(response);
       }
@@ -133,6 +154,25 @@ const remove = async (request, response) => {
    }
 };
 
+const productAvailabilty = async (request, response) => {
+   try{
+      const tempBody = {...request.body}
+      const result = await commonModel.tryBlock (
+         tempBody,
+         "(Products:productAvailabilty)",
+         productsModel.productAvailabilty
+      )
+      if(result.error){
+         sendErroresponse(response,result.message);
+      } else if (!_isEmpty(result.data)){
+         sendSuccessResponse(response,result.data);
+      } else{
+         sendNoContentResponse(response);
+      }
+   } catch (error){
+      sendInternalErrorResponse(response, { message: err.toString()});
+   }
+};
 
 module.exports = {
    create,
@@ -140,5 +180,6 @@ module.exports = {
    getAll,
    getOne,
    remove,
-   getShopProducts
+   getShopProducts,
+   productAvailabilty
 }

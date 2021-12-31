@@ -24,7 +24,7 @@ const create = async (request, response) => {
             "(orderItems:create : getOne)",
             orderItemsModel.getOne
          );
-          sendSuccessResponse(response, result1.data);
+         sendSuccessResponse(response, result1.data);
 
       }
    } catch (error){
@@ -50,6 +50,26 @@ const update = async (request, response) => {
          );
          const data = result1 || null;
          sendSuccessResponse(response, data);
+      }
+   } catch (error){
+      sendInternalErrorResponse(response, {message: error.toString()});
+   }
+};
+
+const getCardDetails = async (request, response) => {
+   try{
+      const tempBody = {...request.currentUser}
+      const result = await commonModel.tryBlock(
+         tempBody,
+         "(orderItems:getCardDetails)",
+         orderItemsModel.getCardDetails
+      )
+      if(result.error){
+         sendErroresponse(response, result.message);
+      } else if(!_isEmpty(result.data)){
+         sendSuccessResponse(response, result.data);
+      } else{
+         sendNoContentResponse(response);
       }
    } catch (error){
       sendInternalErrorResponse(response, {message: error.toString()});
@@ -117,6 +137,7 @@ const remove = async (request, response) => {
 module.exports ={
    create,
    update,
+   getCardDetails,
    getAll,
    getOne,
    remove

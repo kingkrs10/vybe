@@ -89,17 +89,18 @@ module.exports = {
       try{
          const limit =  250;
 			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
-
          var qryText = `SELECT
          "productId", "productName", "productDescription", "productPrice",
          "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty",
          "productImageURL", "productThumpImageURL", "productMediumImageURL",
          "productCollectionIds","productOptions", P."productShopId",S."shopName",
          P."productCategoryItemId", CI."categoryItemName",
-         P."createdAt", P."updatedAt", P."isActive"
+         P."createdAt", P."updatedAt", P."isActive",
+         SC."collectionName", SC."shopCollectionId"
          FROM "products" as P
          INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  P."productCategoryItemId"
          INNER JOIN "shops" S ON S."shopId" = P."productShopId"
+         INNER JOIN "shop_collections" SC ON (SC."shopCollectionId" = ANY(P."productCollectionIds" ::uuid[]) AND SC."shopId" = P."productShopId")
          WHERE P."isActive" =$1`
          var qryValues = [true];
 
@@ -124,13 +125,31 @@ module.exports = {
          "productImageURL", "productThumpImageURL", "productMediumImageURL",
          "productCollectionIds","productOptions", P."productShopId",S."shopName",
          P."productCategoryItemId", CI."categoryItemName",
-         P."createdAt", P."updatedAt", P."isActive"
+         P."createdAt", P."updatedAt", P."isActive",
+         SC."collectionName", SC."shopCollectionId"
          FROM "products" as P
          INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  P."productCategoryItemId"
          INNER JOIN "shops" S ON S."shopId" = P."productShopId"
+         INNER JOIN "shop_collections" SC ON (SC."shopCollectionId" = ANY(P."productCollectionIds" ::uuid[]) AND SC."shopId" = P."productShopId")
          WHERE P."productId" =$1`,
          [reqObj.id])
          return {error: false , data: result.rows, message: 'Read successfully'}
+
+      } catch(error){
+         return {error: true, message: error.toString()}
+      }
+   },
+
+   productAvailabilty : async (reqObj ,client) => {
+      try{
+         const result = await client.query(`SELECT
+         "productId", "productName",
+         ("productTotalQty"-("productSoldQty"+ "productDamageQty")) as "availableProductQty",
+         ("productTotalQty"-("productSoldQty"+ "productDamageQty")) > $2 as "isAvailable"
+         FROM "products"
+         WHERE "productId" = ANY($1 ::uuid[])`,
+         [reqObj.productIds, 0])
+         return {error: false , data: result.rows, message: 'read successfully'}
 
       } catch(error){
          return {error: true, message: error.toString()}
@@ -151,5 +170,6 @@ module.exports = {
       } catch(error){
          return {error: true, message: error.toString()}
       }
-   }
+   },
+
 }
