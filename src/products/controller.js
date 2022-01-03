@@ -119,13 +119,34 @@ const getShopProducts = async (request, response) => {
 
          if(!colectionResult.error){
             colectionResult.data.map(item => {
-               const tempArr = result.data.filter(i => i.shopCollectionId === item.shopCollectionId);
-               resultData.push({collectionName: item.collectionName, products: tempArr});
+               const tempArr = result.data.filter(i => i.shopCollectionId === item.shopCollectionId).slice(0, 4);
+               resultData.push({collectionName: item.collectionName, shopCollectionId: item.shopCollectionId, products: tempArr});
             })
          } else {
             resultData = [...result.data];
          }
          sendSuccessResponse(response, resultData);
+      } else{
+         sendNoContentResponse(response);
+      }
+   } catch (error){
+      sendInternalErrorResponse(response, { message: err.toString()});
+   }
+};
+
+const getShopCollectionProducts = async (request, response) => {
+   try{
+      const tempBody =  {shopId: request.params.shopId, collectionId: request.params.collectionId};
+
+      const result = await commonModel.tryBlock (
+         tempBody,
+         "(Products:getShopCollectionProducts)",
+         productsModel.getAll
+      )
+      if(result.error){
+         sendErroresponse(response,result.message);
+      } else if (!_isEmpty(result.data)){
+         sendSuccessResponse(response,result.data);
       } else{
          sendNoContentResponse(response);
       }
@@ -181,5 +202,6 @@ module.exports = {
    getOne,
    remove,
    getShopProducts,
-   productAvailabilty
+   productAvailabilty,
+   getShopCollectionProducts
 }

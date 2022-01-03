@@ -16,6 +16,12 @@ router.get(
    productsController.getShopProducts
 )
 
+router.get(
+   "/shopCollections/:shopId/:collectionId",
+   authMiddleware,
+   productsController.getShopCollectionProducts
+)
+
 router.put(
    "/:id",
    authMiddleware,

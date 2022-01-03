@@ -108,6 +108,10 @@ module.exports = {
             qryText += `AND  P."productShopId" = $2`;
             qryValues = [true, reqObj.shopId];
          }
+         if(reqObj.collectionId){
+            qryText += `AND   $3 = ANY(P."productCollectionIds" ::uuid[])`;
+            qryValues = [true, reqObj.shopId, reqObj.collectionId];
+         }
 
          const result = await client.query(qryText, qryValues);
          return {error: false , data: result.rows , message: 'Read successfully'}
