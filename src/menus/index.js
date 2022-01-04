@@ -6,19 +6,7 @@ const { authMiddleware, upload} = require('../common/common');
 router.get(
     "/",
     authMiddleware,
-    Controller.getAllCategories
-)
-
-router.get(
-    "/:keyCode",
-    authMiddleware,
-    Controller.getCategoryItems
-)
-
-router.post(
-    "/subCategories",
-    authMiddleware,
-    Controller.getSubCategoryItems
+    Controller.getAllMenus
 )
 
 module.exports = router;

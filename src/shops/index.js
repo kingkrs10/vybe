@@ -6,14 +6,12 @@ const { authMiddleware, upload} = require('../common/common');
 router.post(
     "/",
     authMiddleware,
-    upload.single('image'),
     shopsController.create
 );
 
 router.put(
     "/:id",
     authMiddleware,
-    upload.single('image'),
     shopsController.update
 );
 

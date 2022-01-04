@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const messageController = require("./controller");
-const { authMiddleware, upload } = require('../common/common');
+const { authMiddleware } = require('../common/common');
 
 router.post("/",
     authMiddleware,
-    upload.none(),
     messageController.create
 );
 
@@ -18,14 +17,12 @@ router.get(
 router.put(
     "/:id",
     authMiddleware,
-    upload.none(),
     messageController.update
 );
 
 router.put(
     "/updateUnRead/:id",
     authMiddleware,
-    upload.none(),
     messageController.updateUnRead
 );
 

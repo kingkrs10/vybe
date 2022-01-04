@@ -1,18 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const offersController = require("./controller");
-const { authMiddleware, upload } = require('../common/common');
+const { authMiddleware } = require('../common/common');
 
 router.post("/",
    authMiddleware,
-   upload.array("image", 10),
    offersController.create
 );
 
 router.post(
    "/getInfo",
    authMiddleware,
-   upload.none(),
    offersController.getAll
 );
 
@@ -25,7 +23,6 @@ router.get(
 router.put(
    "/:id",
    authMiddleware,
-   upload.array("image", 10),
    offersController.update
 );
 
@@ -68,20 +65,17 @@ router.delete(
 router.post(
    "/favorites",
    authMiddleware,
-   upload.none(),
    offersController.saveFavorites
 );
 router.post(
    "/report",
    authMiddleware,
-   upload.none(),
    offersController.saveReport
 );
 
 router.get(
    "/offerFavoriter/:id",
    authMiddleware,
-   upload.none(),
    offersController.getOfferFavoriters
 );
 

@@ -13,15 +13,6 @@ const create = async (request, response) => {
       var mediumImagePath = null;
       var thumpImagePath = null;
 
-      // if (request.file) {
-      //    const result = await commonModel.fileUpload(
-      //       request.file,
-      //       userId,
-      //       "profile"
-      //    );
-      //    imagePath = result.fileLocation ? result.fileLocation : null;
-      // }
-
       if (!_isEmpty(request.body.profileImage)) {
          imagePath = request.body.profileImage;
       }
@@ -104,46 +95,6 @@ const getOne = async (request, response, next) => {
    }
 };
 
-// const updateMobileNumber = async (request, response) => {
-//    try {
-//       firebaseAdmin.auth().updateUser(request.params.id, { phoneNumber: request.body.phoneNumber })
-//          .then(async function (userRecord) {
-//             const data = {
-//                reqObj: request.body,
-//                uid: request.params.id,
-//             };
-//             // if (request.file) {
-//             //    const result = await commonModel.fileUpload(
-//             //       request.file,
-//             //       request.params.id,
-//             //       "profile"
-//             //    );
-//             //    if (result.fileLocation) {
-//             //       data.reqObj.imageURl = result.fileLocation;
-//             //    }
-//             // }
-//             if (!_isEmpty(request.body.profileImage)) {
-//                data.reqObj.imageURl = request.body.profileImage;
-//             }
-//             const result = await commonModel.tryBlock(
-//                data,
-//                "(User:update)",
-//                usersModel.update
-//             );
-//             if (!result.error) {
-//                sendSuccessResponse(response, result['data'])
-//             } else {
-//                sendInternalErrorResponse(response)
-//             }
-//          })
-//          .catch(function (error) {
-//             sendInternalErrorResponse(response)
-//          });
-//    } catch (error) {
-//       sendInternalErrorResponse(response, { message: err.toString() })
-//    }
-// };
-
 
 
 const update = async (request, response, next) => {
@@ -154,16 +105,7 @@ const update = async (request, response, next) => {
                reqObj: request.body,
                uid: request.params.id,
             };
-            // if (request.file) {
-            //    const result = await commonModel.fileUpload(
-            //       request.file,
-            //       request.params.id,
-            //       "profile"
-            //    );
-            //    if (result.fileLocation) {
-            //       data.reqObj.imageURl = result.fileLocation;
-            //    }
-            // }
+
             if (!_isEmpty(request.body.profileImage)) {
                data.reqObj.imageURl = request.body.profileImage;
             }

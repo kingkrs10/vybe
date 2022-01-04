@@ -1,19 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const stripeController = require("./controller");
-const { authMiddleware, upload } = require('../common/common');
+const { authMiddleware } = require('../common/common');
 
 router.post(
     "/createCustomer",
     authMiddleware,
-    upload.none(),
     stripeController.createCustomer
 );
 
 router.post(
     "/createCustomerCard",
     authMiddleware,
-    upload.none(),
     stripeController.createCustomerCard
 );
 

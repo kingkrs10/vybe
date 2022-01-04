@@ -1,18 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const usersController = require("./controller");
-const { authMiddleware, upload} = require('../common/common');
+const { authMiddleware } = require('../common/common');
 
 router.post(
     "/",
-    upload.single('image'),
     usersController.create
 );
 
 router.put(
     "/:id",
     authMiddleware,
-    upload.single('image'),
     usersController.update
 );
 
@@ -43,14 +41,12 @@ router.delete(
 router.put(
     "/location/:id",
     authMiddleware,
-    upload.none(),
     usersController.updateLocation
 );
 
 router.put(
     "/blockedUsers/:id",
     authMiddleware,
-    upload.none(),
     usersController.updateBlockedUsers
 );
 
@@ -70,11 +66,4 @@ router.put(
     authMiddleware,
     usersController.updateStripeId
 );
-
-// router.put(
-//     "/updateMobileNumber/:id",
-//     authMiddleware,
-//     upload.none(),
-//     usersController.updateMobileNumber
-// )
 module.exports = router;

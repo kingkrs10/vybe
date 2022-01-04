@@ -143,10 +143,9 @@ const dashboard = async (request, response) =>{
       } else if (!_isEmpty(result.data) || !_isEmpty(NearbyResult.data)) {
          const resultData = [];
          resultData.push({shopCategory: 'Nearby', shopList: NearbyResult.data.slice(0, 4)});
-         const groupname = [...new Set(result.data.map(item => item.groupName))];
-
-         await Promise.all(groupname.map( async (item) =>{
-            const tempData = result.data.filter(data => data.groupName === item).slice(0, 4);
+         const categoryNameArr = [...new Set(result.data.map(item => item.categoryName))];
+         await Promise.all(categoryNameArr.map( async (item) =>{
+            const tempData = result.data.filter(data => data.categoryName === item).slice(0, 4);
             resultData.push({shopCategory: item, shopList: tempData});
          }));
          sendSuccessResponse(response, resultData)

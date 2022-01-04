@@ -1,19 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const usersCountryCurrencyController = require("./controller");
-const { authMiddleware, upload } = require('../common/common');
+const { authMiddleware } = require('../common/common');
 
 router.post(
     "/",
     authMiddleware,
-    upload.none(),
     usersCountryCurrencyController.create
 );
 
 router.put(
     "/:id",
     authMiddleware,
-    upload.none(),
     usersCountryCurrencyController.update
 );
 

@@ -14,7 +14,6 @@ const create = async (request, response) => {
       // var mediumImagePath = request.body.offerMediumImage && request.body.offerMediumImage !== '' ? request.body.offerMediumImage : null;
       // var thumpImagePath =  request.body.offerThumpImage  && request.body.offerThumpImage !== ''? request.body.offerThumpImage : null;
 
-      // const imagePathArr = await fileUploadingProcess(request.files, offerId);
 
       const tempBody = {
          ...request.body,
@@ -41,18 +40,6 @@ const create = async (request, response) => {
    }
 };
 
-const fileUploadingProcess = async (filesData, offerId) => {
-   const fileNameArr = [];
-   await filesData.map( async fileItem => {
-      const resp = await commonModel.fileUpload(
-         fileItem,
-         offerId,
-         "offers"
-      );
-      fileNameArr.push(resp.fileLocation);
-   })
-   return fileNameArr;
-}
 
 const update = async (request, response, next) => {
    try {
@@ -60,7 +47,7 @@ const update = async (request, response, next) => {
          reqObj: {...request.body,currentUser: request.currentUser},
          offerId: request.params.id,
       };
-      // const imagePathArr = await fileUploadingProcess(request.files, offerId);
+
       if (!_isEmpty(request.body.offerImage)) {
          data.reqObj.imageURL = request.body.offerImage;
       }
