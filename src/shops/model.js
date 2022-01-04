@@ -169,11 +169,11 @@ module.exports = {
          var queryText = `SELECT * FROM (SELECT
             S."shopId","shopName","shopDescription","shopShortDescription","locationName",
             "latitude","longitude","shopImageURL","shopThumpImageURL","shopMediumImageURL",
-            CI."categoryId", CI."categoryItemName",CI."groupName", S."isActive",
+            C."categoryId", C."categoryName", S."isActive",
             ( 3959 * acos( cos( radians($2) ) * cos( radians( S.latitude ) ) * cos( radians( S.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( S.latitude) ) ) ) AS distance
             FROM shops AS S
             INNER JOIN "shop_categoryItems" AS SCI ON SCI."shopId" = S."shopId"
-            INNER JOIN "categoryItems" AS CI On SCI."categoryItemId" = CI."categoryItemId") AS tbl
+			INNER JOIN  categories C ON C."categoryId" = SCI."categoryItemId") AS tbl
          WHERE "isActive" = $1`
          var qryValue = [true,  reqObj.latitude, reqObj.longitude]
 
