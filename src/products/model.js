@@ -100,7 +100,7 @@ module.exports = {
          FROM "products" as P
          INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  P."productCategoryItemId"
          INNER JOIN "shops" S ON S."shopId" = P."productShopId"
-         INNER JOIN "shop_collections" SC ON (SC."shopCollectionId" = ANY(P."productCollectionIds" ::uuid[]) AND SC."shopId" = P."productShopId")
+         INNER JOIN "shopCollections" SC ON (SC."shopCollectionId" = ANY(P."productCollectionIds" ::uuid[]) AND SC."shopId" = P."productShopId")
          WHERE P."isActive" =$1`
          var qryValues = [true];
 
@@ -134,7 +134,7 @@ module.exports = {
          FROM "products" as P
          INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  P."productCategoryItemId"
          INNER JOIN "shops" S ON S."shopId" = P."productShopId"
-         INNER JOIN "shop_collections" SC ON (SC."shopCollectionId" = ANY(P."productCollectionIds" ::uuid[]) AND SC."shopId" = P."productShopId")
+         INNER JOIN "shopCollections" SC ON (SC."shopCollectionId" = ANY(P."productCollectionIds" ::uuid[]) AND SC."shopId" = P."productShopId")
          WHERE P."productId" =$1`,
          [reqObj.id])
          return {error: false , data: result.rows, message: 'Read successfully'}
