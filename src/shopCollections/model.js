@@ -1,7 +1,7 @@
 module.exports = {
    create : async (reqObj, client) => {
       try{
-         const result = await client.query(`INSERT INTO "shopCollections"(
+         const result = await client.query(`INSERT INTO ""shopCollections""(
             "shopCollectionId", "shopId",
             "collectionName", "collectionDescription"
          ) VALUES($1, $2, $3, $4)`,
@@ -15,7 +15,7 @@ module.exports = {
 
    update: async (reqObj, client) => {
       try{
-         const result = await client.query(`UPDATE shopCollections SET
+         const result = await client.query(`UPDATE "shopCollections" SET
          "collectionName" = $1,
          "collectionDescription" = $2,
          "updatedAt" = now()
@@ -35,7 +35,7 @@ module.exports = {
       try{
          var qryText = `SELECT
             "shopCollectionId", "shopId", "collectionName", "collectionDescription", "isActive"
-         FROM shopCollections
+         FROM "shopCollections"
          WHERE "isActive" = $1`;
          var qryValues = [true];
 
@@ -60,7 +60,7 @@ module.exports = {
       try{
          const result = await client.query(`SELECT
             "shopCollectionId", "shopId", "collectionName", "collectionDescription", "isActive"
-         FROM "shopCollections"
+         FROM ""shopCollections""
          WHERE "shopCollectionId" = $1`,
          [reqObj.id])
 
@@ -72,7 +72,7 @@ module.exports = {
 
    remove : async (reqObj, client) => {
       try{
-         const result = await client.query(`UPDATE shopCollections SET
+         const result = await client.query(`UPDATE "shopCollections" SET
          "isActive" = $1 WHERE "shopCollectionId" = $2`,
          [false,reqObj.id])
          return {error: false, message: 'Deleted Successfully'}
