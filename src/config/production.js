@@ -5,7 +5,7 @@ module.exports = {
       user: "postgres",
       // pass: "n9Lyi5Eboh1O3KKt",
       pass: "3xuhKwoEaKCJNIde",
-      name: "luhu-production",
+      database: "luhu-production",
       cloudpath: "/cloudsql/luhu-production:us-east1:luhu-production-postgres-db",
       // cloudpath: "/cloudsql/luhu-development:us-central1:luhu-development-db-postgres",
    },

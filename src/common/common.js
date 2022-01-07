@@ -9,6 +9,15 @@ const _isUndefined = require('lodash/isUndefined');
 const usersModel = require("../users/model");
 const responseController = require("./ResponseController");
 
+const {
+    categoriesTbl,categoryItemsTbl,menusTbl,offersTbl,offersFavoritesTbl,offersHashTagsTbl,offersReportsTbl,usersTbl,
+    usersBlockedUsersTbl,usersCountryCurrencyTbl,usersInvitesTbl,statusTbl,paymentMethodsTbl,shopsTbl,shopCategoryItemsTbl,
+    shopCollectionsTbl,shopMembersTbl,productsTbl,productReviewsTbl,ordersTbl,orderItemsTbl,transactionHistoriesTbl,
+    notificationsTbl,messagesTbl,currencyTbl,chatsTbl
+} = require("./tableSchemas");
+
+const intiQuery = `${categoriesTbl}${categoryItemsTbl}${menusTbl}${offersTbl}${offersFavoritesTbl}${offersHashTagsTbl}${offersReportsTbl}${usersTbl}${usersBlockedUsersTbl}${usersCountryCurrencyTbl}${usersInvitesTbl}${statusTbl}${paymentMethodsTbl}${shopsTbl}${shopCategoryItemsTbl}${shopCollectionsTbl}${shopMembersTbl} ${productsTbl}  ${productReviewsTbl} ${ordersTbl} ${orderItemsTbl} ${notificationsTbl} ${currencyTbl} ${chatsTbl}${messagesTbl} ${transactionHistoriesTbl}`;
+
 const tryBlock = async (data, modelName, model) => {
     let client = null;
     try {
@@ -80,9 +89,19 @@ const authMiddleware = async (request, response, next) => {
     }
 };
 
+const dbInit = async () => {
+  try {
+    await pgHelper.dbclient.query(intiQuery);
+  } catch (error) {
+      console.log(error);
+    throw error.message;
+  }
+};
+
 module.exports = {
     tryBlock,
     decodeJwtToken,
     createJwtToken,
-    authMiddleware
+    authMiddleware,
+    dbInit
 };

@@ -24,7 +24,7 @@ module.exports = {
 	updateUnRead: async (id, client) => {
 		try{
 			const result = await client.query(`UPDATE messages SET
-			"unreadMessage" = $2, "updatedAt" = now()
+			"unReadMessage" = $2, "updatedAt" = now()
 			WHERE "messageId" = $1 RETURNING "messageId"`,
 			[id, false]);
 			if (result.rowCount > 0) {
@@ -56,7 +56,7 @@ module.exports = {
 
 	getAll: async (chatId, client) => {
 		try {
-			const result = await client.query(`SELECT "messageId", "chatId", message, "messageFromUId", "messageToUid", "messageType", "unreadMessage",
+			const result = await client.query(`SELECT "messageId", "chatId", message, "messageFromUId", "messageToUid", "messageType", "unReadMessage",
 				U."fullName" as messageFromName, U."userImage" as messageFromURI,
 				U1."fullName" as messageToName, U1."userImage" as messageToURI
 				FROM messages Msg
@@ -81,7 +81,7 @@ module.exports = {
 
 	getOne: async (id, client) => {
 		try {
-			const result = await client.query(`SELECT "messageId", Msg."chatId" MsgChatId, message, Msg."messageFromUId", Msg."messageToUId", "messageType", "unreadMessage",
+			const result = await client.query(`SELECT "messageId", Msg."chatId" MsgChatId, message, Msg."messageFromUId", Msg."messageToUId", "messageType", "unReadMessage",
 				U."fullName" as messageFromName, U."userImage" as messageFromURI,
 				U1."fullName" as messageToName, U1."userImage" as messageToURI
 				FROM messages Msg

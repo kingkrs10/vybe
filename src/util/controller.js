@@ -377,7 +377,7 @@ const migration = async (request, response) => {
                   // console.log('temptransactionHistoryData', value);
                   const senderUserData = await qryClient.query(`SELECT "uid", "currencyCode", "currencySymbol", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['sender_id']]);
                   const receiverUserData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['receiver_id']]);
-                  const checkAvailable = await qryClient.query(`SELECT "firebaseTransactionId" FROM transaction_histories WHERE "firebaseTransactionId" = $1`, [item] );
+                  const checkAvailable = await qryClient.query(`SELECT "firebaseTransactionId" FROM "transactionHistories" WHERE "firebaseTransactionId" = $1`, [item] );
                   const senderData = senderUserData.rows[0] || null;
                   const transactionTime = value["transaction_date"]? value["transaction_date"]["value"]["_seconds"] * 1000  : '';
                   const createdAt = transactionTime ? new Date(transactionTime) : new Date();
@@ -394,7 +394,7 @@ const migration = async (request, response) => {
                            senderSymbol: value['senderSymbol'] ? value['senderSymbol'] : senderData["currencySymbol"] ? senderData["currencySymbol"] : null,
                            firebaseTransactionId: item
                         }
-                        await qryClient.query(`INSERT INTO "transaction_histories" ("transactionId", amount, "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt")
+                        await qryClient.query(`INSERT INTO "transactionHistories" ("transactionId", amount, "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt")
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, [transactionId, reqObj.amount, reqObj.senderUId, reqObj.receiverUId, reqObj.senderCurrencyCode, reqObj.senderSymbol, reqObj.firebaseTransactionId, createdAt]);
                      }
                   } else {

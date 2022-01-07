@@ -1,7 +1,7 @@
 module.exports = {
    create : async (reqObj, client) => {
       try{
-         const result = await client.query(`INSERT INTO ""shopCollections""(
+         const result = await client.query(`INSERT INTO "shopCollections"(
             "shopCollectionId", "shopId",
             "collectionName", "collectionDescription"
          ) VALUES($1, $2, $3, $4)`,
@@ -60,7 +60,7 @@ module.exports = {
       try{
          const result = await client.query(`SELECT
             "shopCollectionId", "shopId", "collectionName", "collectionDescription", "isActive"
-         FROM ""shopCollections""
+         FROM "shopCollections"
          WHERE "shopCollectionId" = $1`,
          [reqObj.id])
 
