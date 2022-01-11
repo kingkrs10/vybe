@@ -2,14 +2,11 @@
 var self = module.exports = {
 	create: async (reqObj, client) => {
 		try {
-			const result = await client.query(`INSERT INTO "users_countryCurrency"(uid, amount, "oppPersonBalance", currency, label, value, "balanceData")
-			VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING "uid"`,
+			const result = await client.query(`INSERT INTO "users_countryCurrency"
+			("userId", amount, "oppPersonBalance", currency, label, value, "balanceData")
+			VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
 			[reqObj.uid, reqObj.amount, reqObj.oppPersonBalance, reqObj.currency, reqObj.label, reqObj.value, reqObj.balanceData]);
-			if (result.rowCount > 0) {
-				return { error: false, message: 'Data saved successfully' };
-			} else {
-				return { error: true, message: "Data save failed" };
-			}
+			return { error: false, message: 'Data saved successfully' };
 		} catch (error) {
 			return { error: true, message: error.toString()};
 		}
@@ -20,14 +17,15 @@ var self = module.exports = {
 			const { reqObj, uid } = Obj;
 			const result = await client.query(`UPDATE "users_countryCurrency"
 				SET amount=$3, "oppPersonBalance"=$4, "balanceData"=$5
-				WHERE "uid"= $1  AND currency = $2`, [uid, reqObj.currency, reqObj.amount, reqObj.oppPersonBalance, reqObj.balanceData]);
+				WHERE "userId"= $1  AND currency = $2`,
+				[uid, reqObj.currency, reqObj.amount, reqObj.oppPersonBalance, reqObj.balanceData]);
 			let data = [];
 			if (result.rowCount > 0) {
 				const result1 = await module.exports.getUserCountryCurrency(uid, client);
-				data = result1 ? result1 : null;
+				data = result1 ? result1 : [];
 				return { error: false, data, message: 'Data updated successfully' };
 			} else {
-				return { error: true, data, message: "Data updated failed" };
+				return { error: false, data: [], message: "Data updated successfully" };
 			}
 		} catch (error) {
 			return { error: true, message: error.toString() };
@@ -39,49 +37,42 @@ var self = module.exports = {
 			const result = await client.query(`SELECT
 				amount, "oppPersonBalance", currency, label, value, "balanceData"
 				FROM "users_countryCurrency" UCC
-				INNER JOIN users U ON U.uid = UCC."uid"
-				WHERE UCC.uid = $1`, [id]);
+				INNER JOIN users U ON U."userId" = UCC."userId"
+				WHERE UCC."userId" = $1`, [id]);
 
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'get users Country Currency data successfully'};
-			} else {
-				return { error: false, data:[], message: "get users Country Currency data failed"};
-			}
+			const data = result.rows || [];
+			return { error: false, data, message: 'get users Country Currency data successfully'};
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
 	},
+
 	checkUserCountryCurrency: async (id, currency, client) => {
 		try {
 			const result = await client.query(`SELECT
 				amount, "oppPersonBalance", currency, label, value, "balanceData"
 				FROM "users_countryCurrency" UCC
-				INNER JOIN users U ON U.uid = UCC."uid"
-				WHERE UCC.uid = $1 AND UCC.currency= $2`, [id, currency]);
+				INNER JOIN users U ON U."userId" = UCC."userId"
+				WHERE UCC."userId" = $1 AND UCC.currency= $2`, [id, currency]);
+			const isAvailable = result.rowCount > 0 ? true : false;
+			return { error: false, available: isAvailable, message: 'get users Country Currency data successfully'};
 
-			if (result.rowCount > 0) {
-				return { error: false, available: true, message: 'get users Country Currency data successfully'};
-			} else {
-				return { error: false, available: false, message: "get users Country Currency data failed"};
-			}
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
 	},
+
 	remove: async (reqObj, client) => {
 		try {
 			const result = await client.query(`DELETE FROM "users_countryCurrency"
-				WHERE "uid"= $1  AND currency = $2`, [reqObj.uid, reqObj.currency]);
-			if (result.rowCount > 0) {
+				WHERE "userId"= $1  AND currency = $2`, [reqObj.uid, reqObj.currency]);
 				return { error: false, message: 'Deleted data successfully'};
-			} else {
-				return { error: false, message: "Deleted data failed"};
-			}
+
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
 	},
+
 	bulkInsert: async (reqObj, client) => {
 		try {
 			var result = null;

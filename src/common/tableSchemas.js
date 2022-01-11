@@ -56,7 +56,7 @@ const offersHashTagsColumns = `
 
 const offersReportsColumns = `
   "offerId" uuid NOT NULL,
-  "reporterUId" uuid NOT NULL,
+  "reporterUserId" uuid NOT NULL,
   comment text,
   "createdAt" timestamp with time zone DEFAULT current_timestamp
 `;
@@ -75,9 +75,9 @@ const usersColumns = `
   profession character varying(150),
   "phoneNumber" character varying(25),
   "firebaseUId" character varying(50),
-  "userImage" text[],
-  "userThumpImage" text[],
-  "userMediumImage" text[],
+  "userImage" text,
+  "userThumpImage" text,
+  "userMediumImage" text,
   "isActive" boolean NOT NULL DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -171,7 +171,7 @@ const shopMemberColumns = `
 
 const productsColumns = `
   "productId" uuid NOT NULL PRIMARY KEY,
-  "productShopId" uuid NOT NULL,
+  "productShopId" uuid,
   "productName" character varying(250),
   "productDescription" text,
   "productPrice" numeric DEFAULT 0,
@@ -182,7 +182,7 @@ const productsColumns = `
   "productImageURL" text[],
   "productThumpImageURL" text[],
   "productMediumImageURL" text[],
-  "productCategoryItemId" uuid NOT NULL,
+  "productCategoryItemId" uuid,
   "productCurrency" character varying(25),
   "productCollectionIds" text[],
   "productOptions" jsonb,
@@ -332,7 +332,7 @@ exports.offersHashTagsHelper = new pgp.helpers.ColumnSet(
 );
 
 exports.offersReportsHelper = new pgp.helpers.ColumnSet(
-  ["offerId", "reporterUId", "comment"],
+  ["offerId", "reporterUserId", "comment"],
   {
     table: "offers_reports",
   }
@@ -352,6 +352,13 @@ exports.usersBlockedUsersHelper = new pgp.helpers.ColumnSet(
   [ "uid", "blockedUserId" ],
   {
     table: "users_blockedUsers",
+  }
+);
+
+exports.usersInvitesHelper = new pgp.helpers.ColumnSet(
+  [ "userId", "amount",  "oppPersonBalance", "currency", "label", "value", "balanceData"],
+  {
+    table: "users_countryCurrency",
   }
 );
 
@@ -464,7 +471,7 @@ exports.messagesHelper = new pgp.helpers.ColumnSet(
 exports.messagesHelper = new pgp.helpers.ColumnSet(
   [ "chatId" , "messageFromUId", "messageToUId", "lastMessage", "isActive", "createdAt"],
   {
-    table: "currency",
+    table: "chats",
   }
 );
 
@@ -475,16 +482,16 @@ exports.categoryItemsTbl = `CREATE TABLE IF NOT EXISTS public."categoryItems" ( 
 exports.menusTbl = `CREATE TABLE IF NOT EXISTS public.menus ( ${menusColumns} );`;
 exports.offersTbl = `CREATE TABLE IF NOT EXISTS public.offers ( ${offersColumns} );`;
 exports.offersFavoritesTbl = `CREATE TABLE IF NOT EXISTS public.offers_favorites ( ${offersFavoritesColumns} );`;
-exports.offersHashTagsTbl = `CREATE TABLE IF NOT EXISTS public.offers_hashTags ( ${offersHashTagsColumns} );`;
+exports.offersHashTagsTbl = `CREATE TABLE IF NOT EXISTS public."offers_hashTags" ( ${offersHashTagsColumns} );`;
 exports.offersReportsTbl = `CREATE TABLE IF NOT EXISTS public.offers_reports ( ${offersReportsColumns} );`;
 exports.usersTbl = `CREATE TABLE IF NOT EXISTS public.users ( ${usersColumns} );`;
-exports.usersBlockedUsersTbl = `CREATE TABLE IF NOT EXISTS public.users_blockedUsers ( ${usersBlockedUsersColumns} );`;
-exports.usersCountryCurrencyTbl = `CREATE TABLE IF NOT EXISTS public.users_countryCurrency ( ${usersCountryCurrencyColumns} );`;
+exports.usersBlockedUsersTbl = `CREATE TABLE IF NOT EXISTS public."users_blockedUsers" ( ${usersBlockedUsersColumns} );`;
+exports.usersCountryCurrencyTbl = `CREATE TABLE IF NOT EXISTS public."users_countryCurrency" ( ${usersCountryCurrencyColumns} );`;
 exports.usersInvitesTbl = `CREATE TABLE IF NOT EXISTS public.users_invites ( ${usersInvitesColumns} );`;
 exports.statusTbl = `CREATE TABLE IF NOT EXISTS public.status ( ${statusColumns} );`;
 exports.paymentMethodsTbl = `CREATE TABLE IF NOT EXISTS public.paymentMethods ( ${paymentMethodsColumns} );`;
 exports.shopsTbl = `CREATE TABLE IF NOT EXISTS public.shops ( ${shopsColumns} );`;
-exports.shopCategoryItemsTbl = `CREATE TABLE IF NOT EXISTS public.shop_categoryItems ( ${shopCategoryItemsColumns} );`;
+exports.shopCategoryItemsTbl = `CREATE TABLE IF NOT EXISTS public."shop_categoryItems" ( ${shopCategoryItemsColumns} );`;
 exports.shopCollectionsTbl = `CREATE TABLE IF NOT EXISTS public."shopCollections" ( ${shopCollectionColumns} );`;
 exports.shopMembersTbl = `CREATE TABLE IF NOT EXISTS public.shop_members ( ${shopMemberColumns} );`;
 exports.productsTbl = `CREATE TABLE IF NOT EXISTS public.products ( ${productsColumns} );`;

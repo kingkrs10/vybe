@@ -58,9 +58,9 @@ module.exports = {
       try{
          const result = await client.query(`SELECT
          SM."shopMemberId", SM."shopId", SM."userId", SM."designation",
-         U."fullName", U."imageURl", U."thump_imageURL", U."medium_imageURL", U."phoneNumber",U."firebaseUId"
+         U."fullName", U."userImage", U."userThumpImage", U."userMediumImage", U."phoneNumber",U."firebaseUId"
          FROM "shop_members" SM
-         INNER JOIN users U ON SM."userId" = U.uid
+         INNER JOIN users U ON SM."userId" = U."userId"
          WHERE SM."shopId" = $1`,
          [reqObj.id])
          return { error: false, data: result.rows, messsge: 'Read successfully'}

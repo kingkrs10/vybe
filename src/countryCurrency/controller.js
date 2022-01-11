@@ -1,7 +1,7 @@
 const userCountryCurrencyModel = require("./model");
 const userModel = require("../users/model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse,sendNoContentResponse } = require("../common/ResponseController");
 const _isEmpty = require('lodash/isEmpty');
 
 const create = async (request, response, next) => {

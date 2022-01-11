@@ -6,12 +6,8 @@ module.exports = {
 			FROM public.categories AS C
 			INNER JOIN menus M ON M."menuId" = C."parentId" AND M."isActive" =$1
 			WHERE C."isActive" = $1`, [true]);
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return {error: false, data};
-			} else {
-				return { error: false, data:[]};
-			}
+			const data = result.rows || [];
+			return {error: false, data};
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -28,12 +24,8 @@ module.exports = {
 				AND M."isActive" = $1
 				AND M."keyCode" = $2`, [true, reqObj.keyCode]);
 
-				const data = result.rows;
-				if (result.rowCount > 0) {
-					return {error: false, data};
-				} else {
-					return { error: false, data:[]};
-				}
+				const data = result.rows || [];
+				return {error: false, data};
 			} catch (error) {
 				return { error: true, message: error.toString() };
 			}

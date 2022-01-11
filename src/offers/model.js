@@ -1,33 +1,25 @@
 const _isEmpty = require('lodash/isEmpty');
 var self = module.exports = {
 	create: async (reqObj, client) => {
-		const imageURlData = Array.isArray(reqObj.imageURl) ? reqObj.imageURl : JSON.parse(reqObj.imageURl);
-		const thumpImageData = Array.isArray(reqObj.thump_imageURl) ? reqObj.thump_imageURl : JSON.parse(reqObj.thump_imageURL);
+
+		const imageURlData = Array.isArray(reqObj.imageURL) ? reqObj.imageURL : JSON.parse(reqObj.imageURL);
+		const thumpImageData = Array.isArray(reqObj.thump_imageURL) ? reqObj.thump_imageURL : JSON.parse(reqObj.thump_imageURL);
 		const mediumImageData = Array.isArray(reqObj.medium_imageURL) ? reqObj.medium_imageURL : JSON.parse(reqObj.medium_imageURL);
 
 		try {
 			const result = await client.query(`INSERT INTO offers
 				(
-					"offerId", "firebaseOfferId", uid, "headLine", "offerDescription",
+					"offerId", "firebaseOfferId", "userId", "headLine", "offerDescription",
 					"locationName", latitude, longitude,
 					"offerImage", "offerThumpImage", "offerMediumImage"
 				)
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
 				[reqObj.offerId, reqObj.firebaseOfferId, reqObj.uid, reqObj.headLine, reqObj.offerDescription,
 				reqObj.locationName, reqObj.latitude, reqObj.longitude, `{${imageURlData}}`, `{${thumpImageData}}`, `{${mediumImageData}}`]);
 
-			let data = null;
-			if (result.rowCount > 0) {
-				const Obj = { reqObj: reqObj, offerId: reqObj.offerId};
-				const result1 = await module.exports.getOne(reqObj, client);
-				data = result1 ? result1.data : null;
-				await self.updateHashTags(Obj, client);
-			}
-			if (result.rowCount > 0 && data) {
-				return { error: false, data, message: 'Data saved successfully' };
-			} else {
-				return { error: true, message: "Data save failed" };
-			}
+			let data = result.rowCount > 0 ? result.rows[0] : null;
+			return { error: false, data, message: 'Data saved successfully' };
+
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -50,21 +42,12 @@ var self = module.exports = {
 				"offerThumpImage" = $8,
 				"offerMediumImage" = $9,
 				"updatedAt" = now()
-				WHERE "offerId" = $1 RETURNING "offerId"`,
+				WHERE "offerId" = $1 RETURNING *`,
 				[offerId, reqObj.headLine, reqObj.offerDescription, reqObj.locationName, reqObj.latitude, reqObj.longitude, `{${imageURlData}}`,`{${thumpImageData}}`, `{${mediumImageData}}`]);
 
-			let data = null;
-			if (result.rowCount > 0) {
-				const Obj = { reqObj: reqObj, offerId: offerId};
-				const result1 = await module.exports.getOne({...reqObj, offerId: offerId}, client);
-				await self.updateHashTags(Obj, client);
-				data = result1 ? result1.data : null;
-			}
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'Data update successfully' };
-			} else {
-				return { error: true, message: "Data update failed" };
-			}
+			let data = result.rowCount > 0 ? result.rows[0] : null;
+
+			return { error: false, data, message: 'Data update successfully' };
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -75,27 +58,24 @@ var self = module.exports = {
 			const limit = reqObj.limit ? reqObj.limit : 50;
 			const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
 			const result = await client.query(`SELECT * FROM (
-				SELECT O."offerId", O."headLine",O.latitude, O.longitude, O."locationName",	O."offerDescription", O.uid as userId,
-				O."isActive", O."offerImage" as offerImage, "firebaseOfferId", O."offerThumpImage", O."offerMediumImage",  O."createdAt", O."updatedAt",
-				(select count(uid) from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
-				(select count(uid) from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
+				SELECT O."offerId", O."headLine",O.latitude, O.longitude, O."locationName",	O."offerDescription", O."userId",
+				O."isActive", O."offerImage", "firebaseOfferId", O."offerThumpImage", O."offerMediumImage",  O."createdAt", O."updatedAt",
+				(select count("userId") from offers_favorites OFS where  OFS."offerId" = O."offerId") as favoriterCount,
+				(select count("userId") from offers_favorites OFS1 where  OFS1."offerId" = O."offerId" AND "userId" =  $1) as isFavorites,
 				U.profession, U."userImage", U."userThumpImage", U."userMediumImage", U."fullName", U."firebaseUId" as uid,
 				( 3959 * acos( cos( radians($5) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($6) ) + sin( radians($5) ) * sin( radians( O.latitude ) ) ) ) AS distance
 				FROM offers O
-				INNER JOIN users U ON U.uid = O.uid
+				INNER JOIN users U ON U."userId" = O."userId"
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
-				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)
+				AND O."userId" not in (select "blockedUserId" from "users_blockedUsers" WHERE "userId" =  $1)
+				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUserId" =  $1)
 				ORDER BY O."createdAt" DESC) as tbl
 				WHERE tbl.distance < 100
 				offset $4 limit $3`, [reqObj.uid, true, limit, pageNo, reqObj.latitude, reqObj.longitude]);
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'get all data successfully' };
-			} else {
-				return { error: true, message: "get all data failed" };
-			}
+			const data = result.rows || [];
+			return { error: false, data, message: 'get all data successfully' };
+
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -105,20 +85,20 @@ var self = module.exports = {
 		try {
 			const limit =  250;
 			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
-			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."offerImage" as offerImage,"firebaseOfferId", O."offerThumpImage", O."offerMediumImage",
-				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
-				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
+			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O."userId", O."isActive",
+				O."offerImage","firebaseOfferId", O."offerThumpImage", O."offerMediumImage",
+				(select count("userId") from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
+				(select count("userId") from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND "userId" =  $1) as isFavorites,
 				U.profession, U."userImage", U."userThumpImage", U."userMediumImage", U."fullName",U."firebaseUId" uid,
 				( 3959 * acos( cos( radians($3) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($4) ) + sin( radians($3) ) * sin( radians( O.latitude ) ) ) ) AS distance
 				FROM offers O
-				INNER JOIN users U ON U.uid = O.uid
+				INNER JOIN users U ON U."userId" = O."userId"
 				INNER JOIN offers_favorites fav ON  O."offerId" = fav."offerId"
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
-				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)
-				AND fav."uid"=$1 `;
+				AND O."userId" not in (select "blockedUserId" from "users_blockedUsers" WHERE "userId" =  $1)
+				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUserId" =  $1)
+				AND fav."userId"=$1 `;
 
 			// var qryValue = [reqObj.favoriteUid, true, reqObj.latitude, reqObj.longitude, limit, pageNo];
 			// const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC offset $4 limit $3`, qryValue);
@@ -126,12 +106,9 @@ var self = module.exports = {
 			var qryValue = [reqObj.favoriteUid, true, reqObj.latitude, reqObj.longitude];
 			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC`, qryValue);
 
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'get all data successfully' };
-			} else {
-				return { error: false, data:[], message: "get all data failed" };
-			}
+			const data = result.rowCount > 0 ? result.rows : [];
+			return { error: false, data, message: 'get all data successfully' };
+
 		} catch (error) {
 			return { error: true, message: error.toString()};
 		}
@@ -143,18 +120,18 @@ var self = module.exports = {
 			const pageNo = reqObj.pageNo ? parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1 : 1;
 			const userId = reqObj.favoriteUid ? reqObj.favoriteUid : reqObj.userId;
 
-			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."offerImage" as offerImage,"firebaseOfferId", O."offerThumpImage", O."offerMediumImage",
-				(select count(uid) from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
-				(select count(uid) from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND uid =  $1) as isFavorites,
-				U.profession, U."userImage", U."userThumpImage", U."userMediumImage", U."fullName",U."firebaseUId" uid,
+			var qryText = `SELECT O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O."userId", O."isActive",
+				O."offerImage","firebaseOfferId", O."offerThumpImage", O."offerMediumImage",
+				(select count("userId") from offers_favorites OFS WHERE  OFS."offerId" = O."offerId") as favoriterCount,
+				(select count("userId") from offers_favorites OFS1 WHERE  OFS1."offerId" = O."offerId" AND "userId" =  $1) as isFavorites,
+				U.profession, U."userImage", U."userThumpImage", U."userMediumImage", U."fullName",U."firebaseUId" as uid,
 				( 3959 * acos( cos( radians($5) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($6) ) + sin( radians($5) ) * sin( radians( O.latitude ) ) ) ) AS distance
 				FROM offers O
-				INNER JOIN users U ON U.uid = O.uid
+				INNER JOIN users U ON U."userId" = O."userId"
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
-				AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)`;
+				AND O."userId" not in (select "blockedUserId" from "users_blockedUsers" WHERE "userId" =  $1)
+				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUserId" =  $1)`;
 			var qryValue = [userId, true, limit, pageNo, reqObj.latitude, reqObj.longitude];
 
 			if ((reqObj.category && !_isEmpty(reqObj.category)) && (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm))){
@@ -184,19 +161,15 @@ var self = module.exports = {
 						OR LOWER("locationName") like LOWER($7))`;
 				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, `%${reqObj.searchTerm}%`]
 			} else if (reqObj.uid) {
-				qryText = `${qryText} AND O.uid = $7`;
+				qryText = `${qryText} AND O."userId" = $7`;
 				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.uid]
 			} else if (reqObj.favoriteUid) {
 				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $7)`;
 				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.favoriteUid]
 			}
 			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $4 limit $3`, qryValue);
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'get all data successfully' };
-			} else {
-				return { error: false, data:[], message: "get all data failed" };
-			}
+			const data = result.rowCount > 0 ? result.rows : [];
+			return { error: false, data, message: 'get all data successfully' };
 		} catch (error) {
 			return { error: true, message: error.toString()};
 		}
@@ -205,23 +178,21 @@ var self = module.exports = {
 	getOfferFavoriters: async (reqObj, client) => {
 		try {
 			var qryText = `SELECT O."offerId", O."createdAt" as "offerCreatedAt", O."headLine", O."offerDescription",
-				O."offerImage" as offerImage, O.""offerThumpImag"e", O.""offerMediumImag"e",
+				O."offerImage", O."offerThumpImage", O."offerMediumImage",
 				U."firebaseUId" uid, U."fullName", U.profession, U."userImage", U."userThumpImage", U."userMediumImage",
 				fav."createdAt" as "createdAtOffersFavorites"
 				FROM offers O
 				INNER JOIN offers_favorites fav ON  O."offerId" = fav."offerId"
-				INNER JOIN users U ON U.uid = fav.uid
+				INNER JOIN users U ON U."userId" = fav."userId"
 				WHERE O."isActive" =  $2
 				AND U."isActive" =  $2
-				AND O."uid" = $1`;
+				AND O."userId" = $1`;
 			var qryValue = [reqObj.uid, true];
 			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC`, qryValue);
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return { error: false, data, message: 'get all data successfully' };
-			} else {
-				return { error: false, data:[], message: "get all data failed" };
-			}
+
+			const data = result.rows || [];
+			return { error: false, data, message: 'get all data successfully' };
+
 		} catch (error) {
 			return { error: true, message: error.toString()};
 		}
@@ -232,20 +203,16 @@ var self = module.exports = {
 		const id = reqObj.params ? reqObj.params.id : reqObj.offerId;
 		try {
 			const result = await client.query(`SELECT
-				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O.uid userId, O."isActive",
-				O."offerImage" as offerImage, "firebaseOfferId", O."offerThumpImage", O."offerMediumImage",
-				U.profession,U."userImage", U."userThumpImage", U."userMediumImage", U."fullName",U."firebaseUId" uid,
-				(select count(uid) from offers_favorites OFS where  OFS."offerId" = $1) as favoriterCount,
+				O."offerId", O."createdAt", O."updatedAt", O."headLine",O.latitude, O.longitude, O."locationName", O."offerDescription", O."userId", O."isActive",
+				O."offerImage", "firebaseOfferId", O."offerThumpImage", O."offerMediumImage",
+				U.profession,U."userImage", U."userThumpImage", U."userMediumImage", U."fullName", U."firebaseUId" uid,
+				(select count("userId") from offers_favorites OFS where  OFS."offerId" = $1) as favoriterCount,
 				( 3959 * acos( cos( radians($2) ) * cos( radians( O.latitude ) ) * cos( radians( O.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( O.latitude ) ) ) ) AS distance
 				FROM offers O
-				INNER JOIN users U ON U.uid = O.uid
+				INNER JOIN users U ON U."userId" = O."userId"
 				WHERE O."offerId" = $1`, [id, currentUser.latitude, currentUser.longitude]);
-			const data = result.rows[0];
-			if (result.rowCount > 0) {
-				return {error: false, data};
-			} else {
-				return { error: false, data:[]};
-			}
+			const data = result.rows[0] || {};
+			return {error: false, data};
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -254,11 +221,7 @@ var self = module.exports = {
 	remove: async (id, client) => {
 		try {
 			const result = await client.query(`UPDATE offers SET "isActive" = $1  WHERE "offerId" = $2`, [false, id]);
-			if (result.rowCount > 0) {
-				return { error: false, removedOfferId: id, message: 'Offer removed successfully' };
-			} else {
-				return { error: true, message: "Offer removed failed" };
-			}
+			return { error: false, removedOfferId: id, message: 'Offer removed successfully' };
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -283,12 +246,8 @@ var self = module.exports = {
 	getHashTags: async (ids, client) => {
 		try{
 			const result = await client.query(`SELECT "offerId", "hashTag" FROM "offers_hashTags" WHERE "offerId" = ANY(ARRAY[$1::uuid[]])`, [ids]);
-			const data = result.rows;
-			if (result.rowCount > 0) {
-				return data;
-			} else {
-				return [];
-			}
+			const data = result.rows || [];
+			return data;
 		} catch (error){
 			return { error: true, message: error.toString() };
 		}
@@ -298,15 +257,12 @@ var self = module.exports = {
 		try {
 			var result = {};
 			if (!Boolean(Number(reqObj.isFavorite))) {
-				result = await client.query(`DELETE FROM "offers_favorites" WHERE "offerId" = $1 AND uid = $2`, [reqObj.offerId, reqObj.uid]);
+				result = await client.query(`DELETE FROM "offers_favorites" WHERE "offerId" = $1 AND "userId" = $2`, [reqObj.offerId, reqObj.uid]);
 			} else {
-				result = await client.query(`INSERT INTO "offers_favorites"("offerId", uid) VALUES ($1, $2)`, [reqObj.offerId, reqObj.uid]);
+				result = await client.query(`INSERT INTO "offers_favorites"("offerId", "userId") VALUES ($1, $2)`, [reqObj.offerId, reqObj.uid]);
 			}
-			if (result.rowCount > 0) {
-				return { error: false, message: 'Data updated successfully' };
-			} else {
-				return { error: true, message: "Data saved failed" };
-			}
+			return { error: false, message: 'Data updated successfully' };
+
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -314,14 +270,10 @@ var self = module.exports = {
 
 	saveReport: async (reqObj, client) => {
 		try {
-			const result = await client.query(`INSERT INTO offers_reports("offerId", "reporterUId",comment)
+			const result = await client.query(`INSERT INTO offers_reports("offerId", "reporterUserId",comment)
 			VALUES ($1, $2, $3)`, [reqObj.offerId, reqObj.reporterUId, reqObj.comment]);
+			return { error: false, message: 'Data saved successfully' };
 
-			if (result.rowCount > 0) {
-				return { error: false, message: 'Data saved successfully' };
-			} else {
-				return { error: true, message: "Data saved failed" };
-			}
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -332,11 +284,11 @@ var self = module.exports = {
 			var qry = `SELECT DISTINCT "hashTag" as name,  count(OH."offerId") as length
 			FROM "offers_hashTags" OH
 			INNER JOIN "offers" O on O."offerId" = OH."offerId"
-            INNER JOIN users U ON U.uid = O.uid
+            INNER JOIN users U ON U."userId" = O."userId"
 			WHERE O."isActive" = $2
 			AND U."isActive" = $2
-			AND O.uid not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-			AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUId" =  $1)`;
+			AND O."userId" not in (select "blockedUserId" from "users_blockedUsers" WHERE "userId" =  $1)
+			AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUserId" =  $1)`;
 			var qryValue = [reqObj.userId,true];
 
 			if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
@@ -348,11 +300,8 @@ var self = module.exports = {
 				qryValue = [reqObj.userId, true, `%${reqObj.searchTerm}%`];
 			}
 			const result = await client.query(`${qry} group by name`, qryValue);
-			if (result.rowCount > 0) {
-				return { error: false, data: result.rows, message: 'Get Data successfully' };
-			} else {
-				return { error: false, data: [], message: 'Get Data successfully' };
-			}
+
+			return { error: false, data: result.rows || [], message: 'Get Data successfully' };
 		} catch (error) {
 			return { error: true, message: error.toString() };
 		}
@@ -362,7 +311,7 @@ var self = module.exports = {
 		try {
 			var qry = `SELECT DISTINCT "locationName" as name, count("offerId") as length
 			FROM "offers" AS O
-            INNER JOIN users U ON U.uid = O.uid
+            INNER JOIN users U ON U."userId" = O."userId"
 			WHERE O."isActive" = $1
             AND U."isActive" = $1`;
 			var qryValue = [true];
@@ -374,11 +323,8 @@ var self = module.exports = {
 				qryValue = [true, `%${reqObj.searchTerm}%`];
 			}
 			const result = await client.query(`${qry} group by "name"`, qryValue);
-			if (result.rowCount > 0) {
-				return { error: false, data: result.rows, message: 'Get Data successfully' };
-			} else {
-				return { error: false, data: [], message: "Get Data failed" };
-			}
+			const data = result.rows || [];
+			return { error: false, data: data, message: 'Get Data successfully' };
 		} catch (error) {
 			return { error: true, message: error.toString()};
 		}

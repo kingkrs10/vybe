@@ -25,7 +25,7 @@ const create = async (request, response) => {
          thumpImagePath = request.body.profileThumpImage;
       }
 
-      const tempBody = { ...request.body, imageURl: imagePath, medium_imageURL:mediumImagePath, thump_imageURL: thumpImagePath, uid: userId };
+      const tempBody = { ...request.body, imageURl: imagePath, userMediumImage:mediumImagePath, userThumpImage: thumpImagePath, uid: userId };
       const result = await commonModel.tryBlock(
          tempBody,
          "(User:create)",
@@ -195,7 +195,7 @@ const updateBlockedUsers = async (request, response, next) => {
       if (result.error) {
          sendErroresponse(response, result.message);
       } else if (!result.error) {
-         sendSuccessResponse(response, result['data'])
+         sendSuccessResponse(response)
       } else {
          sendInternalErrorResponse(response)
       }

@@ -1,10 +1,11 @@
 const twilio = require("twilio");
 const nodemailer = require("nodemailer");
+const {Storage} = require('@google-cloud/storage');
+const isImage = require('is-image');
+
 const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { firebaseAdmin, bucket } = require("../common/firebase");
 const pgHelper = require("../common/pgHelper");
-const {Storage} = require('@google-cloud/storage');
-const isImage = require('is-image');
 
 const {
    twilioTest,
@@ -180,9 +181,6 @@ const migration = async (request, response) => {
    try {
       const filePath = join(__dirname,`../../public/backup/${firbaseDatabaseFileName}`);
 
-      // Production DB collection Data
-      // const filePath = join(__dirname,`../../public/backup/luhu-production-firebase-database.json`);
-
       fs.readFile(filePath, "utf8", async(err, rawdata) => {
          if (err) {
             console.log("Error reading file from disk:", err);
@@ -192,7 +190,6 @@ const migration = async (request, response) => {
             const jsonData = JSON.parse(rawdata)["__collections__"];
             const userData = jsonData[users_collection_name] || [];
             const OfferData = jsonData[offers_collection_name]|| [];
-            // const OfferData = jsonData['offers']|| [];
             const currencyData = jsonData[currency_collection_name] || [];
             const transactionHistoryData = jsonData[transaction_history_collection_name] || [];
             const blockedUsersId = [];
@@ -200,6 +197,7 @@ const migration = async (request, response) => {
             const tempUserData = Object.keys(userData);
             const tempOfferData = Object.keys(OfferData);
             const temptransactionHistoryData = Object.keys(transactionHistoryData);
+
             console.log('Start the users data save process',tempUserData.length);
             // Currency Data Save pr
             console.log('start Currency migration process');
@@ -215,7 +213,7 @@ const migration = async (request, response) => {
                   if(_isEmpty(checkAvailable.rows[0])) {
                      const userId = uuidv4();
                      if(value.blockListID && !_isEmpty(value.blockListID)){
-                        blockedUsersId.push({firebaseUId: item,userId: userId, blockListID: value.blockListID});
+                        blockedUsersId.push({firebaseUId: item, userId: userId, blockListID: value.blockListID});
                      }
                      if(value.inviteNumber && !_isEmpty(value.inviteNumber)){
                         inviteNumbersArr.push({firebaseUId: item, userId: userId, inviteNumber: value.inviteNumber});
@@ -228,8 +226,8 @@ const migration = async (request, response) => {
                         deviceId: value['deviceId'] || null,
                         fullName: value['fullname'],
                         imageURl: value['imageURl'] || null,
-                        thump_imageURL: value['userTempImage'] || null,
-                        medium_imageURL: value['userTempImage'] || null,
+                        thump_imageURL: value['userTempImage'] || value['imageURl'] || null,
+                        medium_imageURL: value['userTempImage'] || value['imageURl'] || null,
                         stripeCustomerId: value["stripeCustomerId"] || '',
                         latitude: value["currentLocation"] ? value["currentLocation"]["latitude"] : '',
                         longitude: value["currentLocation"] ? value["currentLocation"]["longitude"] : '',
@@ -241,18 +239,18 @@ const migration = async (request, response) => {
                         firebaseUId : value["uid"] ? value["uid"] : item
                      }
                      await qryClient.query(`INSERT INTO users(
-                        uid, balance, "notificationUnReadcount", "deviceId",
+                        "userId", balance, "notificationUnReadcount", "deviceId",
                         "fullName",	"userImage", "phoneNumber", "stripeCustomerId",
-                        "currencyCode", "currencySymbol", profession, createdAt, "firebaseUId", "userThumpImage", "userMediumImage")
-                        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING uid`,
+                        "currencyCode", "currencySymbol", profession, "createdAt", "firebaseUId", "userThumpImage", "userMediumImage")
+                        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING "userId"`,
                      [userId, reqObj.balance, reqObj.notificationUnReadcount, `{${reqObj.deviceId}}`,
-                     reqObj.fullName, reqObj.imageURl, reqObj.phoneNumber, reqObj.stripeCustomerId,
-                     reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.created_at, reqObj.firebaseUId, reqObj.thump_imageURL, reqObj.medium_imageURL]);
+                     reqObj.fullName,`${reqObj.imageURl}`, reqObj.phoneNumber, reqObj.stripeCustomerId,
+                     reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.created_at, reqObj.firebaseUId, `${reqObj.thump_imageURL}`, `${reqObj.medium_imageURL}`]);
 
                      if(value.countryCurrency && !_isEmpty(value.countryCurrency)){
                         await value.countryCurrency.map(async items => {
-                           await qryClient.query(`INSERT INTO "users_countryCurrency"(uid, amount, "oppPersonBalance", currency, label, value, "balanceData")
-                           VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING "uid"`,
+                           await qryClient.query(`INSERT INTO "users_countryCurrency"("userId", amount, "oppPersonBalance", currency, label, value, "balanceData")
+                           VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING "userId"`,
                            [userId, items.amount, items.oppPersonBalance, items.currency, items.label, items.value, items.balanceData]);
                         });
                      }
@@ -265,10 +263,10 @@ const migration = async (request, response) => {
             if(!_isEmpty(blockedUsersId)){
                await Promise.all(blockedUsersId.map(async item => {
                   item.blockListID.map(async bUid => {
-                     const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [bUid] );
-                     const blockedUserId = userData.rows[0]?.uid || null;
+                     const userData = await qryClient.query(`SELECT "userId", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [bUid] );
+                     const blockedUserId = userData.rows[0]?.userId || null;
                      if(blockedUserId){
-                        await qryClient.query(`INSERT INTO "users_blockedUsers" (uid, "blockedUserId") VALUES ($1, $2)`, [item.userId, blockedUserId]);
+                        await qryClient.query(`INSERT INTO "users_blockedUsers" ("userId", "blockedUserId") VALUES ($1, $2)`, [item.userId, blockedUserId]);
                      }
                   })
                }));
@@ -280,7 +278,7 @@ const migration = async (request, response) => {
                      // const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [phoneNo] );
                      // const invitedUserId = userData.rows[0].uid;
                      // if(invitedUserId){
-                     await qryClient.query(`INSERT INTO users_invites("senderUId", "receiverPhoneNumber", status)
+                     await qryClient.query(`INSERT INTO users_invites("senderUserId", "receiverPhoneNumber", status)
                      VALUES($1, $2, $3)`, [item.userId, phoneNo, 0]);
                      // }
                   })
@@ -299,10 +297,10 @@ const migration = async (request, response) => {
                   const value = OfferData[item];
                   // console.log('value',value);
                   const checkAvailable = await qryClient.query(`SELECT "firebaseOfferId" FROM offers WHERE "firebaseOfferId" = $1`, [item] );
-                  const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['uid']] );
+                  const userData = await qryClient.query(`SELECT "userId", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['uid']] );
                   if(_isEmpty(checkAvailable.rows[0])) {
                      if(!_isEmpty(userData.rows[0])){
-                        const userId = userData.rows[0].uid;
+                        const userId = userData.rows[0].userId;
                         const offerId = uuidv4();
                         if(value.tempFavoriteID && !_isEmpty(value.tempFavoriteID)){
                            offerFavoriteList.push({firebaseOfferId: item, offerId: offerId, tempFavoriteIDs: value.tempFavoriteID});
@@ -323,9 +321,9 @@ const migration = async (request, response) => {
                            locationName: value['locationName'],
                            firebaseOfferId: item
                         }
-                        await qryClient.query(`INSERT INTO offers("offerId", "headLine", "offerImage", latitude, longitude, "offerDescription", uid, "locationName", "firebaseOfferId", "createdAt", "offerThumpImage", "offerMediumImage")
+                        await qryClient.query(`INSERT INTO offers("offerId", "headLine", "offerImage", latitude, longitude, "offerDescription", "userId", "locationName", "firebaseOfferId", "createdAt", "offerThumpImage", "offerMediumImage")
                            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-                        [offerId, reqObj.headLine, `{${reqObj.imageURl}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, userId, reqObj.locationName, reqObj.firebaseOfferId, createdAt, reqObj.thump_imageURL, reqObj.medium_imageURL]);
+                        [offerId, reqObj.headLine, `{${reqObj.imageURl}}`, reqObj.latitude, reqObj.longitude, reqObj.offerDescription, userId, reqObj.locationName, reqObj.firebaseOfferId, createdAt, `{${reqObj.thump_imageURL}}`, `{${reqObj.medium_imageURL}}`]);
 
                         if(value['offerHashTag'] && !_isEmpty(value['offerHashTag'])){
                            qryClient.query(`INSERT INTO "offers_hashTags"("offerId", "hashTag") VALUES ($1, $2)`, [offerId, value['offerHashTag']]);
@@ -341,12 +339,12 @@ const migration = async (request, response) => {
             if(!_isEmpty(offerFavoriteList)){
                await Promise.all(offerFavoriteList.map(async item => {
                   item.tempFavoriteIDs.map(async favoriteID => {
-                     const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [favoriteID] );
-                     const favoriteUId = userData.rows[0]?.uid || null;
+                     const userData = await qryClient.query(`SELECT "userId", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [favoriteID] );
+                     const favoriteUId = userData.rows[0]?.userId || null;
                      if(favoriteUId){
-                        const favoriteData = await qryClient.query(`SELECT "uid", "offerId" FROM offers_favorites WHERE "offerId" = $1 AND uid = $2`, [item.offerId, favoriteUId] );
+                        const favoriteData = await qryClient.query(`SELECT "userId", "offerId" FROM offers_favorites WHERE "offerId" = $1 AND "userId" = $2`, [item.offerId, favoriteUId] );
                         if(_isEmpty(favoriteData.rows[0])){
-                           await qryClient.query(`INSERT INTO "offers_favorites" ("offerId", uid) VALUES ($1, $2)`, [item.offerId, favoriteUId]);
+                           await qryClient.query(`INSERT INTO "offers_favorites" ("offerId", "userId") VALUES ($1, $2)`, [item.offerId, favoriteUId]);
                         }
                      }
                   })
@@ -356,10 +354,10 @@ const migration = async (request, response) => {
             if(!_isEmpty(reportListIDsArr)){
                await Promise.all(reportListIDsArr.map(async item => {
                   item.reportListID.map(async reporterId => {
-                     const userData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [reporterId] );
-                     const reporterUserId = userData.rows[0]?.uid || null;
+                     const userData = await qryClient.query(`SELECT "userId", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [reporterId] );
+                     const reporterUserId = userData.rows[0]?.userId || null;
                      if(reporterUserId){
-                        await qryClient.query(`INSERT INTO offers_reports("offerId", "reporterUId") VALUES ($1, $2)`, [item.offerId, reporterUserId]);
+                        await qryClient.query(`INSERT INTO offers_reports("offerId", "reporterUserId") VALUES ($1, $2)`, [item.offerId, reporterUserId]);
                      }
                   })
                }))
@@ -375,16 +373,16 @@ const migration = async (request, response) => {
                try {
                   const value = transactionHistoryData[item];
                   // console.log('temptransactionHistoryData', value);
-                  const senderUserData = await qryClient.query(`SELECT "uid", "currencyCode", "currencySymbol", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['sender_id']]);
-                  const receiverUserData = await qryClient.query(`SELECT "uid", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['receiver_id']]);
+                  const senderUserData = await qryClient.query(`SELECT "userId", "currencyCode", "currencySymbol", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['sender_id']]);
+                  const receiverUserData = await qryClient.query(`SELECT "userId", "firebaseUId" FROM users WHERE "firebaseUId" = $1`, [value['receiver_id']]);
                   const checkAvailable = await qryClient.query(`SELECT "firebaseTransactionId" FROM "transactionHistories" WHERE "firebaseTransactionId" = $1`, [item] );
                   const senderData = senderUserData.rows[0] || null;
                   const transactionTime = value["transaction_date"]? value["transaction_date"]["value"]["_seconds"] * 1000  : '';
                   const createdAt = transactionTime ? new Date(transactionTime) : new Date();
                   if(_isEmpty(checkAvailable.rows[0])) {
                      if(!_isEmpty(senderData) && !_isEmpty(receiverUserData.rows[0]) ){
-                        const senderID = senderData?.uid ;
-                        const receiverID = receiverUserData.rows[0]?.uid;
+                        const senderID = senderData?.userId ;
+                        const receiverID = receiverUserData.rows[0]?.userId;
                         const transactionId = uuidv4();
                         const reqObj = {
                            amount: value['amount'] || null,
@@ -394,7 +392,7 @@ const migration = async (request, response) => {
                            senderSymbol: value['senderSymbol'] ? value['senderSymbol'] : senderData["currencySymbol"] ? senderData["currencySymbol"] : null,
                            firebaseTransactionId: item
                         }
-                        await qryClient.query(`INSERT INTO "transactionHistories" ("transactionId", amount, "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt")
+                        await qryClient.query(`INSERT INTO "transactionHistories" ("transactionId", amount, "senderUserId", "receiverUserId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt")
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, [transactionId, reqObj.amount, reqObj.senderUId, reqObj.receiverUId, reqObj.senderCurrencyCode, reqObj.senderSymbol, reqObj.firebaseTransactionId, createdAt]);
                      }
                   } else {
@@ -599,62 +597,43 @@ const firebaseImageDelete = async (request, response) => {
    }
 }
 
-const firebaseImageResize1 = async (request, response) => {
-   try {
-      const [files] = await myBucket.getFiles();
-      const workingDir = join(tmpdir(), 'thump');
-      const tempFilepath = join(workingDir, 'source.png');
-      // Ensure image resize directory
-      await fse.ensureDir(workingDir);
-
-      // await Promise.all(files.map(async file => {
-         const filePath = file.name;
-         const fileNameArr = filePath.split('/');
-         const fileName = fileNameArr.pop();
-
-         if(!fileName.includes('_200x200') && !fileName.includes('_400x400') && !fileName.includes('_1080x1080') ){
-            // DownLoad Source File
-            await bucket.file(filePath).download({
-               destination: tempFilepath
-            });
-
-            // Resize the images
-            const sizes = [200, 400, 1080];
-            const uploadPromises = sizes.map(async size => {
-               const tempFilename = fileName.split('.');
-               const imageResizename = `${tempFilename[0]}_${size}x${size}.${tempFilename[1]}`;
-               const resizepath = join(workingDir, imageResizename);
-               const uploadFilepath = `photos/${fileNameArr[1]}/${fileNameArr[2]}/${imageResizename}`
-               const uuid = uuidv4();
-
-               //  Resize the source Image
-               await sharp(tempFilepath)
-               .resize(size, size)
-               .toFile(resizepath)
-               .then(async (info, err) => {
-                  if(!_isEmpty(info)){
-                     await  storage.bucket(bucketName).upload(resizepath, {
-                        gzip: true,
-                        destination: uploadFilepath,
-                        metadata: {
-                           contentType: tempFilename[1],
-                           metadata: {
-                              firebaseStorageDownloadTokens: uuid
-                           }
-                        },
-                     });
-                  }
-               });
-               // Run upload operation
-            })
-            await Promise.all(uploadPromises);
-            // CleanUp remove the temp/thumbs from file system
-            // return fse.remove(workingDir)
-         }
-      // });
+const offerMigration = async(request, response) => {
+   try{
+      let qryClient = null;
+      try {
+         qryClient = await pgHelper.getClientFromPool();
+      } catch (err) {
+         throw err;
+      }
+      const offerData = await qryClient.query(`SELECT * FROM "offers" O
+         INNER JOIN "offers_hashTags" OH ON O."offerId" = OH."offerId" AND "hashTag" like $1
+      `,['Product%'])
+      if(offerData.rowCount>0){
+         await Promise.all(offerData.rows.map(async(items,index) =>{
+            const productId = uuidv4();
+            await qryClient.query(`INSERT INTO "products"
+               (
+                  "productId",
+                  "productName",
+                  "productDescription",
+                  "productImageURL",
+                  "productThumpImageURL",
+                  "productMediumImageURL"
+               ) VALUES ($1, $2, $3, $4, $5, $6)`,
+               [
+                  productId,
+                  items.headLine,
+                  items.offerDescription,
+                  items.imageURl,
+                  items.thumpImageURL,
+                  items.mediumImageURL
+            ])
+         })
+         )
+      }
       sendSuccessResponse(response, {});
-   } catch (error) {
-      console.log('catch', error);
+   } catch (error){
+      sendInternalErrorResponse(response, { message: error.toString() });
    }
 }
 
@@ -666,5 +645,6 @@ module.exports = {
    firebaseImageResize,
    firebaseImageDownload,
    firebaseImageUpload,
-   firebaseImageDelete
+   firebaseImageDelete,
+   offerMigration
 };

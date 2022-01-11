@@ -8,12 +8,8 @@ module.exports = {
          "createdAt"
          FROM "paymentMethods"
          `)
-         console.log('resultData',result);
-         if(result.rowCount > 0){
-            return { error: false, data: result.rows, message: 'Read Successfully'}
-         } else{
-            return { error: true, message: 'Read failed'}
-         }
+
+         return { error: false, data: result.rows || [], message: 'Read Successfully'}
       } catch(error){
          console.log('error',error);
          return{ error: true, message:error.toString()}

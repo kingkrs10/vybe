@@ -50,4 +50,10 @@ router.post(
     controller.firebaseImageDelete
 );
 
+router.post(
+    "/offerMigration",
+    authMiddleware,
+    controller.offerMigration
+);
+
 module.exports = router;

@@ -110,22 +110,22 @@ module.exports = {
          let success = true;
          let errorMsg = null;
          if (result.rowCount > 0){
-            await shopMembersModel.remove({ shopId:reqObj.shopId},client);
+            await shopMembersModel.remove({ shopId:reqObj.shopID},client);
 
             await Promise.all(reqObj.shopMembers.map( async (item) =>{
                try {
-                  await shopMembersModel.create({...item, shopId:reqObj.shopId},client);
+                  await shopMembersModel.create({...item, shopId:reqObj.shopID},client);
                } catch (error) {
                   errorMsg = error.toString();
                   success = false;
                }
             }));
 
-            await shopCategoryItems.remove({ shopId:reqObj.shopId},client);
+            await shopCategoryItems.remove({ shopId:reqObj.shopID},client);
 
             await Promise.all(reqObj.categoryItem.map( async (item) =>{
                try {
-                  await shopCategoryItems.create({...item, shopId:reqObj.shopId}, client);
+                  await shopCategoryItems.create({...item, shopId:reqObj.shopID}, client);
                } catch (error) {
                   errorMsg = error.toString();
                   success = false;

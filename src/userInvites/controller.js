@@ -1,7 +1,10 @@
+const _isEmpty = require('lodash/isEmpty');
 const userInvitesModel = require("./model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
-const _isEmpty = require('lodash/isEmpty');
+const {
+   sendErroresponse, sendCreatedesponse, sendInternalErrorResponse,
+   sendSuccessResponse, sendNoContentResponse
+} = require("../common/ResponseController");
 
 const create = async (request, response, next) => {
    try {

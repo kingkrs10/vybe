@@ -21,25 +21,24 @@ const paymentMethodsRouter = require("./src/paymentMethods");
 const statusRouter = require("./src/status");
 const productReviewsRouter = require("./src/productReviews");
 
-
 router.use("/", utilRouter);
 router.use("/users", userRouter);
-router.use("/offers", offersRouter);
 router.use("/userInvites", userInvitesRouter);
-router.use("/notifications", notificationsRouter);
+router.use("/offers", offersRouter);
 router.use("/countryCurrency", countryCurrencyRouter);
 router.use("/currency", currencyRouter);
 router.use("/menus", menusRouter);
 router.use("/categories", categoriesRouter);
+router.use("/paymentMethods", paymentMethodsRouter);
+router.use("/status", statusRouter);
 router.use("/shops", shopsRouter);
 router.use("/collections", shopCollectionsRouter);
 router.use("/products", productsRouter);
 router.use("/orders", ordersRouter);
 router.use("/orderItems", orderItemsRouter);
-router.use("/paymentMethods", paymentMethodsRouter);
-router.use("/status", statusRouter);
 router.use("/productReviews", productReviewsRouter);
 
+router.use("/notifications", notificationsRouter);
 router.use("/chats", chatsRouter);
 router.use("/messages", messagesRouter);
 router.use("/stripe", stripeRouter);
