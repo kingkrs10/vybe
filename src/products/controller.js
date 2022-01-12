@@ -195,6 +195,26 @@ const productAvailabilty = async (request, response) => {
    }
 };
 
+const relativeProducts = async (request, response) => {
+   try{
+      const tempBody = {...request.body}
+      const result = await commonModel.tryBlock (
+         {categoryItemId: request.params.categoryItemId},
+         "(Products:relativeProducts)",
+         productsModel.relativeProducts
+      )
+      if(result.error){
+         sendErroresponse(response,result.message);
+      } else if (!_isEmpty(result.data)){
+         sendSuccessResponse(response,result.data);
+      } else{
+         sendNoContentResponse(response);
+      }
+   } catch (error){
+      sendInternalErrorResponse(response, { message: err.toString()});
+   }
+};
+
 module.exports = {
    create,
    update,
@@ -203,5 +223,6 @@ module.exports = {
    remove,
    getShopProducts,
    productAvailabilty,
+   relativeProducts,
    getShopCollectionProducts
 }

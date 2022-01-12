@@ -304,7 +304,7 @@ exports.categoriesHelper = new pgp.helpers.ColumnSet(
 );
 
 exports.menusHelper = new pgp.helpers.ColumnSet(
-  ["menuId", "menuName", "keyCode", "isActive", "createdAt"],
+  ["menuId", "menuName", "keyCode", "order"],
   {
     table: "menus",
   }

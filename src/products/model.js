@@ -160,6 +160,31 @@ module.exports = {
       }
    },
 
+   relativeProducts : async (reqObj ,client) => {
+      try{
+         const limit = 50;
+         const result = await client.query(`SELECT
+         "productId", "productName", "productDescription", "productPrice",
+         "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty",
+         "productImageURL", "productThumpImageURL", "productMediumImageURL",
+         "productCollectionIds","productOptions", P."productShopId",S."shopName",
+         P."productCategoryItemId", CI."categoryItemName",
+         P."createdAt", P."updatedAt", P."isActive",
+         SC."collectionName", SC."shopCollectionId"
+         FROM "products" as P
+         INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  P."productCategoryItemId"
+         INNER JOIN "shops" S ON S."shopId" = P."productShopId"
+         INNER JOIN "shopCollections" SC ON (SC."shopCollectionId" = ANY(P."productCollectionIds" ::uuid[]) AND SC."shopId" = P."productShopId")
+         WHERE P."isActive" =$1
+         AND P."productCategoryItemId" = $2
+         LIMIT $3`,
+         [true, reqObj.categoryItemId,limit])
+         return {error: false , data: result.rows, message: 'read successfully'}
+      } catch(error){
+         return {error: true, message: error.toString()}
+      }
+   },
+
    remove : async (reqObj ,client) => {
       try{
          const result = await client.query(`UPDATE "products" SET

@@ -2,6 +2,13 @@ const twilio = require("twilio");
 const nodemailer = require("nodemailer");
 const {Storage} = require('@google-cloud/storage');
 const isImage = require('is-image');
+const fs = require('fs');
+var {join, dirname} = require('path');
+const { v4: uuidv4 } = require("uuid");
+const _isEmpty = require('lodash/isEmpty');
+const { tmpdir } = require("os");
+const fse = require('fs-extra');
+const sharp = require("sharp");
 
 const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { firebaseAdmin, bucket } = require("../common/firebase");
@@ -19,14 +26,7 @@ const {
 } = require("../config/config");
 const accountSid = twilioTest.accountSid;
 const authToken = twilioTest.authToken;
-const fs = require('fs');
-var {join, dirname} = require('path');
-const { v4: uuidv4 } = require("uuid");
-const _isEmpty = require('lodash/isEmpty');
-const { tmpdir } = require("os");
-const fse = require('fs-extra');
-const sharp = require("sharp");
-const { replace } = require("lodash");
+
 
 const client = nodemailer.createTransport({
    host: "smtp.gmail.com",

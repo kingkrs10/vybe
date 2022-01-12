@@ -51,4 +51,10 @@ router.post(
    productsController.productAvailabilty
 )
 
+router.get(
+   "/relativeProducts/:categoryItemId",
+   authMiddleware,
+   productsController.relativeProducts
+)
+
 module.exports = router;
