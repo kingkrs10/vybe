@@ -4,7 +4,7 @@ module.exports = {
       port: 5432,
       user: "postgres",
       pass: "3xuhKwoEaKCJNIde",
-      name: "luhu-production",
+      database: "luhu-production",
       cloudpath: "/cloudsql/luhu-production:us-east1:luhu-production-postgres-db",
    },
    app: {
