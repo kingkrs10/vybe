@@ -235,7 +235,6 @@ const orderItemsColumns = `
   "orderItemPrice" numeric DEFAULT 0,
   "orderItemDiscount" numeric DEFAULT 0,
   "orderItemTotalPrice" numeric,
-  "orderPaymentTransactionId" character varying(150),
   "isActive" boolean DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -435,13 +434,7 @@ exports.ordersHelper = new pgp.helpers.ColumnSet(
 );
 
 exports.orderItemsHelper = new pgp.helpers.ColumnSet(
-  [ "orderItemId", "orderId", "productId", "shopId","userId", "orderItemQty", "orderItemPrice", "orderItemDiscount", "orderItemTotalPrice", "isActive", "orderPaymentTransactionId", "createdAt" ],
-  {
-    table: "orderItems",
-  }
-);
-exports.transactionHistoriesHelper = new pgp.helpers.ColumnSet(
-  [ "orderItemId", "orderId", "productId", "shopId","userId", "orderItemQty", "orderItemPrice", "orderItemDiscount", "orderItemTotalPrice", "isActive", "orderPaymentTransactionId", "createdAt" ],
+  [ "orderItemId", "orderId", "productId", "shopId","userId", "orderItemQty", "orderItemPrice", "orderItemDiscount", "orderItemTotalPrice", "isActive", "createdAt", "updatedAt" ],
   {
     table: "orderItems",
   }
@@ -450,7 +443,7 @@ exports.transactionHistoriesHelper = new pgp.helpers.ColumnSet(
 exports.transactionHistoriesHelper = new pgp.helpers.ColumnSet(
   [ "transactionId", "amount", "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt" ],
   {
-    table: "orderItems",
+    table: "transactionHistories",
   }
 );
 
@@ -489,7 +482,7 @@ exports.usersBlockedUsersTbl = `CREATE TABLE IF NOT EXISTS public."users_blocked
 exports.usersCountryCurrencyTbl = `CREATE TABLE IF NOT EXISTS public."users_countryCurrency" ( ${usersCountryCurrencyColumns} );`;
 exports.usersInvitesTbl = `CREATE TABLE IF NOT EXISTS public.users_invites ( ${usersInvitesColumns} );`;
 exports.statusTbl = `CREATE TABLE IF NOT EXISTS public.status ( ${statusColumns} );`;
-exports.paymentMethodsTbl = `CREATE TABLE IF NOT EXISTS public.paymentMethods ( ${paymentMethodsColumns} );`;
+exports.paymentMethodsTbl = `CREATE TABLE IF NOT EXISTS public."paymentMethods" ( ${paymentMethodsColumns} );`;
 exports.shopsTbl = `CREATE TABLE IF NOT EXISTS public.shops ( ${shopsColumns} );`;
 exports.shopCategoryItemsTbl = `CREATE TABLE IF NOT EXISTS public."shop_categoryItems" ( ${shopCategoryItemsColumns} );`;
 exports.shopCollectionsTbl = `CREATE TABLE IF NOT EXISTS public."shopCollections" ( ${shopCollectionColumns} );`;

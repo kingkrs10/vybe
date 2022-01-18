@@ -3,11 +3,9 @@ module.exports = {
       host: "34.139.179.163",
       port: 5432,
       user: "postgres",
-      // pass: "n9Lyi5Eboh1O3KKt",
       pass: "3xuhKwoEaKCJNIde",
-      database: "luhu-production",
+      name: "luhu-production",
       cloudpath: "/cloudsql/luhu-production:us-east1:luhu-production-postgres-db",
-      // cloudpath: "/cloudsql/luhu-development:us-central1:luhu-development-db-postgres",
    },
    app: {
       port: 8081,
@@ -40,5 +38,5 @@ module.exports = {
    users_collection_name: "users",
    offers_collection_name: "offers",
    currency_collection_name: "currency",
-   transaction_history_collection_name: "transaction_history",
+   transaction_history_collection_name: "transactionHistory",
 };

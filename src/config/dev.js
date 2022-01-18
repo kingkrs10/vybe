@@ -1,11 +1,11 @@
 module.exports = {
    relational_db: {
-      host: "34.139.179.163",
+      host: "35.202.0.126",
       port: 5432,
       user: "postgres",
-      pass: "3xuhKwoEaKCJNIde",
-      database: "luhu-production",
-      cloudpath: "/cloudsql/luhu-production:us-east1:luhu-production-postgres-db",
+      pass: "n9Lyi5Eboh1O3KKt",
+      name: "luhu-development",
+      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
    },
 
    app: {
@@ -13,31 +13,30 @@ module.exports = {
       secretKey: "luhu-jwt-stuff-secret"
    },
    stripe_api_key:
-      "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",
-   firebaseProjectId: "luhu-production.appspot.com",
+      "sk_test_51HIi1UKuVVSM1kRYQEEPj5OFOR0vGhgGGp7P8NO8o6RwsLe5Mpv7a1c8xyZwTj81Y2GvdNlntTp9FFHas1f3F1Pj00EswMHlps",
+   firebaseProjectId: "luhu-dev.appspot.com",
    serviceAccountKey: {
       type: "service_account",
-      project_id: "luhu-production",
-      private_key_id: "9f8f2ae055146156f610cfc6ad39f9153649a32a",
+      project_id: "luhu-dev",
+      private_key_id: "7c94c94ca2a1a299d7c3feb8d08416fd98ef3238",
       private_key:
-         "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCRQ9soAQ0nTsXD\nA8LRkLlpOWTz158jBjAC9X0KF6CQASSp60vDpYNFQLu94p1Ts9hqHbmpX/2dD9Ne\n4OYjk6wwbP5GvEbN5Pbb5WjCP1UiM2tw9Gso6Sf1K7U21hzKVrD1WnfBgfM0cgZC\nQ2cVrdHet8DF4MNDUIp6n2YdFkeHfV+eO1q+nzT0WxkWBBpdOpxiy1yXABBaBF+Y\nGBLD+pktypUT5awKi275Chxr0Pl9iuH9/G626s2J5UwRZzgti4NvAIiGvs+v9IwZ\nvQM8EIJobCHV+SpFdPA0xjpw3DsHllxlcwoIn/ckzJ05D5ndNi7RGcIn/aw14VXK\nKusn87fHAgMBAAECggEAJvYNri2WAxBwH01/b6jC6fOAXZxb7M9oiiqgllfe8zCz\nTjWzNO7MBgOGNzg0HTKT3WZKmSCLS5hmh0CHyUv+t2BMVNmDng6GnVTq44qMAWfM\nLdgIc8kRNAM8j9AembBltvDEROzfN5ZLknM0j053Bya+t/QAOyo7cgcVosCKf86b\nnwKujXwwl+BVD9sZqzdsqhzXjS++P4G/MF5hzwGwpkes+2sGNWQfI+PCvQ2m0SLX\nzhcJxrMNR4vk5HgI4znhaD2XTJhwU92wXiaTO1RJr3M6AJ/G+dI7QwvNBiXOXSMN\nETmWJzkigobVUOzkTGg+eURV22b+l6B3yTUDQT+0FQKBgQDGDRUjSCLXpckIbYGV\n70iBhNTpRgU8bbfgjVP07kBsdqZMNbtPaKb88LqWEgz+dq0snVLDdD9jOsNPtBFD\nAiO+qKY0dV9Oh+JT1Djj83LxuaBW6blIvL6LSfqeFQgRLFy3lJ5kCf8YIxBawC3+\nTgN1Pc07fv8Tf45BTKY8sL7M0wKBgQC7xNylM2DYMpY3e7rwK30OIzNAyS4aAk4h\nwephjVnhzFl9nDn+mcZ+dJiRrUrHvhZIk+EukRAvNOhZcDRgAf7rgZaua7BOnz3Q\nX7BGYAFOmEgCpazczJ1MkbwxlTxL5LcEAoGoJUb6b5R1VV0fTxRF7eAsvtBMI8tl\nJp/quH+AvQKBgCbye62sie2OlLIrlsg9fiy6SoR1WKJBkV9/a3tHPzQVQS7LgkJj\nejNTw92vPw7rl7KmXZhCTBTfgXkzGBHtYcoksEqwqkVvQ3roySdKwNf4gSeWXvGG\n7JHHwplD2YpHBxSzDVLvBFNi0dyG3oScIuHzfWCt4Muc0gTVZfuZZmwxAoGBAJZB\npr+cKbdYY9TqcmGWq3AQwwbo9rdheNySrNh7oJ2MRWC7D72pmKnA7AZHQjws5PAX\nRm9ZLjZYhEZt/7uEXVZgURAqpN+FlpWUvR7T3LfkLFvR8E6Qfp+zT4HuBl5FHB9d\nUhwYGIB3oblzIh3XzkVXYbjsyQrk6fJ7wiS2l3GRAoGBAIrH1uQU3KnXH8/0jYDA\n0Zp5ExHFpxfI+oRT6BHWoxDPa0enj7j+F1TICU4pPSr9k0BuA4rT5VbK8MysjxgW\nhaGyvD4ZJR1FGpRrFsJC4wVYGtFs0aL9mPeyOdal9ioLr6weD1jH7HfDylsjStNZ\nW0c9AQ6eAkDaZoAW+ImiCuPt\n-----END PRIVATE KEY-----\n",
-      client_email:
-         "firebase-adminsdk-pb4nj@luhu-production.iam.gserviceaccount.com",
-      client_id: "117413583041352807383",
+         "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCuDFVIfhW5Fp6l\n7Dl7XTN1oNGgPfFaO0V3W2y+RQqdvv4u8laD44hTdWSfXJaEOaeaVvNv/tTPLiVZ\n7NuiPdF1/ExvmwTsWWk1m8NaAaLpy+gVc7VP9hvJJqlxsIg7cPrtUXVs3/bPmOSx\n/dDSLpGwMRB1w3mXpuGfpwybxjJVzcD7PJe0xRWd2UeeBU7OVU0FBahb0TTLv+JC\nVbpoLFiYIqDGrRWjI2zSXdws9jZA2pj5aiSfzAIWDCVnMDdnM5Kpnyy6Hb1RCUim\nocMHr4XDlDY2KX2a+VqhOxQcNvoeu6+1yDBr10/pj7KinKVF8oKBgrZRnXJ8MZtx\nIFrqgi8DAgMBAAECggEAAJIFHDJ8si6zINi+Vwm3C1jddwGHoRH2Nm4JRfl4K/4s\nW015kY2/5WcDMtoOt1VUJhBWqeZMOyIIXDFrFKB7A86/+dKMH7G5GODhBnXusKMD\n4V06fXGYetO5uG8bVr6H7qhIdlhTVUxkMpbpIiyJkCLQI41UHQSQNrq7FmcoqC6o\nf/12uplMsBsGcHJDLGulOcDS94kvgQ5P49R5Sa0UqdmcGVPMrmD+aJPkY5NHhcyx\nkADIqXMMCwzV0AatmqlOKVZ63MJ8oivRxXxe8g8oApDmIpOKmSKa8RmenJMAtXlE\noNFvNQb2TWqC/TlJHIzDm5L0HW5YNisTRcNxsmP8oQKBgQDb1k7P3lMk61iTTThL\nfr6TfQaarqsJaYw9Z03Bed8aVN1ob/PPnyYz5lIZEt5Ao9nLT6hMhE28K8fTnui1\n/y+uLM6lOqeQMsKNmlG8EOo/dQUh/LZdncONiBXW0rNE05QubL/GlzW8T6GCdtqb\n5dTq6bOIBaQzpZowiWLznn/xkQKBgQDKrcdxreKzB1beADzYYdDjkXj2u6r0qhGs\nGkyy9Udol7RDRgZ5Uh3sOOXsysMVTdAqM1flmlEv8n2QMWD6DHoa0ItsdcZcineJ\nJyj5VxAmuHv3lNG913z117b/mwZ7pT0aaWe82RCQGr98G4m/rASBmlGas4VkXmT2\nr4b0AlqNUwKBgQCvd/FULarDry319Q7YA4RuCL86u+w9CQgtAsWnhnUzeUV4VNOQ\nhwFhL5eb99l6Us5GX4CAAqJhbbiECzTH/7W5Gn6el6CjkkCD8gcHS6ENoYPFSwbs\n1j3+O/7ihy8b4p1GKPsxsgPsGMtbbS60fNBj6MGp8obLyoS19RMMTRjmYQKBgQC2\nT6ES0a4VCioKYb5ZiYtD2IwtrNv3Xq+s1q9dXqLQI33j8a5LHSGLZhb0a+MVW7w+\n6ZZMEwaqkX5+4NvxsJ15V1PCySIYBfnGZnJF7xm5KsNgDf6ovJhL77FNtN4dBKK1\nClFlHv/2EAlkksTSo+IdznlPJeJ8SSiaeYN0JFXdvwKBgQCSti6EEROiMJiS/kIe\n0mbStGYIct2QpzbzQ6HkRxRtdzKrr0oJa/Qhw4FconzGGm/bETEABpwNxzaSLMjv\njT+wl0dLvDc/cPVjTka0XRBzFQHjeQgM6pW/vRbru7LRfYgJrHMLVxcdAwouuvhO\nuNoy2RvNZp+3YSKldJBOMhr3Ww==\n-----END PRIVATE KEY-----\n",
+      client_email: "firebase-adminsdk-52ar2@luhu-dev.iam.gserviceaccount.com",
+      client_id: "113787800772663393496",
       auth_uri: "https://accounts.google.com/o/oauth2/auth",
       token_uri: "https://oauth2.googleapis.com/token",
       auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
       client_x509_cert_url:
-         "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-pb4nj%40luhu-production.iam.gserviceaccount.com",
+         "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-52ar2%40luhu-dev.iam.gserviceaccount.com",
    },
    twilioTest: {
       accountSid: 'AC7527c54a4e94b4cf887855d63d55287b',
       authToken: 'b6f938eeabeaca59a58cf18edc6e9def',
    },
    firbaseDatabaseFileName: "luhu-dev-firebase-database.json",
-   firbaseCredentialsFileName: "serviceAccountKey-production.json",
+   firbaseCredentialsFileName: "serviceAccountKey-dev.json",
    users_collection_name: "users",
-   offers_collection_name: "offers",
+   offers_collection_name: "staticOffers",
    currency_collection_name: "currency",
-   transaction_history_collection_name: "transaction_history",
-};
+   transaction_history_collection_name: "transactionHistory",
+}
