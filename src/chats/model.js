@@ -43,12 +43,12 @@ module.exports = {
 			U."fullName" as messageFromName, U."userImage" as messageFromURI,
 			U1."fullName" as messageToName, U1."userImage" as messageToURI
 			FROM chats Ch
-			INNER JOIN users U ON U.uid = ch."messageFromUId"
-			INNER JOIN users U1 ON U1.uid = ch."messageToUId"
+			INNER JOIN users U ON U."userId" = ch."messageFromUId"
+			INNER JOIN users U1 ON U1."userId" = ch."messageToUId"
 			WHERE Ch."isActive" =  $2
 			AND U."isActive" =  $2
-			AND Ch."messageFromUId" not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
-			AND Ch."messageToUId" not in (select "blockedUserId" from "users_blockedUsers" WHERE uid =  $1)
+			AND Ch."messageFromUId" not in (select "blockedUserId" from "users_blockedUsers" WHERE "userId" =  $1)
+			AND Ch."messageToUId" not in (select "blockedUserId" from "users_blockedUsers" WHERE "userId" =  $1)
 			AND (Ch."messageFromUId" = $1 OR ch."messageToUId" = $1)
 			ORDER BY Ch."createdAt" DESC`, [reqObj.uid, true]);
 		const data = result.rows;
@@ -64,8 +64,8 @@ module.exports = {
 			U."fullName" as messageFromName, U."userImage" as messageFromURI,
 			U1."fullName" as messageToName, U1."userImage" as messageToURI
 			FROM chats Ch
-			INNER JOIN users U ON U.uid = Ch."messageFromUId"
-			INNER JOIN users U1 ON U1.uid = Ch."messageToUId"
+			INNER JOIN users U ON U."userId" = Ch."messageFromUId"
+			INNER JOIN users U1 ON U1."userId" = Ch."messageToUId"
 			WHERE Ch."chatId" = $1`, [id]);
 		const data = result.rows[0];
 		if (result.rowCount > 0) {

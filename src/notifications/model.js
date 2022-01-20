@@ -20,8 +20,8 @@ module.exports = {
 			const result = await client.query(`SELECT "notificationId", "offerId", "senderUId", "receiverUId", "createdAt",
 				U.profession, U."userImage", U."fullName"
 				FROM notifications N
-				INNER JOIN users U ON U.uid = N."senderUId"
-			WHERE U.uid = $1`, [id]);
+				INNER JOIN users U ON U."userId" = N."senderUId"
+			WHERE U."userId" = $1`, [id]);
 			const data = result.rows;
 			if (result.rowCount > 0) {
 				return { error: false, data, message: 'get notifications data successfully' };

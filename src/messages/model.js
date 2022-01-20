@@ -60,8 +60,8 @@ module.exports = {
 				U."fullName" as messageFromName, U."userImage" as messageFromURI,
 				U1."fullName" as messageToName, U1."userImage" as messageToURI
 				FROM messages Msg
-				INNER JOIN users U ON U.uid = Msg."messageFromUId"
-				INNER JOIN users U1 ON U1.uid = Msg."messageToUid"
+				INNER JOIN users U ON U."userId" = Msg."messageFromUId"
+				INNER JOIN users U1 ON U1."userId" = Msg."messageToUid"
 				INNER JOIN chats Ch ON Ch."chatId" = Msg."chats"
 				WHERE Msg."chatId" =  $1
 				WHERE Msg."isActive" =  $2
@@ -85,8 +85,8 @@ module.exports = {
 				U."fullName" as messageFromName, U."userImage" as messageFromURI,
 				U1."fullName" as messageToName, U1."userImage" as messageToURI
 				FROM messages Msg
-				INNER JOIN users U ON U.uid = Msg."messageFromUId"
-				INNER JOIN users U1 ON U1.uid = Msg."messageToUId"
+				INNER JOIN users U ON U."userId" = Msg."messageFromUId"
+				INNER JOIN users U1 ON U1."userId" = Msg."messageToUId"
 				INNER JOIN chats Ch ON Ch."chatId" = Msg."chatId"
 				WHERE Msg."messageId" = $1`, [id]);
 			const data = result.rows[0];

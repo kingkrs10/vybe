@@ -310,14 +310,14 @@ exports.menusHelper = new pgp.helpers.ColumnSet(
 );
 
 exports.offersHelper = new pgp.helpers.ColumnSet(
-  ["offerId", "uid", "headLine", "latitude", "longitude", "offerDescription", "locationName", "firebaseOfferId", "offerImage", "offerThumpImage", "offerMediumImage", "isActive"],
+  ["offerId", "userId", "headLine", "latitude", "longitude", "offerDescription", "locationName", "firebaseOfferId", "offerImage", "offerThumpImage", "offerMediumImage", "isActive"],
   {
     table: "offers",
   }
 );
 
 exports.usersHelper = new pgp.helpers.ColumnSet(
-  ["offerId", "uid"],
+  ["offerId", "userId"],
   {
     table: "offers_favorites",
   }
@@ -339,8 +339,7 @@ exports.offersReportsHelper = new pgp.helpers.ColumnSet(
 
 exports.usersHelper = new pgp.helpers.ColumnSet(
   [
-    "uid", "balance", "notificationUnReadcount", "deviceId", "fullName", "userImage", "stripeCustomerId", "latitude", "longitude", "currencyCode",
-    "currencySymbol", "profession", "isActive", "phoneNumber", "firebaseUId", "userThumpImage", "userMediumImage"
+    "userId", "balance", "notificationUnReadcount", "deviceId", "fullName", "userImage", "stripeCustomerId", "latitude", "longitude", "currencyCode","currencySymbol", "profession", "isActive", "phoneNumber", "firebaseUId", "userThumpImage", "userMediumImage"
   ],
   {
     table: "users",
@@ -348,7 +347,7 @@ exports.usersHelper = new pgp.helpers.ColumnSet(
 );
 
 exports.usersBlockedUsersHelper = new pgp.helpers.ColumnSet(
-  [ "uid", "blockedUserId" ],
+  [ "userId", "blockedUserId" ],
   {
     table: "users_blockedUsers",
   }

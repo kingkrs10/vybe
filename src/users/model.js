@@ -57,7 +57,7 @@ module.exports = {
 			const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
 			const result = await client.query(`SELECT
 			"userId", balance, "notificationUnReadcount", "deviceId", "fullName", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
-			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId", "userImage", "userThumpImage", "userMediumImage"
+			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" as uid, "userImage", "userThumpImage", "userMediumImage"
 			FROM users
 			${whereCondition}`, [val]);
 			const data = result.rows[0] || {};

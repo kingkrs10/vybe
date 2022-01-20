@@ -59,7 +59,7 @@ module.exports ={
             U."fullName", U."userImage", U."userMediumImage", U."userThumpImage",
             P."productName"
             FROM "productReviews" AS PR
-            INNER JOIN users U ON U.uid = PR."userId"
+            INNER JOIN users U ON U."userId" = PR."userId"
             INNER JOIN products P ON P."productId" = PR."productId"
          WHERE PR."productId" = $1
          `, [reqObj.productId]);
@@ -79,7 +79,7 @@ module.exports ={
          U."fullName", U."userImage", U."userMediumImage", U."userThumpImage",
          P."productName"
          FROM "productReviews" AS PR
-         INNER JOIN users U ON U.uid = PR."userId"
+         INNER JOIN users U ON U."userId" = PR."userId"
          INNER JOIN products P ON P."productId" = PR."productId"
          WHERE PR."productId" = $1
          AND PR."productReviewId" = $2`,

@@ -50,7 +50,7 @@ module.exports = {
             INNER JOIN "paymentMethods" p ON  p."paymentMethodId" = O."orderPaymentMethodId"
             INNER JOIN "status" s1 ON s1."statusId" = O."orderStatusId"
             INNER JOIN "status" s2 ON s2."statusId" = O."orderPaymentStatusId"
-            INNER JOIN "users" U ON U."uid" = O."userId"
+            INNER JOIN "users" U ON U."userId" = O."userId"
             WHERE O."shopId" = $1
          `,[reqObj.shopId])
 
@@ -71,7 +71,7 @@ module.exports = {
             INNER JOIN "paymentMethods" p ON  p."paymentMethodId" = O."orderPaymentMethodId"
             INNER JOIN "status" s1 ON s1."statusId" = O."orderStatusId"
             INNER JOIN "status" s2 ON s2."statusId" = O."orderPaymentStatusId"
-            INNER JOIN "users" U ON U."uid" = O."userId"
+            INNER JOIN "users" U ON U."userId" = O."userId"
             WHERE O."shopId" = $1
             AND O."orderId" = $2
          `,[reqObj.shopId, reqObj.orderId])

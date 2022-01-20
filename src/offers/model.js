@@ -164,7 +164,7 @@ var self = module.exports = {
 				qryText = `${qryText} AND O."userId" = $7`;
 				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.uid]
 			} else if (reqObj.favoriteUid) {
-				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE uid = $7)`;
+				qryText = `${qryText} AND O."offerId" in (SELECT "offerId" FROM "offers_favorites" WHERE "userId" = $7)`;
 				qryValue = [userId, true, limit, pageNo,  reqObj.latitude, reqObj.longitude, reqObj.favoriteUid]
 			}
 			const result = await client.query(`${qryText} ORDER BY O."createdAt" DESC offset $4 limit $3`, qryValue);
