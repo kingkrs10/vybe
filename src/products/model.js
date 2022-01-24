@@ -185,6 +185,27 @@ module.exports = {
       }
    },
 
+   homepageProducts : async (reqObj ,client) => {
+      // To-DO
+      // Will use Union ALL for combine the Products , Services and Donation Offers
+      try{
+         const limit = 50;
+         const pageNo = parseInt(reqObj.pageNo) === 1 ? 0 : ((parseInt(reqObj.pageNo) - 1) * limit) + 1
+         const result = await client.query(`Select *  FROM (
+            SELECT Pr."productId", Pr."productName", Pr."productDescription", Pr."productImageURL", 
+            Pr."productThumpImageURL", Pr."productMediumImageURL", Pr."userId", Pr."isActive", 'Products' As Category
+            FROM products AS Pr
+            WHERE Pr."isActive" =$1
+            ORDER BY Pr."createdAt" DESC
+            offset $3 LIMIT $2) tbl
+         `,
+         [true, limit, pageNo])
+         return {error: false , data: result.rows, message: 'read successfully'}
+      } catch(error){
+         return {error: true, message: error.toString()}
+      }
+   },
+
    remove : async (reqObj ,client) => {
       try{
          const result = await client.query(`UPDATE "products" SET

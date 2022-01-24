@@ -215,6 +215,30 @@ const relativeProducts = async (request, response) => {
    }
 };
 
+const homepageProducts = async (request, response) => {
+   try{
+      const tempBody = {
+         ...request.currentUser,
+         ...request.query,
+         pageNo: request.query.pageNo || 1
+      }
+      const result = await commonModel.tryBlock (
+         tempBody,
+         "(Products:homepageProducts)",
+         productsModel.homepageProducts
+      )
+      if(result.error){
+         sendErroresponse(response,result.message);
+      } else if (!_isEmpty(result.data)){
+         sendSuccessResponse(response,result.data);
+      } else{
+         sendNoContentResponse(response);
+      }
+   } catch (error){
+      sendInternalErrorResponse(response, {message: err.toString()});
+   }
+};
+
 module.exports = {
    create,
    update,
@@ -224,5 +248,6 @@ module.exports = {
    getShopProducts,
    productAvailabilty,
    relativeProducts,
-   getShopCollectionProducts
+   getShopCollectionProducts,
+   homepageProducts
 }
