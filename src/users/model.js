@@ -59,7 +59,7 @@ module.exports = {
 			"userId", balance, "notificationUnReadcount", "deviceId", "fullName", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
 			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" as uid, "userImage", "userThumpImage", "userMediumImage"
 			FROM users
-			${whereCondition}`, [val]);
+			${whereCondition} AND "isActive" = $2`, [val,true]);
 			const data = result.rows[0] || {};
 			return { error: false, data, message: 'get data successfully' };
 		} catch (error) {

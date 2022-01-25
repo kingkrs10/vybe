@@ -45,7 +45,7 @@ const decodeJwtToken = async (token) => {
 
 const createJwtToken = async(userData) => {
     const payload = {
-        userId: userData.userid,
+        userId: userData.userId,
         firebaseUId: userData.uid,
         phoneNumber: userData.phoneNumber,
         latitude: userData.latitude,
