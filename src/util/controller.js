@@ -10,7 +10,7 @@ const { tmpdir } = require("os");
 const fse = require('fs-extra');
 const sharp = require("sharp");
 
-const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { firebaseAdmin, bucket } = require("../common/firebase");
 const pgHelper = require("../common/pgHelper");
 
@@ -85,7 +85,7 @@ const pushFirebaseNotification = async (request, response) => {
          })
          .catch(error => {
             console.log(error);
-            sendErroresponse(response, error.toString());
+            sendErrorResponse(response, error.toString());
          });
 
    } catch (err) {
@@ -107,7 +107,7 @@ const sendSMS = async (request, response) => {
             sendSuccessResponse(response, message);
          })
          .catch((error) => {
-            sendErroresponse(response, error.toString());
+            sendErrorResponse(response, error.toString());
          });
    } catch (error) {
       sendInternalErrorResponse(response, { message: error.toString() });
@@ -160,7 +160,7 @@ const sendMail = async (request, response) => {
       client.sendMail(mailOptionsInfo, (err, info) => {
          if (err) {
             console.log("errr", err);
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          }
          console.log("info", info);
          sendSuccessResponse(response, {message:  `Mensagem enviada com sucesso. Id: ${info.messageId} | Response: ${info.response}`});

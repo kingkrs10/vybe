@@ -1,7 +1,7 @@
 const usersModel = require("./model");
 const userCountryCurrencyModel = require("../countryCurrency/model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _isEmpty = require('lodash/isEmpty');
 const { firebaseAdmin } = require("../common/firebase");
@@ -32,9 +32,9 @@ const create = async (request, response) => {
          usersModel.create
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
-         sendCreatedesponse(response, result.data);
+         sendCreatedResponse(response, result.data);
       } else {
          sendInternalErrorResponse(response);
       }
@@ -56,7 +56,7 @@ const getAll = async (request, response, next) => {
       );
 
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data);
       } else {
@@ -75,7 +75,7 @@ const getOne = async (request, response, next) => {
          usersModel.getOne
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          const resUserCountryCurrency = await commonModel.tryBlock(
             result.data.userid,
@@ -124,7 +124,7 @@ const update = async (request, response, next) => {
                usersModel.update
             );
             if (result.error) {
-               sendErroresponse(response, result.message);
+               sendErrorResponse(response, result.message);
             } else if (!result.error) {
                sendSuccessResponse(response, result['data'])
             } else {
@@ -147,7 +147,7 @@ const remove = async (request, response, next) => {
          usersModel.remove
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
          sendSuccessResponse(response, result);
       } else {
@@ -170,7 +170,7 @@ const updateLocation = async (request, response, next) => {
          usersModel.updateLocation
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
          sendSuccessResponse(response, result['data'])
       } else {
@@ -193,7 +193,7 @@ const updateBlockedUsers = async (request, response, next) => {
          usersModel.updateBlockedUsers
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
          sendSuccessResponse(response)
       } else {
@@ -212,7 +212,7 @@ const getAuthToken = async (request, response, next) => {
          usersModel.getOne
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          const JwtToken = await commonModel.createJwtToken(result.data);
          sendSuccessResponse(response, { authToken: JwtToken })
@@ -237,7 +237,7 @@ const getRecentUsers = async (request, response, next) => {
          usersModel.getAll
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data);
       } else {
@@ -261,7 +261,7 @@ const updateStripeId = async (request, response, next) => {
          usersModel.updateStripeId
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else {
          sendSuccessResponse(response, {});
       }
@@ -284,7 +284,7 @@ const getBlockedUsers = async (request, response, next) => {
          usersModel.getBlockedUsers
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data);
       } else {

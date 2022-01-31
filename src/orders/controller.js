@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const ordersModel = require('./model');
 const commonModel = require("../common/common");
 const {
-   sendErroresponse, sendCreatedesponse,
+   sendErrorResponse, sendCreatedResponse,
    sendInternalErrorResponse, sendNoContentResponse,
    sendSuccessResponse
 } = require("../common/ResponseController");
@@ -20,14 +20,14 @@ const create = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else {
          const result1 = await commonModel.tryBlock(
             {orderId:orderId, userId: request.body.userId},
             "(Orders:create : getOne)",
             ordersModel.getOne
          )
-         sendCreatedesponse(response, result1.data);
+         sendCreatedResponse(response, result1.data);
       }
    } catch (error){
       sendInternalErrorResponse(response, {message: error.toString()});
@@ -44,7 +44,7 @@ const getAll = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -66,7 +66,7 @@ const getOne = async (request, response) => {
       );
 
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -88,7 +88,7 @@ const updateStatus = async (request, response) => {
       );
 
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{

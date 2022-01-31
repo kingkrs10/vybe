@@ -4,7 +4,7 @@ const _isEmpty = require('lodash/isEmpty');
 const shippingAddressesModel = require("./model");
 const commonModel = require("../common/common");
 const {
-   sendErroresponse, sendCreatedesponse, sendInternalErrorResponse,
+   sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse,
    sendNoContentResponse, sendSuccessResponse
 } = require("../common/ResponseController");
 
@@ -19,14 +19,14 @@ const create = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else {
          const result1 = await commonModel.tryBlock (
             {addressId: addressId},
             "(shippingAddresses:getOne)",
             shippingAddressesModel.getOne
          )
-         sendCreatedesponse(response, result1.data);
+         sendCreatedResponse(response, result1.data);
       }
    } catch (error){
       sendInternalErrorResponse(response, { message: err.toString()});
@@ -42,7 +42,7 @@ const update = async (request, response) => {
          shippingAddressesModel.update
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else {
          const result1 = await commonModel.tryBlock (
             {addressId: request.params.addressId},
@@ -65,7 +65,7 @@ const getAll = async(request, response) => {
          shippingAddressesModel.getAll
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data)
       } else{
@@ -85,7 +85,7 @@ const getOne = async(request, response) => {
          shippingAddressesModel.getOne
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data)
       } else{
@@ -105,7 +105,7 @@ const remove = async(request, response) => {
          shippingAddressesModel.remove
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data)
       } else{

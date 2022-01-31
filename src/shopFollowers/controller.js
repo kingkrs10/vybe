@@ -1,7 +1,7 @@
 const shopFollowersModel = require("./model");
 const commonModel = require("../common/common");
 const {
-   sendErroresponse, sendCreatedesponse, sendInternalErrorResponse,
+   sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse,
 } = require("../common/ResponseController");
 
 const create = async (request, response) => {
@@ -15,9 +15,9 @@ const create = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else {        
-         sendCreatedesponse(response);
+         sendCreatedResponse(response);
       }
    } catch (error){
       sendInternalErrorResponse(response, { message: err.toString()});

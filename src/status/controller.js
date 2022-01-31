@@ -1,6 +1,6 @@
 const statusModel = require("./model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
 const _isEmpty = require('lodash/isEmpty');
 
 const getAll = async (request, response, next) => {
@@ -15,7 +15,7 @@ const getAll = async (request, response, next) => {
       );
 
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data);
       } else {

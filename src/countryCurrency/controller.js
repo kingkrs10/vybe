@@ -1,7 +1,7 @@
 const userCountryCurrencyModel = require("./model");
 const userModel = require("../users/model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse,sendNoContentResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendInternalErrorResponse, sendSuccessResponse,sendNoContentResponse } = require("../common/ResponseController");
 const _isEmpty = require('lodash/isEmpty');
 
 const create = async (request, response, next) => {
@@ -18,7 +18,7 @@ const create = async (request, response, next) => {
          userModel.updateBalance
       );
       if (resUpdateBalance.error){
-            sendErroresponse(response, resUpdateBalance.message);
+            sendErrorResponse(response, resUpdateBalance.message);
       } else if (!resUpdateBalance.error){
          const result = await commonModel.tryBlock(
             request.body,
@@ -26,7 +26,7 @@ const create = async (request, response, next) => {
             userCountryCurrencyModel.bulkInsert
          );
          if (result.error){
-            sendErroresponse(response, result.message);
+            sendErrorResponse(response, result.message);
          } else if (!result.error){
             sendSuccessResponse(response, result['data']);
          } else {
@@ -53,7 +53,7 @@ const update = async (request, response, next) => {
       );
 
       if (result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
       } else {
@@ -72,7 +72,7 @@ const getUserCountryCurrency = async (request, response, next) => {
          userCountryCurrencyModel.getUserCountryCurrency
       );
       if (result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data);
       } else {
@@ -91,7 +91,7 @@ const remove = async (request, response, next) => {
          userCountryCurrencyModel.remove
       );
       if (result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
          sendSuccessResponse(response, result.data);
       } else {

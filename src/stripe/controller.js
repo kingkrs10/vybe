@@ -2,7 +2,7 @@ const commonModel = require("../common/common");
 const config = require("../config/config");
 const userModel = require("../users/model");
 const Stripe = require("stripe");
-const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendInternalErrorResponse, sendSuccessResponse } = require("../common/ResponseController");
 
 const stripe = Stripe(config.stripe_api_key);
 
@@ -25,7 +25,7 @@ const createCustomer = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          });
    } catch (err) {
       sendInternalErrorResponse(response);
@@ -45,7 +45,7 @@ const createCustomerCard = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          });
    } catch (err) {
       sendInternalErrorResponse(response);
@@ -65,7 +65,7 @@ const getAllCardDetails = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          });
    } catch (err) {
       sendInternalErrorResponse(response);
@@ -85,7 +85,7 @@ const removeCustomerCard = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          });
    } catch (err) {
       sendInternalErrorResponse(response);
@@ -106,7 +106,7 @@ const updateDefaultPaymentCard = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          });
    } catch (err) {
       sendInternalErrorResponse(response);
@@ -126,7 +126,7 @@ const geCustomerDetails = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          });
    } catch (err) {
       sendInternalErrorResponse(response);
@@ -150,7 +150,7 @@ const payWithStripe = async (request, response, next) => {
             sendSuccessResponse(response, result);
          })
          .catch((err) => {
-            sendErroresponse(response, err.toString());
+            sendErrorResponse(response, err.toString());
          });
    } catch (err) {
       sendInternalErrorResponse(response);

@@ -1,7 +1,7 @@
 const _isEmpty = require('lodash/isEmpty');
 const messagesModel = require("./model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendSuccessResponse, sendInternalErrorResponse, sendNoContentResponse} = require("../common/ResponseController");
+const {sendErrorResponse, sendSuccessResponse, sendInternalErrorResponse, sendNoContentResponse} = require("../common/ResponseController");
 
 const create = async (request, response) => {
    try {
@@ -11,7 +11,7 @@ const create = async (request, response) => {
          messagesModel.create
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
 		} else {
@@ -34,7 +34,7 @@ const update = async (request, response, next) => {
          messagesModel.update
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
 		} else {
@@ -53,7 +53,7 @@ const getAll = async (request, response, next) => {
          messagesModel.getAll
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result['data']);
 		} else {
@@ -72,7 +72,7 @@ const getOne = async (request, response, next) => {
          messagesModel.getOne
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
 		} else {
@@ -91,7 +91,7 @@ const updateUnRead = async (request, response, next) => {
          messagesModel.updateUnRead
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
 		} else {
@@ -110,7 +110,7 @@ const remove = async (request, response, next) => {
          messagesModel.remove
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data'])
 		} else {

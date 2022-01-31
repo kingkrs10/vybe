@@ -3,7 +3,7 @@ const _uniqBy = require('lodash/uniqBy');
 
 const Model = require("./model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
 
 const getAllCategories = async (request, response) => {
    try {
@@ -16,7 +16,7 @@ const getAllCategories = async (request, response) => {
             Model.getAllCategories
         );
       if (result.error) {
-        sendErroresponse(response, result.message);
+        sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
         sendSuccessResponse(response, result.data);
       } else {
@@ -39,7 +39,7 @@ const getCategoryItems = async (request, response) =>{
             Model.getCategoryItems
         );
         if (result.error) {
-            sendErroresponse(response, result.message);
+            sendErrorResponse(response, result.message);
         } else if (!_isEmpty(result.data)) {
             sendSuccessResponse(response, result.data);
         } else {
@@ -62,7 +62,7 @@ const getSubCategoryItems = async (request, response) =>{
             Model.getSubCategoryItems
         );
         if (result.error) {
-            sendErroresponse(response, result.message);
+            sendErrorResponse(response, result.message);
         } else if (!_isEmpty(result.data)) {
             const categoryNames = _uniqBy(result.data, 'categoryName').map(item => item.categoryName);
             const resultArr = categoryNames.map(item => {

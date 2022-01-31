@@ -5,7 +5,7 @@ const productsModel = require("./model");
 const CollectionsModel = require("../shopCollections/model");
 const commonModel = require("../common/common");
 const {
-   sendErroresponse, sendCreatedesponse, sendInternalErrorResponse,
+   sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse,
    sendNoContentResponse, sendSuccessResponse
 } = require("../common/ResponseController");
 
@@ -20,14 +20,14 @@ const create = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else {
          const result1 = await commonModel.tryBlock (
             {id: productId},
             "(Products:getOne)",
             productsModel.getOne
          )
-         sendCreatedesponse(response, result1.data);
+         sendCreatedResponse(response, result1.data);
       }
 
    } catch (error){
@@ -44,7 +44,7 @@ const update = async (request, response) => {
          productsModel.update
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else{
          const result1 = await commonModel.tryBlock (
             {id: request.params.id},
@@ -68,7 +68,7 @@ const getAll = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response,result.data);
       } else{
@@ -88,7 +88,7 @@ const getOne = async (request, response) => {
          productsModel.getOne
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -108,7 +108,7 @@ const getShopProducts = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          const colectionResult = await commonModel.tryBlock (
             {shopId: request.params.shopId},
@@ -144,7 +144,7 @@ const getShopCollectionProducts = async (request, response) => {
          productsModel.getAll
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response,result.data);
       } else{
@@ -164,7 +164,7 @@ const remove = async (request, response) => {
          productsModel.remove
       )
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
          sendSuccessResponse(response, result);
       } else {
@@ -184,7 +184,7 @@ const productAvailabilty = async (request, response) => {
          productsModel.productAvailabilty
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response,result.data);
       } else{
@@ -204,7 +204,7 @@ const relativeProducts = async (request, response) => {
          productsModel.relativeProducts
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response,result.data);
       } else{
@@ -228,7 +228,7 @@ const homepageProducts = async (request, response) => {
          productsModel.homepageProducts
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response,result.data);
       } else{

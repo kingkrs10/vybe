@@ -1,7 +1,7 @@
 const Model = require("./model");
 const commonModel = require("../common/common");
 const {
-    sendErroresponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse
+    sendErrorResponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse
 } = require("../common/ResponseController");
 const _isEmpty = require('lodash/isEmpty');
 
@@ -17,7 +17,7 @@ const getAllMenus = async (request, response) => {
             Model.getAll
         );
       if (result.error) {
-        sendErroresponse(response, result.message);
+        sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
         sendSuccessResponse(response, result.data);
       } else {

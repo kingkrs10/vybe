@@ -1,7 +1,7 @@
 const _isEmpty = require('lodash/isEmpty');
 const notificationsModel = require("./model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendSuccessResponse, sendInternalErrorResponse, sendNoContentResponse} = require("../common/ResponseController");
+const {sendErrorResponse, sendSuccessResponse, sendInternalErrorResponse, sendNoContentResponse} = require("../common/ResponseController");
 
 const create = async (request, response, next) => {
    try {
@@ -11,7 +11,7 @@ const create = async (request, response, next) => {
          notificationsModel.create
       );
       if (!result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
 		} else {
@@ -30,7 +30,7 @@ const getUsersNotification = async (request, response, next) => {
          notificationsModel.getUsersNotification
       );
      if (!result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result['data']);
 		} else {

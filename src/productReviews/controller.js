@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const productReviewModel = require('./model');
 const commonModel = require("../common/common");
 const {
-   sendErroresponse, sendCreatedesponse,
+   sendErrorResponse, sendCreatedResponse,
    sendInternalErrorResponse, sendNoContentResponse,
    sendSuccessResponse
 } = require("../common/ResponseController");
@@ -20,14 +20,14 @@ const create = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else {
          const result1 = await commonModel.tryBlock(
             { productId: request.body.productId , productReviewId : productReviewId },
             "(productReview:create : getOne)",
             productReviewModel.getOne
          )
-         sendCreatedesponse(response, result1.data);
+         sendCreatedResponse(response, result1.data);
       }
    } catch (error){
       sendInternalErrorResponse(response, {message: error.toString()});
@@ -43,7 +43,7 @@ const update =  async (request, response) => {
          productReviewModel.update
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
           const result1 = await commonModel.tryBlock(
             { productId: request.body.productId , productReviewId: request.params.id },
@@ -69,7 +69,7 @@ const getAll = async (request, response) => {
       )
 
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response,result.data);
       } else{
@@ -89,7 +89,7 @@ const getOne = async (request, response) => {
          productReviewModel.getOne
       )
       if(result.error){
-         sendErroresponse(response,result.message);
+         sendErrorResponse(response,result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -111,7 +111,7 @@ const remove = async (request, response) =>{
          productReviewModel.remove
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
          sendSuccessResponse(response);
       } else {

@@ -2,7 +2,7 @@ const _isEmpty = require('lodash/isEmpty');
 const userInvitesModel = require("./model");
 const commonModel = require("../common/common");
 const {
-   sendErroresponse, sendCreatedesponse, sendInternalErrorResponse,
+   sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse,
    sendSuccessResponse, sendNoContentResponse
 } = require("../common/ResponseController");
 
@@ -14,9 +14,9 @@ const create = async (request, response, next) => {
          userInvitesModel.create
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
-         sendCreatedesponse(response, result['data']);
+         sendCreatedResponse(response, result['data']);
       } else {
          sendInternalErrorResponse(response);
       }
@@ -37,7 +37,7 @@ const update = async (request, response, next) => {
          userInvitesModel.update
       );
        if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error){
          sendSuccessResponse(response, result['data']);
       } else {
@@ -56,7 +56,7 @@ const getUserInvites = async (request, response, next) => {
          userInvitesModel.getUserInvites
       );
        if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data);
       } else {

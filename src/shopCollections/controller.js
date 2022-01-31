@@ -1,8 +1,8 @@
 const shopCollectionsModel = require("./model");
 const commonModel = require("../common/common");
 const {
-   sendErroresponse,
-   sendCreatedesponse,
+   sendErrorResponse,
+   sendCreatedResponse,
    sendInternalErrorResponse,
    sendNoContentResponse,
    sendSuccessResponse
@@ -20,14 +20,14 @@ const create = async (request, response) => {
          shopCollectionsModel.create
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else{
          const result1 = await commonModel.tryBlock(
             {id:request.params.id},
             "(ShopCollections:update : fetch updated data)",
             shopCollectionsModel.getOne
          )
-         sendCreatedesponse(response, result1.data);
+         sendCreatedResponse(response, result1.data);
       }
    } catch(error){
       sendInternalErrorResponse(response, {message: error.toString()})
@@ -43,7 +43,7 @@ const update = async(request, response) => {
          shopCollectionsModel.update
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else{
          const result1 = await commonModel.tryBlock(
             {id:request.params.id},
@@ -70,7 +70,7 @@ const getAll = async(request, response) => {
          shopCollectionsModel.getAll
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data)
       } else{
@@ -90,7 +90,7 @@ const getOne = async (request, response) =>{
          shopCollectionsModel.getOne
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data)
       } else{
@@ -110,7 +110,7 @@ const getShopCollections = async (request, response) =>{
          shopCollectionsModel.getAll
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data)
       } else{
@@ -130,7 +130,7 @@ const remove = async(request, response) =>{
          shopCollectionsModel.remove
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else{
          sendSuccessResponse(response, result);
       }

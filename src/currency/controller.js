@@ -1,7 +1,7 @@
 const currencyModel = require("./model");
 const userModel = require("../users/model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
 const _isEmpty = require('lodash/isEmpty');
 
 const getCurrency = async (request, response, next) => {
@@ -12,7 +12,7 @@ const getCurrency = async (request, response, next) => {
          currencyModel.getCurrency
       );
       if (result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data);
       } else {

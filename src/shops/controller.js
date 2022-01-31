@@ -3,7 +3,7 @@ const shopMembersModel = require("../shopMembers/model");
 const shopCategoryItemsModel = require("../shopCategoryItems/model");
 const commonModel = require("../common/common");
 
-const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _isEmpty = require('lodash/isEmpty');
 
@@ -17,7 +17,7 @@ const create = async (request, response) => {
          shopsModel.create
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else {
 
          const result1 = await commonModel.tryBlock(
@@ -29,7 +29,7 @@ const create = async (request, response) => {
          const itemData = await constructedResponseData(result1.data[0], {id: shopID});
          data.push(itemData);
 
-         sendCreatedesponse(response, data);
+         sendCreatedResponse(response, data);
       }
    } catch (error) {
      sendInternalErrorResponse(response, { message: error.toString() });
@@ -45,7 +45,7 @@ const update =  async (request, response) => {
          shopsModel.update
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
           const result1 = await commonModel.tryBlock(
             {id: request.params.id},
@@ -76,7 +76,7 @@ const getAll = async (request, response) => {
          shopsModel.getAll
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          const resultData = [];
          await Promise.all(result.data.map( async (item) =>{
@@ -109,7 +109,7 @@ const getOne = async (request, response) =>{
       );
 
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          const resultData = [];
          const itemObj = await constructedResponseData(result.data[0], tempBody);
@@ -139,7 +139,7 @@ const dashboard = async (request, response) =>{
       );
 
       if (result.error || NearbyResult.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data) || !_isEmpty(NearbyResult.data)) {
          const resultData = [];
          resultData.push({shopCategory: 'Nearby', shopList: NearbyResult.data.slice(0, 4)});
@@ -168,7 +168,7 @@ const remove = async (request, response) =>{
          shopsModel.remove
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!result.error) {
          sendSuccessResponse(response, result);
       } else {

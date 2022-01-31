@@ -1,7 +1,7 @@
 const orderItemsModel = require('./model');
 const commonModel = require("../common/common");
 const {
-   sendErroresponse, sendCreatedesponse, sendInternalErrorResponse,
+   sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse,
    sendNoContentResponse, sendSuccessResponse
 } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
@@ -17,7 +17,7 @@ const create = async (request, response) => {
          orderItemsModel.create
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else{
          const result1 = await commonModel.tryBlock(
             {orderItemId:orderItemId, userId: request.body.userId},
@@ -41,7 +41,7 @@ const update = async (request, response) => {
          orderItemsModel.update
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else{
          const result1 = await commonModel.tryBlock(
             {orderItemId: request.params.Id, userId: request.body.userId},
@@ -65,7 +65,7 @@ const getCardDetails = async (request, response) => {
          orderItemsModel.getCardDetails
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -85,7 +85,7 @@ const getAll = async (request, response) => {
          orderItemsModel.getAll
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -105,7 +105,7 @@ const getOne = async (request, response) => {
          orderItemsModel.getOne
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -125,7 +125,7 @@ const remove = async (request, response) => {
          orderItemsModel.remove
       )
       if(result.error){
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else{
          sendSuccessResponse(response, null);
       }

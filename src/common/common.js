@@ -13,10 +13,10 @@ const {
     categoriesTbl,categoryItemsTbl,menusTbl,offersTbl,offersFavoritesTbl,offersHashTagsTbl,offersReportsTbl,usersTbl,
     usersBlockedUsersTbl,usersCountryCurrencyTbl,usersInvitesTbl,statusTbl,paymentMethodsTbl,shopsTbl,shopCategoryItemsTbl,
     shopCollectionsTbl,shopMembersTbl,productsTbl,productReviewsTbl,ordersTbl,orderItemsTbl,transactionHistoriesTbl,
-    notificationsTbl,messagesTbl,currencyTbl,chatsTbl
+    notificationsTbl,messagesTbl,currencyTbl,chatsTbl,serviceTbl
 } = require("./tableSchemas");
 
-const intiQuery = `${categoriesTbl}${categoryItemsTbl}${menusTbl}${offersTbl}${offersFavoritesTbl}${offersHashTagsTbl}${offersReportsTbl}${usersTbl}${usersBlockedUsersTbl}${usersCountryCurrencyTbl}${usersInvitesTbl}${statusTbl}${paymentMethodsTbl}${shopsTbl}${shopCategoryItemsTbl}${shopCollectionsTbl}${shopMembersTbl} ${productsTbl}  ${productReviewsTbl} ${ordersTbl} ${orderItemsTbl} ${notificationsTbl} ${currencyTbl} ${chatsTbl}${messagesTbl} ${transactionHistoriesTbl}`;
+const intiQuery = `${categoriesTbl}${categoryItemsTbl}${menusTbl}${offersTbl}${offersFavoritesTbl}${offersHashTagsTbl}${offersReportsTbl}${usersTbl}${usersBlockedUsersTbl}${usersCountryCurrencyTbl}${usersInvitesTbl}${statusTbl}${paymentMethodsTbl}${shopsTbl}${shopCategoryItemsTbl}${shopCollectionsTbl}${shopMembersTbl} ${productsTbl}  ${productReviewsTbl} ${ordersTbl} ${orderItemsTbl} ${notificationsTbl} ${currencyTbl} ${chatsTbl}${messagesTbl} ${transactionHistoriesTbl} ${serviceTbl}`;
 
 const tryBlock = async (data, modelName, model) => {
     let client = null;

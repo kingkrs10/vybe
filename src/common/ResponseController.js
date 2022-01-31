@@ -31,12 +31,12 @@ class ResponseController {
         response.status(200).json(resObj);
     }
 
-    sendCreatedesponse(response, resObj = {}) {
+    sendCreatedResponse(response, resObj = {}) {
         resObj['statusCode'] = STATUS.CREATED.CODE;
         resObj['statusMessage'] = STATUS.CREATED.TEXT;
         response.status(200).json({ data: resObj });
     }
-    sendErroresponse(response, message) {
+    sendErrorResponse(response, message) {
         const resObj = {};
         resObj['statusCode'] = STATUS.INTERNAL_ERROR.CODE;
         resObj['statusMessage'] = message;

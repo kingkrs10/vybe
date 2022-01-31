@@ -1,6 +1,6 @@
 const offersModel = require("./model");
 const commonModel = require("../common/common");
-const {sendErroresponse, sendCreatedesponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
+const {sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _map = require('lodash/map');
 const _isEmpty = require('lodash/isEmpty');
@@ -26,9 +26,9 @@ const create = async (request, response) => {
          offersModel.create
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
-         sendCreatedesponse(response, result.data);
+         sendCreatedResponse(response, result.data);
       } else {
          sendInternalErrorResponse(response);
       }
@@ -58,7 +58,7 @@ const update = async (request, response, next) => {
          offersModel.update
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          sendSuccessResponse(response, result.data)
       } else {
@@ -77,7 +77,7 @@ const getAll = async (request, response, next) => {
          offersModel.getAll
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          const offerIds = result.data.map(item => item.offerId);
          const resultHashTagData = await commonModel.tryBlock(
@@ -112,7 +112,7 @@ const getAllOffers = async (request, response, next) => {
          offersModel.getAllOffers
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
          const offerIds = result.data.map(item => item.offerId);
          const resultHashTagData = await commonModel.tryBlock(
@@ -142,7 +142,7 @@ const getOne = async (request, response, next) => {
          offersModel.getOne
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)){
          const offerIds = [result.data.offerId];
          const resultHashTagData = await commonModel.tryBlock(
@@ -168,7 +168,7 @@ const remove = async (request, response, next) => {
          offersModel.remove
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!result.error){
          sendSuccessResponse(response, result)
       } else {
@@ -187,7 +187,7 @@ const saveFavorites = async (request, response, next) => {
          offersModel.saveFavorites
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!result.error){
          sendSuccessResponse(response)
       } else {
@@ -206,7 +206,7 @@ const saveReport = async (request, response, next) => {
          offersModel.saveReport
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!result.error){
          sendSuccessResponse(response)
       } else {
@@ -229,7 +229,7 @@ const getCategories = async (request, response, next) => {
          offersModel.getAllCategories
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else{
@@ -248,7 +248,7 @@ const getAllLocation = async (request, response, next) => {
          offersModel.getAllLocation
       );
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data)
       } else {
@@ -274,7 +274,7 @@ const getUserOffers = async (request, response, next) => {
       );
 
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          const offerIds = result.data.map(item => item.offerId);
          const resultHashTagData = await commonModel.tryBlock(
@@ -310,7 +310,7 @@ const getUserfavorites = async (request, response, next) => {
       );
 
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          const offerIds = result.data.map(item => item.offerId);
          const resultHashTagData = await commonModel.tryBlock(
@@ -346,7 +346,7 @@ const getOfferFavoriters = async (request, response, next) => {
       );
 
       if (result.error) {
-         sendErroresponse(response, result.message);
+         sendErrorResponse(response, result.message);
       } else if(!_isEmpty(result.data)){
          sendSuccessResponse(response, result.data);
       } else {
