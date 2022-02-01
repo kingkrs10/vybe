@@ -5,6 +5,7 @@ module.exports = {
          (
             "serviceId",
             "serviceName" ,
+            "userId",
             "serviceImageURL",
             "serviceThumpImageURL" ,
             "serviceMediumImageURL" ,
@@ -17,7 +18,7 @@ module.exports = {
             "serviceStartingPrice",
             "paymentMethods"
          )
-         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
          [reqObj.serviceId, reqObj.serviceName, reqObj.serviceImageURL, reqObj.serviceThumpImageURL, reqObj.serviceMediumImageURL,
           reqObj.serviceDescription, reqObj.categoryId, reqObj.subCategoryItemId, reqObj.locationName, reqObj.latitude,
           reqObj.longitude, reqObj.serviceStartingPrice,reqObj.paymentMethods]
@@ -34,21 +35,22 @@ module.exports = {
       try {
          const result = await  client.query(`UPDATE services SET
             "serviceName" = $2,
-            "serviceImageURL" = $3,
-            "serviceThumpImageURL" = $4 ,
-            "serviceMediumImageURL" = $5 ,
-            "serviceDescription" = $6,
-            "categoryId" = $7 ,
-            "subCategoryItemId" = $8,
-            "locationName" = $9,
-            "latitude" = $10 ,
-            "longitude" = $11 ,
-            "serviceStartingPrice" = $12 ,
-            "paymentMethods" = $13,
-            "isActive" = $14,
+            "userId" = $3
+            "serviceImageURL" = $4,
+            "serviceThumpImageURL" = $5 ,
+            "serviceMediumImageURL" = $6 ,
+            "serviceDescription" = $7,
+            "categoryId" = $8 ,
+            "subCategoryItemId" = $9,
+            "locationName" = $10,
+            "latitude" = $11 ,
+            "longitude" = $12 ,
+            "serviceStartingPrice" = $13 ,
+            "paymentMethods" = $14,
+            "isActive" = $15,
             "updatedAt" = now()
             WHERE "serviceId" = $1 RETURNING *`,
-            [reqObj.serviceId, reqObj.serviceName, reqObj.serviceImageURL, reqObj.serviceThumpImageURL, reqObj.serviceMediumImageURL, 
+            [reqObj.serviceId, reqObj.serviceName, reqObj.userId, reqObj.serviceImageURL, reqObj.serviceThumpImageURL, reqObj.serviceMediumImageURL, 
             reqObj.serviceDescription,reqObj.categoryId, reqObj.subCategoryItemId, reqObj.locationName, 
             reqObj.latitude, reqObj.longitude, reqObj.serviceStartingPrice,reqObj.paymentMethods, reqObj.isActive]
          );
@@ -65,6 +67,7 @@ module.exports = {
          const result = await client.query(`SELECT
             "serviceId",
             "serviceName" ,
+            "userId" ,
             "serviceImageURL",
             "serviceThumpImageURL" ,
             "serviceMediumImageURL" ,
@@ -89,7 +92,7 @@ module.exports = {
    getAll: async (reqObj, client) => {
       try{
          const queryText = `SELECT 
-            "serviceId", "serviceName" ,"serviceImageURL",
+            "serviceId", "serviceName" , "userId" , "serviceImageURL",
             "serviceThumpImageURL", "serviceMediumImageURL", "serviceDescription",
             "categoryId", "subCategoryItemId", "locationName", "latitude",
             "longitude", "serviceStartingPrice", "paymentMethods", "isActive", "createdAt",

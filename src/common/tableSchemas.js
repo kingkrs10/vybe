@@ -289,6 +289,7 @@ const chatsColumns = `
 
 const serviceColumns = `
   "serviceId" uuid NOT NULL PRIMARY KEY,
+  "userId" uuid,
   "categoryId" uuid,
   "subCategoryItemId" uuid,
   "serviceName" character varying(250) NOT NULL,
@@ -501,7 +502,7 @@ exports.messagesHelper = new pgp.helpers.ColumnSet(
 );
 
 exports.servicesHelper = new pgp.helpers.ColumnSet(
-  ["serviceId", "categoryId", "subCategoryItemId","serviceName", "serviceDescription", "locationName", "latitude", "longitude", "serviceStartingPrice", "paymentOptions", "serviceImageURL" , "serviceThumpImageURL", "serviceMediumImageURL","isActive", "createdAt", "updatedAt"],
+  ["serviceId","userId", "categoryId", "subCategoryItemId","serviceName", "serviceDescription", "locationName", "latitude", "longitude", "serviceStartingPrice", "paymentOptions", "serviceImageURL" , "serviceThumpImageURL", "serviceMediumImageURL","isActive", "createdAt", "updatedAt"],
   {
     table: "services"
   }
