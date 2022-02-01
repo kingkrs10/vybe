@@ -32,7 +32,6 @@ module.exports = {
 
    update: async (reqObj, client)=>{
       try {
-         console.log(reqObj, 'reqObj');
          const result = await  client.query(`UPDATE services SET
             "serviceName" = $2,
             "serviceImageURL" = $3,

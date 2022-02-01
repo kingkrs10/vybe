@@ -305,6 +305,21 @@ const serviceColumns = `
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 `
+const serviceBookingColumns = `
+  "serviceBookingId" uuid NOT NULL PRIMARY KEY,
+  "serviceName" character varying(250),
+  "serviceId" uuid NOT NULL,
+  "userId" uuid NOT NULL,
+  "bookingDate" timestamp with time zone,
+  "bookingJobDetails" text,
+  "locationName" text,
+  "latitude" numeric,
+  "longitude" numeric,
+  "bookingStatus" uuid NOT NULL,
+  "paymentStatus" uuid NOT NULL,
+  "createdAt" timestamp with time zone DEFAULT current_timestamp,
+  "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+`
 
 exports.categoriesHelper = new pgp.helpers.ColumnSet(
   ["categoryId", "parentId", "categoryName", "isActive", "createdAt"],
@@ -492,6 +507,15 @@ exports.servicesHelper = new pgp.helpers.ColumnSet(
   }
 )
 
+exports.serviceBookingHelper = new pgp.helpers.ColumnSet(
+  ["serviceBookingId","serviceName","serviceId","userId","bookingDate","bookingJobDetails","bookingStatus","paymentStatus","locationName",
+  "latitude","longitude","createdAt","updatedAt"],
+  {
+    table: "serviceBooking"
+  }
+)
+
+
 exports.categoriesTbl = `CREATE TABLE IF NOT EXISTS public.categories ( ${categoriesColumns} );`;
 exports.categoryItemsTbl = `CREATE TABLE IF NOT EXISTS public."categoryItems" ( ${categoryItemsColumns} );`;
 exports.menusTbl = `CREATE TABLE IF NOT EXISTS public.menus ( ${menusColumns} );`;
@@ -519,3 +543,4 @@ exports.messagesTbl = `CREATE TABLE IF NOT EXISTS public.messages ( ${messagesCo
 exports.currencyTbl = `CREATE TABLE IF NOT EXISTS public.currency ( ${currencyColumns} );`;
 exports.chatsTbl = `CREATE TABLE IF NOT EXISTS public.chats ( ${chatsColumns} );`;
 exports.serviceTbl = `CREATE TABLE IF NOT EXISTS public.services ( ${serviceColumns} );`;
+exports.serviceBookingTbl = `CREATE TABLE IF NOT EXISTS public."serviceBooking" (${serviceBookingColumns});`;

@@ -23,7 +23,8 @@ const productReviewsRouter = require("./src/productReviews");
 const shippingAddressesRouter = require("./src/shippingAddresses");
 const shopFollowersRouter = require("./src/shopFollowers");
 const serviceFollowersRouter = require("./src/serviceFollowers");
-const servicesRouter = require("./src/services")
+const servicesRouter = require("./src/services");
+const serviceBookingRouter = require("./src/serviceBooking")
 
 router.use("/", utilRouter);
 router.use("/users", userRouter);
@@ -44,7 +45,8 @@ router.use("/productReviews", productReviewsRouter);
 router.use("/shippingAddresses", shippingAddressesRouter);
 router.use("/shopFollowers", shopFollowersRouter);
 router.use("/serviceFollowers", serviceFollowersRouter);
-router.use("/services", servicesRouter)
+router.use("/services", servicesRouter);
+router.use("/serviceBooking", serviceBookingRouter)
 
 router.use("/notifications", notificationsRouter);
 router.use("/chats", chatsRouter);

@@ -60,7 +60,6 @@ const update =  async (request, response) => {
          sendInternalErrorResponse(response)
       }
    } catch (error) {
-      console.log(error);
       sendInternalErrorResponse(response, { message: error.toString() });
    }
 };
@@ -137,7 +136,6 @@ const dashboard = async (request, response) =>{
          "(Shop:dashboard)",
          shopsModel.getAll
       );
-
       if (result.error || NearbyResult.error) {
          sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data) || !_isEmpty(NearbyResult.data)) {
