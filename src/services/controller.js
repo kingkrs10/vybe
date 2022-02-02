@@ -37,7 +37,6 @@ const update = async (request, response)=>{
       "(Services:update)",
       serviceModel.update
     )
-    console.log(result);
     if(result.error){
       sendErrorResponse(response, result.message)
     }else if (!_isEmpty(result.data)) {
@@ -114,11 +113,31 @@ const remove = async(request,response)=>{
   }
 }
 
+const relativeServices = async (request, response) => {
+  try{
+     const result = await commonModel.tryBlock (
+        {subCategoryItemId: request.params.categoryId},
+        "(Services:relativeProducts)",
+        serviceModel.relativeProducts
+     )
+     if(result.error){
+        sendErrorResponse(response,result.message);
+     } else if (!_isEmpty(result.data)){
+        sendSuccessResponse(response,result.data);
+     } else{
+        sendNoContentResponse(response);
+     }
+  } catch (error){
+    sendInternalErrorResponse(response, { message: err.toString()});
+  }
+};
+
 
 module.exports = {
   create,
   update,
   getOne,
   getAll,
-  remove
+  remove,
+  relativeServices
 }

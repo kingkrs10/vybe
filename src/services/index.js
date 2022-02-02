@@ -33,4 +33,10 @@ router.delete(
   serviceController.remove
 );
 
+router.get(
+  "/relativeServices/:categoryId",
+  authMiddleware,
+  serviceController.relativeServices
+)
+
 module.exports = router;

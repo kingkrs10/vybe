@@ -27,4 +27,10 @@ router.get(
   controller.getAll
 );
 
+router.post(
+  "/updateStatus/:id",
+  authMiddleware,
+  controller.updateStatus
+);
+
 module.exports = router;

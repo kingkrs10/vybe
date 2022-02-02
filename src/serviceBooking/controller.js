@@ -93,10 +93,31 @@ const getAll = async(request,response) => {
   }
 }
 
+const updateStatus = async (request, response) => {
+  try{
+    const tempBody = {id: request.params.id, Obj: request.body}
+    const result = await commonModel.tryBlock(
+      tempBody,
+      "(ServiceBooking:updateStatus)",
+      serviceBookingModel.updateStatus
+    );
+
+    if(result.error){
+      sendErrorResponse(response, result.message);
+    } else if(!_isEmpty(result.data)){
+      sendSuccessResponse(response, result.data);
+    } else{
+      sendNoContentResponse(response);
+    }
+  } catch (error){
+    sendInternalErrorResponse(response, {message: error.toString()});
+  }
+};
 
 module.exports={
   create,
   update,
   getOne,
-  getAll
+  getAll,
+  updateStatus
 }

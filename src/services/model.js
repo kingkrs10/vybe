@@ -113,6 +113,28 @@ module.exports = {
       } 
    },
 
+   relativeServices : async (reqObj ,client) => {
+      try{
+         const limit = 50;
+         const result = await client.query(`SELECT
+         S."serviceId", S."serviceName", S."userId", S."serviceDescription",
+         S."categoryId", S."subCategoryItemId", S."locationName", S."latitude",
+         S."serviceImageURL", S."serviceThumpImageURL", S."serviceMediumImageURL",
+         S."longitude", S."serviceStartingPrice", P."paymentMethods",
+         S."createdAt", S."updatedAt", S."isActive",         
+         CI."categoryItemName"
+         FROM "services" as S
+         INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  S."subCategoryItemId"        
+         WHERE S."isActive" =$1
+         AND S."subCategoryItemId" = $2
+         LIMIT $3`, [true, reqObj.subCategoryItemId, limit]);
+
+         return {error: false , data: result.rows, message: 'read successfully'}
+      } catch(error){
+         return {error: true, message: error.toString()}
+      }
+   },
+
    remove: async (reqObj, client) => {
       try{
          const result = await client.query(

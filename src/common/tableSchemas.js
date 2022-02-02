@@ -305,7 +305,7 @@ const serviceColumns = `
   "isActive" boolean NOT NULL DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
-`
+`;
 const serviceBookingColumns = `
   "serviceBookingId" uuid NOT NULL PRIMARY KEY,
   "serviceName" character varying(250),
@@ -320,202 +320,391 @@ const serviceBookingColumns = `
   "paymentStatus" uuid NOT NULL,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
-`
+  `;
+const serviceReviewsColumns = `
+  "serviceReviewId" uuid NOT NULL,
+  "userId" uuid NOT NULL,
+  "serviceId" uuid NOT NULL,
+  "ratings" numeric NOT NULL DEFAULT 0,
+  "title" character varying(250),
+  "description" text,
+  "reviewImageURL" text[],
+  "reviewThumpImageURL" text[],
+  "reviewMediumImageURL" text[],
+  "isActive" boolean DEFAULT true,
+  "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+ `;
 
 exports.categoriesHelper = new pgp.helpers.ColumnSet(
   ["categoryId", "parentId", "categoryName", "isActive", "createdAt"],
   {
-    table: "categories",
+    table: "categories"
   }
 );
 
 exports.categoriesHelper = new pgp.helpers.ColumnSet(
   ["categoryItemId", "categoryId", "categoryItemName", "isActive", "createdAt"],
   {
-    table: "categoryItems",
+    table: "categoryItems"
   }
 );
 
 exports.menusHelper = new pgp.helpers.ColumnSet(
   ["menuId", "menuName", "keyCode", "order"],
   {
-    table: "menus",
+    table: "menus"
   }
 );
 
 exports.offersHelper = new pgp.helpers.ColumnSet(
-  ["offerId", "userId", "headLine", "latitude", "longitude", "offerDescription", "locationName", "firebaseOfferId", "offerImage", "offerThumpImage", "offerMediumImage", "isActive"],
+  [
+    "offerId",
+    "userId",
+    "headLine",
+    "latitude",
+    "longitude",
+    "offerDescription",
+    "locationName",
+    "firebaseOfferId",
+    "offerImage",
+    "offerThumpImage",
+    "offerMediumImage",
+    "isActive"
+  ],
   {
-    table: "offers",
+    table: "offers"
   }
 );
 
-exports.usersHelper = new pgp.helpers.ColumnSet(
-  ["offerId", "userId"],
-  {
-    table: "offers_favorites",
-  }
-);
+exports.usersHelper = new pgp.helpers.ColumnSet(["offerId", "userId"], {
+  table: "offers_favorites"
+});
 
 exports.offersHashTagsHelper = new pgp.helpers.ColumnSet(
   ["offerId", "hashTag"],
   {
-    table: "offers_hashTags",
+    table: "offers_hashTags"
   }
 );
 
 exports.offersReportsHelper = new pgp.helpers.ColumnSet(
   ["offerId", "reporterUserId", "comment"],
   {
-    table: "offers_reports",
+    table: "offers_reports"
   }
 );
 
 exports.usersHelper = new pgp.helpers.ColumnSet(
   [
-    "userId", "balance", "notificationUnReadcount", "deviceId", "fullName", "userImage", "stripeCustomerId", "latitude", "longitude", "currencyCode","currencySymbol", "profession", "isActive", "phoneNumber", "firebaseUId", "userThumpImage", "userMediumImage"
+    "userId",
+    "balance",
+    "notificationUnReadcount",
+    "deviceId",
+    "fullName",
+    "userImage",
+    "stripeCustomerId",
+    "latitude",
+    "longitude",
+    "currencyCode",
+    "currencySymbol",
+    "profession",
+    "isActive",
+    "phoneNumber",
+    "firebaseUId",
+    "userThumpImage",
+    "userMediumImage"
   ],
   {
-    table: "users",
+    table: "users"
   }
 );
 
 exports.usersBlockedUsersHelper = new pgp.helpers.ColumnSet(
-  [ "userId", "blockedUserId" ],
+  ["userId", "blockedUserId"],
   {
-    table: "users_blockedUsers",
+    table: "users_blockedUsers"
   }
 );
 
 exports.usersInvitesHelper = new pgp.helpers.ColumnSet(
-  [ "userId", "amount",  "oppPersonBalance", "currency", "label", "value", "balanceData"],
+  [
+    "userId",
+    "amount",
+    "oppPersonBalance",
+    "currency",
+    "label",
+    "value",
+    "balanceData"
+  ],
   {
-    table: "users_countryCurrency",
+    table: "users_countryCurrency"
   }
 );
 
 exports.usersInvitesHelper = new pgp.helpers.ColumnSet(
-  [ "senderUId", "receiverUId", "receiverPhoneNumber", "status" ],
+  ["senderUId", "receiverUId", "receiverPhoneNumber", "status"],
   {
-    table: "users_invites",
+    table: "users_invites"
   }
 );
 
 exports.statusHelper = new pgp.helpers.ColumnSet(
-  [ "statusId", "statusName", "isActive" ],
+  ["statusId", "statusName", "isActive"],
   {
-    table: "status",
+    table: "status"
   }
 );
 
 exports.paymentMethodsHelper = new pgp.helpers.ColumnSet(
-  [ "paymentMethodId", "paymentMethodName", "isActive" ],
+  ["paymentMethodId", "paymentMethodName", "isActive"],
   {
-    table: "paymentMethods",
+    table: "paymentMethods"
   }
 );
 
 exports.shopsHelper = new pgp.helpers.ColumnSet(
-  [ "shopId", "shopName", "shopDescription", "shopShortDescription", "locationName", "latitude", "longitude", "shopImageURL", "shopThumpImageURL", "shopMediumImageURL", "socialMedia",
-   "shipping_processing_time", "shipping_customs_and_import_taxes", "isActive", "createdAt"],
+  [
+    "shopId",
+    "shopName",
+    "shopDescription",
+    "shopShortDescription",
+    "locationName",
+    "latitude",
+    "longitude",
+    "shopImageURL",
+    "shopThumpImageURL",
+    "shopMediumImageURL",
+    "socialMedia",
+    "shipping_processing_time",
+    "shipping_customs_and_import_taxes",
+    "isActive",
+    "createdAt"
+  ],
   {
-    table: "shops",
+    table: "shops"
   }
 );
 
 exports.shopCategoryItemsHelper = new pgp.helpers.ColumnSet(
-  [ "shopCategoryItemId", "shopId", "categoryItemId", "isActive" ],
+  ["shopCategoryItemId", "shopId", "categoryItemId", "isActive"],
   {
-    table: "shop_categoryItems",
+    table: "shop_categoryItems"
   }
 );
 
 exports.shopCollectionsHelper = new pgp.helpers.ColumnSet(
-  [ "shopCollectionId", "shopId", "collectionName", "collectionDescription", "isActive" ],
+  [
+    "shopCollectionId",
+    "shopId",
+    "collectionName",
+    "collectionDescription",
+    "isActive"
+  ],
   {
-    table: "shopCollections",
+    table: "shopCollections"
   }
 );
 
 exports.shopMembersHelper = new pgp.helpers.ColumnSet(
-  [ "shopMemberId", "shopId", "userId", "designation", "isActive", "createdAt" ],
+  ["shopMemberId", "shopId", "userId", "designation", "isActive", "createdAt"],
   {
-    table: "shop_members",
+    table: "shop_members"
   }
 );
 
 exports.productsHelper = new pgp.helpers.ColumnSet(
-  [ "productId" , "productShopId", "productName", "productDescription", "productPrice", "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty", "productImageURL", "productThumpImageURL", "productMediumImageURL", "productCategoryItemId", "productCurrency", "productCollectionIds", "productOptions", "isActive", "createdAt" ],
+  [
+    "productId",
+    "productShopId",
+    "productName",
+    "productDescription",
+    "productPrice",
+    "productDiscount",
+    "productTotalQty",
+    "productSoldQty",
+    "productDamageQty",
+    "productImageURL",
+    "productThumpImageURL",
+    "productMediumImageURL",
+    "productCategoryItemId",
+    "productCurrency",
+    "productCollectionIds",
+    "productOptions",
+    "isActive",
+    "createdAt"
+  ],
   {
-    table: "products",
+    table: "products"
   }
 );
 
 exports.productReviewsHelper = new pgp.helpers.ColumnSet(
-  [ "productReviewId", "productId", "userId", "ratings", "title", "description", "reviewImageURL", "reviewThumpImageURL", "reviewMediumImageURL", "isActive", "createdAt" ],
+  [
+    "productReviewId",
+    "productId",
+    "userId",
+    "ratings",
+    "title",
+    "description",
+    "reviewImageURL",
+    "reviewThumpImageURL",
+    "reviewMediumImageURL",
+    "isActive",
+    "createdAt"
+  ],
   {
-    table: "productReviews",
+    table: "productReviews"
   }
 );
 
 exports.ordersHelper = new pgp.helpers.ColumnSet(
-  [ "orderId", "userId", "shopId", "orderTotalQty","orderSubTotalPrice","OrderTaxPrice","OrderShippingPrice","orderDiscount","orderTotalPrice","orderStatusId",
-    "orderPaymentMethodId", "orderPaymentStatusId", "orderPaymentTransactionId"],
+  [
+    "orderId",
+    "userId",
+    "shopId",
+    "orderTotalQty",
+    "orderSubTotalPrice",
+    "OrderTaxPrice",
+    "OrderShippingPrice",
+    "orderDiscount",
+    "orderTotalPrice",
+    "orderStatusId",
+    "orderPaymentMethodId",
+    "orderPaymentStatusId",
+    "orderPaymentTransactionId"
+  ],
   {
-    table: "orders",
+    table: "orders"
   }
 );
 
 exports.orderItemsHelper = new pgp.helpers.ColumnSet(
-  [ "orderItemId", "orderId", "productId", "shopId","userId", "orderItemQty", "orderItemPrice", "orderItemDiscount", "orderItemTotalPrice", "isActive", "createdAt", "updatedAt" ],
+  [
+    "orderItemId",
+    "orderId",
+    "productId",
+    "shopId",
+    "userId",
+    "orderItemQty",
+    "orderItemPrice",
+    "orderItemDiscount",
+    "orderItemTotalPrice",
+    "isActive",
+    "createdAt",
+    "updatedAt"
+  ],
   {
-    table: "orderItems",
+    table: "orderItems"
   }
 );
 
 exports.transactionHistoriesHelper = new pgp.helpers.ColumnSet(
-  [ "transactionId", "amount", "senderUId", "receiverUId", "senderCurrencyCode", "senderSymbol", "firebaseTransactionId", "createdAt" ],
+  [
+    "transactionId",
+    "amount",
+    "senderUId",
+    "receiverUId",
+    "senderCurrencyCode",
+    "senderSymbol",
+    "firebaseTransactionId",
+    "createdAt"
+  ],
   {
-    table: "transactionHistories",
+    table: "transactionHistories"
   }
 );
 
 exports.notificationsHelper = new pgp.helpers.ColumnSet(
-  [ "notificationId",  "offerId",  "senderUId",  "receiverUId" ],
+  ["notificationId", "offerId", "senderUId", "receiverUId"],
   {
-    table: "notifications",
+    table: "notifications"
   }
 );
 
-exports.messagesHelper = new pgp.helpers.ColumnSet(
-  [ "id", "currencyDetails"],
-  {
-    table: "currency",
-  }
-);
+exports.messagesHelper = new pgp.helpers.ColumnSet(["id", "currencyDetails"], {
+  table: "currency"
+});
 
 exports.messagesHelper = new pgp.helpers.ColumnSet(
-  [ "chatId" , "messageFromUId", "messageToUId", "lastMessage", "isActive", "createdAt"],
+  [
+    "chatId",
+    "messageFromUId",
+    "messageToUId",
+    "lastMessage",
+    "isActive",
+    "createdAt"
+  ],
   {
-    table: "chats",
+    table: "chats"
   }
 );
 
 exports.servicesHelper = new pgp.helpers.ColumnSet(
-  ["serviceId","userId", "categoryId", "subCategoryItemId","serviceName", "serviceDescription", "locationName", "latitude", "longitude", "serviceStartingPrice", "paymentOptions", "serviceImageURL" , "serviceThumpImageURL", "serviceMediumImageURL","isActive", "createdAt", "updatedAt"],
+  [
+    "serviceId",
+    "userId",
+    "categoryId",
+    "subCategoryItemId",
+    "serviceName",
+    "serviceDescription",
+    "locationName",
+    "latitude",
+    "longitude",
+    "serviceStartingPrice",
+    "paymentOptions",
+    "serviceImageURL",
+    "serviceThumpImageURL",
+    "serviceMediumImageURL",
+    "isActive",
+    "createdAt",
+    "updatedAt"
+  ],
   {
     table: "services"
   }
-)
+);
 
 exports.serviceBookingHelper = new pgp.helpers.ColumnSet(
-  ["serviceBookingId","serviceName","serviceId","userId","bookingDate","bookingJobDetails","bookingStatus","paymentStatus","locationName",
-  "latitude","longitude","createdAt","updatedAt"],
+  [
+    "serviceBookingId",
+    "serviceName",
+    "serviceId",
+    "userId",
+    "bookingDate",
+    "bookingJobDetails",
+    "bookingStatus",
+    "paymentStatus",
+    "locationName",
+    "latitude",
+    "longitude",
+    "createdAt",
+    "updatedAt"
+  ],
   {
     table: "serviceBooking"
   }
-)
+);
 
+exports.serviceReviewsHelper = new pgp.helpers.ColumnSet(
+  [
+    "serviceReviewId",
+    "userId",
+    "serviceId",
+    "ratings",
+    "title",
+    "description",
+    "reviewImageURL",
+    "reviewThumpImageURL",
+    "reviewMediumImageURL",
+    "isActive",
+    "createdAt",
+    "updatedAt"
+  ],
+  {
+    table: "serviceReviews"
+  }
+);
 
 exports.categoriesTbl = `CREATE TABLE IF NOT EXISTS public.categories ( ${categoriesColumns} );`;
 exports.categoryItemsTbl = `CREATE TABLE IF NOT EXISTS public."categoryItems" ( ${categoryItemsColumns} );`;
@@ -545,3 +734,4 @@ exports.currencyTbl = `CREATE TABLE IF NOT EXISTS public.currency ( ${currencyCo
 exports.chatsTbl = `CREATE TABLE IF NOT EXISTS public.chats ( ${chatsColumns} );`;
 exports.serviceTbl = `CREATE TABLE IF NOT EXISTS public.services ( ${serviceColumns} );`;
 exports.serviceBookingTbl = `CREATE TABLE IF NOT EXISTS public."serviceBooking" (${serviceBookingColumns});`;
+exports.serviceReviewsTbl = `CREATE TABLE IF NOT EXISTS public."serviceReviews" (${serviceReviewsColumns});`;

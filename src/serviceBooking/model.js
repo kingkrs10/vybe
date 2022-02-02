@@ -84,4 +84,19 @@ module.exports={
 			return { error : true,  message : error.toString()}
 		} 
 	},
+	updateStatus: async (reqObj, client) => {
+		try{
+			 const {id, Obj} = reqObj
+			 const statusColumnName = Obj.paymentStatus ? "paymentStatus" : "bookingStatus";
+			 const result = await client.query(`UPDATE "serviceBooking" SET
+			 "${statusColumnName}" = $2
+			 WHERE "serviceBookingId" = $1
+			 `,[id, Obj[statusColumnName]]);
+
+			 return{ error: false, message:'Updated successfully'};
+
+		} catch(error){
+			 return{ error: true, message:error.toString()}
+		}
+ }
 }

@@ -7,6 +7,7 @@ module.exports = {
             `INSERT INTO shops(
                "shopId",
                "shopName",
+               "userId"
                "shopDescription",
                "shopShortDescription",
                "locationName",
@@ -19,11 +20,12 @@ module.exports = {
                "shipping_processing_time",
                "shipping_customs_and_import_taxes"
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             RETURNING "shopId"`,
             [
                reqObj.shopId,
                reqObj.shopName,
+               reqObj.userId,
                reqObj.shopDescription,
                reqObj.shopShortDescription,
                reqObj.locationName,
@@ -77,23 +79,25 @@ module.exports = {
       try{
          const result = await client.query( `UPDATE shops SET
             "shopName" = $1,
-            "shopDescription" = $2,
-            "shopShortDescription" = $3,
-            "locationName" = $4,
-            "latitude" = $5,
-            "longitude" = $6,
-            "shopImageURL" = $7,
-            "shopThumpImageURL" = $8,
-            "shopMediumImageURL" = $9,
-            "socialMedia" = $10,
-            "shipping_processing_time" = $11,
-            "shipping_customs_and_import_taxes" = $12,
+            "userId" = $2
+            "shopDescription" = $3,
+            "shopShortDescription" = $4,
+            "locationName" = $5,
+            "latitude" = $6,
+            "longitude" = $7,
+            "shopImageURL" = $8,
+            "shopThumpImageURL" = $9,
+            "shopMediumImageURL" = $10,
+            "socialMedia" = $11,
+            "shipping_processing_time" = $12,
+            "shipping_customs_and_import_taxes" = $13,
             "updatedAt" = now()
-            WHERE "shopId" = $13
+            WHERE "shopId" = $14
             RETURNING "shopId"
          `,
          [
             reqObj.shopName,
+            reqObj.userId,
             reqObj.shopDescription,
             reqObj.shopShortDescription,
             reqObj.locationName,
@@ -150,7 +154,7 @@ module.exports = {
    getOne: async (reqObj ,client) => {
       try{
          const result = await client.query(`SELECT
-         "shopId","shopName","shopDescription","shopShortDescription","locationName",
+         "shopId","shopName","userId", "shopDescription","shopShortDescription","locationName",
          "latitude","longitude","shopImageURL","shopThumpImageURL","shopMediumImageURL",
          "socialMedia","shipping_processing_time","shipping_processing_time",
          "isActive","createdAt","updatedAt"
@@ -167,7 +171,7 @@ module.exports = {
    getAll: async (reqObj ,client) => {
       try{
          var queryText = `SELECT * FROM (SELECT
-            S."shopId","shopName","shopDescription","shopShortDescription","locationName",
+            S."shopId","shopName", "userId", "shopDescription","shopShortDescription","locationName",
             "latitude","longitude","shopImageURL","shopThumpImageURL","shopMediumImageURL",
             C."categoryId", C."categoryName", S."isActive",
             ( 3959 * acos( cos( radians($2) ) * cos( radians( S.latitude ) ) * cos( radians( S.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( S.latitude) ) ) ) AS distance
