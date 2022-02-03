@@ -60,7 +60,7 @@ const update = async (request, response) => {
 
 const getAll = async (request, response) => {
    try{
-      const tempBody = {...request.currentUser}
+      const tempBody = { ...request.query,...request.currentUser}
       const result = await commonModel.tryBlock (
          tempBody,
          "(Products:getAll)",

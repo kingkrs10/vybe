@@ -116,8 +116,8 @@ module.exports = {
          }
 
          if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
-				queryText = `${queryText} AND (LOWER(P."productName") like LOWER($3) OR LOWER(P."productDescription") like LOWER($3))`;
-				qryValue = [true, limit, `%${reqObj.searchTerm}%`];
+            qryText = `${qryText} AND (LOWER(P."productName") like LOWER($2) OR LOWER(P."productDescription") like LOWER($2))`;
+            qryValues = [true, `%${reqObj.searchTerm}%`];
 			}
 
          const result = await client.query(qryText, qryValues);
