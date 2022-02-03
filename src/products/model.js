@@ -60,8 +60,8 @@ module.exports = {
             "productMediumImageURL" = $10,
             "productCategoryItemId" = $11,
             "productCollectionIds" = $12,
-            "productCurrency" = $13
-            "productOptions" = $14,
+            "productCurrency" = $13,
+            "productOptions" = $14
             "updatedAt" = now()
             WHERE "productId" = $15`,
          [
