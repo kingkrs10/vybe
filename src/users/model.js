@@ -115,7 +115,6 @@ module.exports = {
 			return { error: false, data: data, message: 'Data saved successfully' };
 
 		} catch (error) {
-			console.log('update', error);
 			return { error: true, message: error.toString() };
 		}
 	},

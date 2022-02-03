@@ -1,4 +1,5 @@
 const _isEmpty = require('lodash/isEmpty');
+
 var self = module.exports = {
 	create: async (reqObj, client) => {
 
@@ -99,9 +100,6 @@ var self = module.exports = {
 				AND O."userId" not in (select "blockedUserId" from "users_blockedUsers" WHERE "userId" =  $1)
 				AND O."offerId" not in (select "offerId" from offers_reports WHERE "reporterUserId" =  $1)
 				AND fav."userId"=$1 `;
-
-			// var qryValue = [reqObj.favoriteUid, true, reqObj.latitude, reqObj.longitude, limit, pageNo];
-			// const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC offset $4 limit $3`, qryValue);
 
 			var qryValue = [reqObj.favoriteUid, true, reqObj.latitude, reqObj.longitude];
 			const result = await client.query(`${qryText} ORDER BY fav."createdAt" DESC`, qryValue);

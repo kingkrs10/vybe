@@ -1,9 +1,10 @@
-const offersModel = require("./model");
-const commonModel = require("../common/common");
-const {sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
 const { v4: uuidv4 } = require("uuid");
 const _map = require('lodash/map');
 const _isEmpty = require('lodash/isEmpty');
+
+const offersModel = require("./model");
+const commonModel = require("../common/common");
+const {sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse, sendSuccessResponse, sendNoContentResponse } = require("../common/ResponseController");
 
 const create = async (request, response) => {
    try {
@@ -36,7 +37,6 @@ const create = async (request, response) => {
       sendInternalErrorResponse(response, { message: err.toString()});
    }
 };
-
 
 const update = async (request, response, next) => {
    try {
@@ -333,7 +333,6 @@ const getUserfavorites = async (request, response, next) => {
 };
 
 const getOfferFavoriters = async (request, response, next) => {
-
    const data = {
       ...request.currentUser,
       uid: request.params.id

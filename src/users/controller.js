@@ -1,9 +1,11 @@
+const { v4: uuidv4 } = require("uuid");
+const _isEmpty = require('lodash/isEmpty');
+
 const usersModel = require("./model");
 const userCountryCurrencyModel = require("../countryCurrency/model");
 const commonModel = require("../common/common");
 const {sendErrorResponse, sendCreatedResponse, sendInternalErrorResponse, sendNoContentResponse, sendSuccessResponse } = require("../common/ResponseController");
-const { v4: uuidv4 } = require("uuid");
-const _isEmpty = require('lodash/isEmpty');
+
 const { firebaseAdmin } = require("../common/firebase");
 
 const create = async (request, response) => {
@@ -94,8 +96,6 @@ const getOne = async (request, response, next) => {
       sendInternalErrorResponse(response, { message: err.toString() });
    }
 };
-
-
 
 const update = async (request, response, next) => {
    try {
@@ -269,7 +269,6 @@ const updateStripeId = async (request, response, next) => {
       sendInternalErrorResponse(response, { message: err.toString() });
    }
 };
-
 
 const getBlockedUsers = async (request, response, next) => {
    try {
