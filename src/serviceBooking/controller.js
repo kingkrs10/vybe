@@ -9,7 +9,6 @@ const {
   sendNoContentResponse, sendSuccessResponse
 } = require("../common/ResponseController");
 
-
 const create = async (request,response)=>{
   try {
     const tempBody = { ...request.body, serviceBookingId: uuidv4()};

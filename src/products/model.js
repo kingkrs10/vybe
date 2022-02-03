@@ -60,9 +60,10 @@ module.exports = {
             "productMediumImageURL" = $10,
             "productCategoryItemId" = $11,
             "productCollectionIds" = $12,
-            "productOptions" = $13,
+            "productCurrency" = $13
+            "productOptions" = $14,
             "updatedAt" = now()
-            WHERE "productId" = $14`,
+            WHERE "productId" = $15`,
          [
             reqObj.productName,
             reqObj.productDescription,
@@ -76,6 +77,7 @@ module.exports = {
             reqObj.productMediumImageURL,
             reqObj.productCategoryItemId,
             reqObj.productCollectionIds,
+            reqObj.productCurrency,
             reqObj.productOptions,
             reqObj.productId
          ])
@@ -93,7 +95,7 @@ module.exports = {
          "productId", "productName", "productDescription", "productPrice",
          "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty",
          "productImageURL", "productThumpImageURL", "productMediumImageURL",
-         "productCollectionIds","productOptions", P."productShopId",S."shopName",
+         "productCollectionIds","productCurrency" , "productOptions", P."productShopId",S."shopName",
          P."productCategoryItemId", CI."categoryItemName",
          P."createdAt", P."updatedAt", P."isActive",
          SC."collectionName", SC."shopCollectionId"
@@ -113,6 +115,11 @@ module.exports = {
             qryValues = [true, reqObj.shopId, reqObj.collectionId];
          }
 
+         if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
+				queryText = `${queryText} AND (LOWER("productName") like LOWER($3) OR LOWER("productDescription") like LOWER($3))`;
+				qryValue = [true, limit, `%${reqObj.searchTerm}%`];
+			}
+
          const result = await client.query(qryText, qryValues);
          return {error: false , data: result.rows , message: 'Read successfully'}
 
@@ -127,7 +134,7 @@ module.exports = {
          "productId", "productName", "productDescription", "productPrice",
          "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty",
          "productImageURL", "productThumpImageURL", "productMediumImageURL",
-         "productCollectionIds","productOptions", P."productShopId",S."shopName",
+         "productCollectionIds","productCurrency" , "productOptions", P."productShopId",S."shopName",
          P."productCategoryItemId", CI."categoryItemName",
          P."createdAt", P."updatedAt", P."isActive",
          SC."collectionName", SC."shopCollectionId"
@@ -167,7 +174,7 @@ module.exports = {
          "productId", "productName", "productDescription", "productPrice",
          "productDiscount", "productTotalQty", "productSoldQty", "productDamageQty",
          "productImageURL", "productThumpImageURL", "productMediumImageURL",
-         "productCollectionIds","productOptions", P."productShopId",S."shopName",
+         "productCollectionIds","productCurrency", "productOptions", P."productShopId",S."shopName",
          P."productCategoryItemId", CI."categoryItemName",
          P."createdAt", P."updatedAt", P."isActive",
          SC."collectionName", SC."shopCollectionId"
