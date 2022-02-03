@@ -116,7 +116,7 @@ module.exports = {
          }
 
          if (reqObj.searchTerm && !_isEmpty(reqObj.searchTerm)) {
-				queryText = `${queryText} AND (LOWER("productName") like LOWER($3) OR LOWER("productDescription") like LOWER($3))`;
+				queryText = `${queryText} AND (LOWER(P."productName") like LOWER($3) OR LOWER(P."productDescription") like LOWER($3))`;
 				qryValue = [true, limit, `%${reqObj.searchTerm}%`];
 			}
 
