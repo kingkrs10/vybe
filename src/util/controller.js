@@ -80,11 +80,9 @@ const pushFirebaseNotification = async (request, response) => {
          .messaging()
          .sendToDevice(registrationToken, message, notification_options)
          .then(result => {
-            console.log('result', result);
             sendSuccessResponse(response, {message: "Notification sent successfully"})
          })
          .catch(error => {
-            console.log(error);
             sendErrorResponse(response, error.toString());
          });
 
@@ -520,7 +518,6 @@ const firebaseImageUpload = async (request, response) => {
    try{
       // const imageData = await fetchImages(request.params.id);
       const imageData = [];
-      console.log('imageData', imageData.length);
       const uuid = uuidv4();
       const uploadSuccess = [];
       const uploadFail = [];

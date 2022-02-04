@@ -43,7 +43,7 @@ module.exports={
 					"bookingStatus" = $9,
 					"paymentStatus" = $10,
 					"updatedAt" = now()
-					WHERE "serviceBookingId" = $1`,
+					WHERE "serviceBookingId" = $1 RETURNING *`,
 			[  reqObj.serviceBookingId, reqObj.serviceName, reqObj.serviceId,
 					reqObj.bookingDate, reqObj.bookingJobDetails, reqObj.locationName,
 					reqObj.latitude, reqObj.longitude, reqObj.bookingStatus, reqObj.paymentStatus

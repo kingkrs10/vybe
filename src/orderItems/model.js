@@ -68,7 +68,6 @@ module.exports ={
    },
 
    getOne: async (reqObj, client) =>{
-      console.log(reqObj);
       try{
          const result = await client.query(`SELECT
          OI."orderItemId",OI."orderId",OI."userId",OI."productId",OI."productName",
@@ -83,7 +82,6 @@ module.exports ={
          return{ error: false, data: result.rows, message:'Read successfully'}
 
       } catch(error){
-         console.log("error_error",error);
          return{ error: true, message: error.toString()}
       }
    },

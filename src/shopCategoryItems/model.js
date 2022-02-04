@@ -17,7 +17,6 @@ module.exports = {
          ])
          return { error: false, messsge: 'Created successfully'}
       } catch (error){
-         console.log('error.toString()', error.toString());
          return { error: true, messsge: error.toString()}
       }
     },

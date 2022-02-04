@@ -20,6 +20,7 @@ const create = async (request, response) => {
       serviceReviewsModel.create
     );
 
+ 
     if (result.error) {
       sendErrorResponse(response, result.message);
     } else {
@@ -29,6 +30,7 @@ const create = async (request, response) => {
     sendInternalErrorResponse(response, { message: error.toString() });
   }
 };
+
 const update = async (request, response) => {
   try {
     const tempBody = { ...request.body, serviceReviewId: request.params.id };
@@ -40,18 +42,8 @@ const update = async (request, response) => {
 
     if (result.error) {
       sendErrorResponse(response, result.message);
-    } else if (!result.error) {
-      const result1 = await commonModel.tryBlock(
-        {
-          serviceId: request.body.serviceId,
-          serviceReviewId: request.params.id
-        },
-        "(serviceReviews:update : fetch getOne)",
-        serviceReviewsModel.getOne
-      );
-      sendSuccessResponse(response, result1.data);
     } else {
-      sendInternalErrorResponse(response);
+      sendSuccessResponse(response, result.data);
     }
   } catch (error) {
     sendInternalErrorResponse(response, { message: error.toString() });
@@ -128,4 +120,4 @@ module.exports = {
   getAll,
   getOne,
   remove
-};
+}

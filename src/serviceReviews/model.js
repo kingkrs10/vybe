@@ -47,7 +47,7 @@ module.exports = {
           "reviewThumpImageURL" = $7,
           "reviewMediumImageURL" = $8,
           "updatedAt" = now()
-         WHERE "serviceReviewId" = $9
+         WHERE "serviceReviewId" = $9 RETURNING *
        `,
         [
           reqObj.userId,
@@ -61,7 +61,7 @@ module.exports = {
           reqObj.serviceReviewId
         ]
       );
-      return { error: false, message: "Updated successfully" };
+      return { error: false,data: result.rows, message: "Updated successfully" };
     } catch (error) {
       return { error: true, message: error.toString() };
     }
@@ -83,7 +83,6 @@ module.exports = {
         [reqObj.serviceId]
       );
 
-      console.log("result", reqObj.serviceId);
       return { error: false, data: result.rows, message: "Read successfully" };
     } catch (error) {
       return { error: true, message: error.toString() };

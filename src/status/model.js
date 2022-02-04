@@ -11,7 +11,6 @@ module.exports = {
             return { error: true, message: 'Read failed'}
          }
       } catch(error){
-         console.log('error',error);
          return{ error: true, message:error.toString()}
       }
    }
