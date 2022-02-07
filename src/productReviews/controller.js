@@ -80,6 +80,27 @@ const getAll = async (request, response) => {
    }
 };
 
+const getReviewtotal = async (request, response) => {
+   try{
+      const tempBody = {productId: request.params.productId}
+      const result = await commonModel.tryBlock (
+         tempBody,
+         "(productReview:getReviewtotal)",
+         productReviewModel.getReviewtotal
+      )
+
+      if(result.error){
+         sendErrorResponse(response,result.message);
+      } else if (!_isEmpty(result.data)){
+         sendSuccessResponse(response,result.data);
+      } else{
+         sendNoContentResponse(response);
+      }
+   } catch (error){
+         sendInternalErrorResponse(response, { message: err.toString()});
+   }
+};
+
 const getOne = async (request, response) => {
    try{
       const tempBody = { productId: request.params.productId, productReviewId:request.params.productReviewId }
@@ -126,6 +147,7 @@ module.exports ={
    create,
    update,
    getAll,
+   getReviewtotal,
    getOne,
    remove
 }

@@ -16,6 +16,12 @@ router.put(
 );
 
 router.get(
+   "/totalCal/:productId",
+   authMiddleware,
+   productReviewsController.getReviewtotal
+);
+
+router.get(
    "/:productId",
    authMiddleware,
    productReviewsController.getAll

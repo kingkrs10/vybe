@@ -16,6 +16,12 @@ router.put(
 );
 
 router.get(
+   "/totalCal/:serviceId",
+   authMiddleware,
+   serviceReviewsController.getServiceReviewtotal
+);
+
+router.get(
    "/:serviceId",
    authMiddleware,
    serviceReviewsController.getAll

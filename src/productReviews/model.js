@@ -70,6 +70,33 @@ module.exports ={
       }
    },
 
+   getReviewtotal: async (reqObj ,client) => {
+      try{
+         const whereCondition = `"productId" = $1 AND "isActive" = $2`;
+         const result = await client.query(`SELECT COUNT(*) as "totalCount",
+            (SELECT COUNT(ratings) FROM "productReviews" WHERE ratings = '1' AND ${whereCondition}) as "oneStarRating",
+			   (SELECT COUNT(ratings) FROM "productReviews" WHERE ratings = '2' AND ${whereCondition}) as "twoStarRating",
+			   (SELECT COUNT(ratings) FROM "productReviews" WHERE ratings = '3' AND ${whereCondition}) as "threeStarRating",
+			   (SELECT COUNT(ratings) FROM "productReviews" WHERE ratings = '4' AND ${whereCondition}) as "FourStarRating",
+			   (SELECT COUNT(ratings) FROM "productReviews" WHERE ratings = '5' AND ${whereCondition}) as "FiveStarRating"
+            FROM "productReviews"
+            WHERE ${whereCondition}`
+         , [reqObj.productId , true]);
+         let resultData = result.rows[0];
+         resultData.subTotal = 0;
+         Object.keys(result.rows[0]).map((item,index) =>{
+            if (item !== 'totalCount' && item !== 'subTotal') {
+               resultData.subTotal = resultData.subTotal + (resultData[item] * index);
+               resultData[item] = (resultData[item]/resultData.totalCount)*100;
+            }
+         })
+         resultData.subTotal = resultData.subTotal / resultData.totalCount;
+         return { error: false, data: resultData, message:'Read successfully'}
+      } catch (error){
+         return { error : true,  message : error.toString()}
+      }
+   },
+
    getOne : async (reqObj ,client) => {
       try{
          const result = await client.query(`SELECT

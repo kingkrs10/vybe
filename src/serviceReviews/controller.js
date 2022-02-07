@@ -50,6 +50,25 @@ const update = async (request, response) => {
   }
 };
 
+const getServiceReviewtotal = async (request, response) => {
+  try {
+    const result = await commonModel.tryBlock(
+      {serviceId: request.params.serviceId},
+      "(serviceReviews:getServiceReviewtotal)",
+      serviceReviewsModel.getServiceReviewtotal
+    )
+    if (result.error) {
+      sendErrorResponse(response, result.message);
+    } else if (!_isEmpty(result.data)) {
+      sendSuccessResponse(response, result.data)
+    } else {
+      sendInternalErrorResponse(response)
+    }
+  } catch (error) {
+    sendInternalErrorResponse(response, { message: error.toString() });
+  }
+}
+
 const getAll = async (request, response) => {
   try {
     const tempBody = { serviceId: request.params.serviceId };
@@ -117,6 +136,7 @@ const remove = async (request, response) => {
 module.exports = {
   create,
   update,
+  getServiceReviewtotal,
   getAll,
   getOne,
   remove

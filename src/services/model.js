@@ -19,9 +19,8 @@ module.exports = {
             "paymentMethods"
          )
          VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
-         [reqObj.serviceId, reqObj.serviceName, reqObj.serviceImageURL, reqObj.serviceThumpImageURL, reqObj.serviceMediumImageURL,
-          reqObj.serviceDescription, reqObj.categoryId, reqObj.subCategoryItemId, reqObj.locationName, reqObj.latitude,
-          reqObj.longitude, reqObj.serviceStartingPrice,reqObj.paymentMethods]
+         [reqObj.serviceId, reqObj.serviceName, reqObj.userId, reqObj.serviceImageURL, reqObj.serviceThumpImageURL, reqObj.serviceMediumImageURL,reqObj.serviceDescription, reqObj.categoryId, reqObj.subCategoryItemId, reqObj.locationName,
+         reqObj.latitude,reqObj.longitude, reqObj.serviceStartingPrice,reqObj.paymentMethods]
          );
 			let data = result.rowCount > 0 ? result.rows[0] : null;
 			return { error: false, data, message: 'Data saved successfully' };
