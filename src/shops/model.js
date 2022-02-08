@@ -7,7 +7,7 @@ module.exports = {
             `INSERT INTO shops(
                "shopId",
                "shopName",
-               "userId"
+               "userId",
                "shopDescription",
                "shopShortDescription",
                "locationName",
@@ -52,7 +52,7 @@ module.exports = {
                }
             }));
 
-            await Promise.all(reqObj.categoryItem.map( async (item) =>{
+            await Promise.all(reqObj.shopCategoryItems.map( async (item) =>{
                try {
                   await shopCategoryItems.create({...item, shopId:reqObj.shopId}, client);
                } catch (error) {
@@ -127,7 +127,7 @@ module.exports = {
 
             await shopCategoryItems.remove({ shopId:reqObj.shopID},client);
 
-            await Promise.all(reqObj.categoryItem.map( async (item) =>{
+            await Promise.all(reqObj.shopCategoryItems.map( async (item) =>{
                try {
                   await shopCategoryItems.create({...item, shopId:reqObj.shopID}, client);
                } catch (error) {
@@ -156,7 +156,7 @@ module.exports = {
          const result = await client.query(`SELECT
          "shopId","shopName","userId", "shopDescription","shopShortDescription","locationName",
          "latitude","longitude","shopImageURL","shopThumpImageURL","shopMediumImageURL",
-         "socialMedia","shipping_processing_time","shipping_processing_time",
+         "socialMedia","shipping_processing_time","shipping_customs_and_import_taxes",
          "isActive","createdAt","updatedAt"
          FROM shops
          WHERE "shopId" = $1

@@ -29,7 +29,18 @@ const create = async (request, response) => {
       if (result.error) {
          sendErrorResponse(response, result.message);
       } else if (!_isEmpty(result.data)) {
-         sendCreatedResponse(response, result.data);
+         await commonModel.tryBlock(
+         { offerId: result.data.offerId, reqObj: request.body},
+         "(Offers:updateHashTags)",
+         offersModel.updateHashTags
+         );
+         const resultHashTagData = await commonModel.tryBlock(
+            [result.data.offerId],
+            "(Offers:getHashTags)",
+            offersModel.getHashTags
+         );
+         const data = { ...result.data, hasTags: resultHashTagData}
+         sendCreatedResponse(response, data);
       } else {
          sendInternalErrorResponse(response);
       }
