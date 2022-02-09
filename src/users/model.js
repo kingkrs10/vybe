@@ -7,12 +7,13 @@ module.exports = {
 				"userId", balance, "notificationUnReadcount", "deviceId",
 				"fullName",	"phoneNumber", "stripeCustomerId",
 				"currencyCode", "currencySymbol", profession, "firebaseUId",
-				"userImage", "userThumpImage", "userMediumImage")
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *`,
+				"userImage", "userThumpImage", "userMediumImage",latitude, longitude)
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *`,
 				[reqObj.uid, reqObj.balance, 0, `{${reqObj.deviceId}}`,
 				reqObj.fullName, reqObj.phoneNumber, reqObj.stripeCustomerId,
 				reqObj.currencyCode, reqObj.currencySymbol, reqObj.profession, reqObj.firebaseUId,
-				reqObj.imageURl, reqObj.thump_imageURL, reqObj.medium_imageURL
+				reqObj.imageURl, reqObj.thump_imageURL, reqObj.medium_imageURL, reqObj.latitude,
+				reqObj.longitude
 			]);
 			let resultData = result.rowCount ? result.rows[0] : {};
 			return { error: false, data: resultData, message: 'Data saved successfully' };

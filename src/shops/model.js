@@ -79,7 +79,7 @@ module.exports = {
       try{
          const result = await client.query( `UPDATE shops SET
             "shopName" = $1,
-            "userId" = $2
+            "userId" = $2,
             "shopDescription" = $3,
             "shopShortDescription" = $4,
             "locationName" = $5,
