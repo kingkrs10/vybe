@@ -122,6 +122,10 @@ module.exports = {
             qryValues = [true, `%${reqObj.searchTerm}%`];
 			}
 
+         if (reqObj.sortValue && reqObj.sortOrder && !_isEmpty(reqObj.sortValue) && !_isEmpty(reqObj.sortOrder)) {
+            qryText = `${qryText} ORDER BY ${reqObj.sortValue} ${reqObj.sortOrder}`;
+         }
+
          const result = await client.query(qryText, qryValues);
          return {error: false , data: result.rows , message: 'Read successfully'}
 

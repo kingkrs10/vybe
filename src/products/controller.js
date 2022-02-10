@@ -136,7 +136,7 @@ const getShopProducts = async (request, response) => {
 
 const getShopCollectionProducts = async (request, response) => {
    try{
-      const tempBody =  {shopId: request.params.shopId, collectionId: request.params.collectionId};
+      const tempBody = { shopId: request.params.shopId, collectionId: request.params.collectionId, ...request.query};
 
       const result = await commonModel.tryBlock (
          tempBody,
