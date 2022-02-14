@@ -138,24 +138,26 @@ const getOne = async (request, response) => {
 const dashboard = async (request, response) => {
   try {
     const shopCategoryList = await commonModel.tryBlock(
+		{...request.body},
       "(Shop:getShopCategory)",
       shopsModel.getShopCategory
-    );
-
+	);
+	
     const tempBody = { ...request.body, isNearby: true, limit: 4 };
     const NearbyResult = await commonModel.tryBlock(
       tempBody,
       "(Shop:dashboard)",
       shopsModel.getAll
-    );
+	);
+	
     if (shopCategoryList.error || NearbyResult.error) {
-      sendErrorResponse(response, result.message);
+      sendErrorResponse(response, shopCategoryList.message || NearbyResult.message);
     } else if (!_isEmpty(NearbyResult) || !_isEmpty(shopCategoryList)) {
       const resultData = [];
       resultData.push({ shopCategory: "Nearby", shopList: NearbyResult.data });
 
       await Promise.all(
-        shopCategoryList.map(async item => {
+        shopCategoryList.data.map(async item => {
           const result = await commonModel.tryBlock(
             { ...request.body, categoryId: item.categoryId, limit: 4 },
             "(Shop:dashboard)",

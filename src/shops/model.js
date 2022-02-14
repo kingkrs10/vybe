@@ -180,7 +180,7 @@ module.exports = {
          "shopId","shopName","userId","shopDescription","shopShortDescription","locationName",
          S."latitude",S."longitude",S."shopImageURL",S."shopThumpImageURL",S."shopMediumImageURL",
          S."socialMedia",S."shipping_processing_time",S."shipping_customs_and_import_taxes",
-         S."isActive",S."createdAt",S."updatedAt" , U."userImage", U."userThumpImageURL", U."userMediumImageURL"
+         S."isActive",S."createdAt",S."updatedAt" , U."userImage", U."userThumpImage", U."userMediumImage"
          FROM shops S
          INNER JOIN users AS U ON U."userId" = S."userId"
          WHERE S."shopId" = $1
@@ -194,7 +194,7 @@ module.exports = {
     }
   },
 
-  getShopCategory: async (reqObj, client) => {
+  getShopCategory: async(reqObj, client) => {
     try {
       var result = await client.query(
         `SELECT * FROM categories CA 
@@ -209,13 +209,14 @@ module.exports = {
       return { error: true, message: error.toString() };
     }
   },
+
   getAll: async (reqObj, client) => {
     const limit = reqObj.limit ? reqObj.limit : 50;
     try {
       var queryText = `SELECT * FROM (SELECT
-            S."shopId", "shopName", "userId", "shopDescription", "shopShortDescription", "locationName",
-            "latitude", "longitude", "shopImageURL", "shopThumpImageURL", "shopMediumImageURL",
-            U."userImage", U."userThumpImageURL", U."userMediumImageURL",
+            S."shopId", "shopName", S."userId", "shopDescription", "shopShortDescription", "locationName",
+            S."latitude", S."longitude", "shopImageURL", "shopThumpImageURL", "shopMediumImageURL",
+            U."userImage", U."userThumpImage", U."userMediumImage",
             C."categoryId", C."categoryName", S."isActive",
             ( 3959 * acos( cos( radians($2) ) * cos( radians( S.latitude ) ) * cos( radians( S.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( S.latitude) ) ) ) AS distance
             FROM shops AS S
