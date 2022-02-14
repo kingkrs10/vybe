@@ -34,7 +34,7 @@ module.exports = {
       try {
          const result = await  client.query(`UPDATE services SET
             "serviceName" = $2,
-            "userId" = $3
+            "userId" = $3,
             "serviceImageURL" = $4,
             "serviceThumpImageURL" = $5 ,
             "serviceMediumImageURL" = $6 ,
