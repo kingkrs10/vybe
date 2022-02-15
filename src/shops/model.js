@@ -177,7 +177,7 @@ module.exports = {
     try {
       const result = await client.query(
         `SELECT
-         "shopId","shopName","userId","shopDescription","shopShortDescription","locationName",
+         "shopId","shopName",S."userId","shopDescription","shopShortDescription","locationName",
          S."latitude",S."longitude",S."shopImageURL",S."shopThumpImageURL",S."shopMediumImageURL",
          S."socialMedia",S."shipping_processing_time",S."shipping_customs_and_import_taxes",
          S."isActive",S."createdAt",S."updatedAt" , U."userImage", U."userThumpImage", U."userMediumImage"
@@ -187,7 +187,6 @@ module.exports = {
          `,
         [reqObj.id]
       );
-
       return { error: false, data: result.rows };
     } catch (error) {
       return { error: true, message: error.toString() };
@@ -197,9 +196,9 @@ module.exports = {
   getShopCategory: async(reqObj, client) => {
     try {
       var result = await client.query(
-        `SELECT * FROM categories CA 
-         INNER JOIN "shop_categoryItems" AS SCI ON SCI."categoryItemId" = CA."categoryId"
-         INNER JOIN shops AS S ON S."shopId" = SCI."shopId"
+        `SELECT DISTINCT CA."categoryId", CA."categoryName" FROM categories CA 
+          INNER JOIN "shop_categoryItems" AS SCI ON SCI."categoryItemId" = CA."categoryId"
+          INNER JOIN shops AS S ON S."shopId" = SCI."shopId"
          WHERE CA."isActive" = $1 
          AND S."isActive" = $1`,
         [true]
