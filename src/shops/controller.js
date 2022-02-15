@@ -135,23 +135,43 @@ const getOne = async (request, response) => {
   }
 };
 
+const viewAllShops = async (request, response) => {
+  try {
+    const result = await commonModel.tryBlock(
+      { ...request.body },
+      "(Shop:viewAll)",
+      shopsModel.getAll
+    );
+
+    if (result.error) {
+      sendErrorResponse(response, result.message);
+    } else {
+      sendSuccessResponse(response, result.data);
+    }
+  } catch (error) {
+    sendInternalErrorResponse(response, { message: error.toString() });
+  }
+};
+
 const dashboard = async (request, response) => {
   try {
     const shopCategoryList = await commonModel.tryBlock(
-		{...request.body},
+      { ...request.body },
       "(Shop:getShopCategory)",
       shopsModel.getShopCategory
-	);
-	
+    );
+
     const tempBody = { ...request.body, isNearby: true, limit: 4 };
     const NearbyResult = await commonModel.tryBlock(
       tempBody,
       "(Shop:dashboard)",
       shopsModel.getAll
-	);
-	
+    );
     if (shopCategoryList.error || NearbyResult.error) {
-      sendErrorResponse(response, shopCategoryList.message || NearbyResult.message);
+      sendErrorResponse(
+        response,
+        shopCategoryList.message || NearbyResult.message
+      );
     } else if (!_isEmpty(NearbyResult) || !_isEmpty(shopCategoryList)) {
       const resultData = [];
       resultData.push({ shopCategory: "Nearby", shopList: NearbyResult.data });
@@ -170,7 +190,6 @@ const dashboard = async (request, response) => {
           });
         })
       );
-
       sendSuccessResponse(response, resultData);
     } else {
       sendNoContentResponse(response);
@@ -230,5 +249,6 @@ module.exports = {
   getAll,
   getOne,
   remove,
-  dashboard
+  dashboard,
+  viewAllShops
 };

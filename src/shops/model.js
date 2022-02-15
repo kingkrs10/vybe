@@ -168,7 +168,6 @@ module.exports = {
         return { error: true, message: "Data saved failed 23" };
       }
     } catch (error) {
-      console.log("err", error);
       return { error: true, message: error.toString() };
     }
   },
@@ -193,7 +192,7 @@ module.exports = {
     }
   },
 
-  getShopCategory: async(reqObj, client) => {
+  getShopCategory: async (reqObj, client) => {
     try {
       var result = await client.query(
         `SELECT DISTINCT CA."categoryId", CA."categoryName" FROM categories CA 
@@ -232,7 +231,7 @@ module.exports = {
       }
 
       if (reqObj.categoryId) {
-        queryText += ` AND C.categoryId = $5`;
+        queryText += ` AND "categoryId" = $5`;
         qryValue = [
           true,
           reqObj.latitude,
@@ -243,7 +242,6 @@ module.exports = {
       }
 
       const result = await client.query(`${queryText} limit $4`, qryValue);
-
       return { error: false, data: result.rows, message: "Read successfully" };
     } catch (error) {
       return { error: true, message: error.toString() };
