@@ -11,7 +11,7 @@ module.exports = {
             "pincode",
             "userId"
          ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-         RETURNING "addressId"`,
+         RETURNING *`,
          [
            reqObj.addressId,
            reqObj.firstName,

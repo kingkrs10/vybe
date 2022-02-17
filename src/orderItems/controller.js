@@ -116,19 +116,19 @@ const getOne = async (request, response) => {
    }
 };
 
+
 const remove = async (request, response) => {
    try{
-      const tempBody = {orderItemId: request.params.orderItemId}
       const result = await commonModel.tryBlock(
-         tempBody,
+         { ...request.body},
          "(orderItems:remove)",
          orderItemsModel.remove
-      )
-      if(result.error){
-         sendErrorResponse(response, result.message);
-      } else{
-         sendSuccessResponse(response, null);
-      }
+       )
+       if(!_isEmpty(result)){
+          sendSuccessResponse(response, null);
+       }else{
+         sendNoContentResponse(response, resultData);
+       }
    } catch (error){
       sendInternalErrorResponse(response, {message: error.toString()});
    }

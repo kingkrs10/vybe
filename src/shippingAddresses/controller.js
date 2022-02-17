@@ -21,12 +21,7 @@ const create = async (request, response) => {
       if(result.error){
          sendErrorResponse(response,result.message);
       } else {
-         const result1 = await commonModel.tryBlock (
-            {addressId: addressId},
-            "(shippingAddresses:getOne)",
-            shippingAddressesModel.getOne
-         )
-         sendCreatedResponse(response, result1.data);
+         sendCreatedResponse(response, result.data);
       }
    } catch (error){
       sendInternalErrorResponse(response, { message: err.toString()});

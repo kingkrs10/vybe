@@ -235,6 +235,7 @@ const orderItemsColumns = `
   "orderItemPrice" numeric DEFAULT 0,
   "orderItemDiscount" numeric DEFAULT 0,
   "orderItemTotalPrice" numeric,
+  "orderItemsproductOptions" jsonb,
   "isActive" boolean DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -335,6 +336,15 @@ const serviceReviewsColumns = `
   "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
  `;
+const shippingAddressesColumns = `
+  "addressId" uuid NOT NULL PRIMARY KEY,
+  "firstName" character varying(250),
+  "lastName" character varying(250),
+  "streetAddress" text,
+  "place" character varying(350),
+  "pincode" character varying(10),
+  "userId" uuid NOT NULL
+`;
 
 exports.categoriesHelper = new pgp.helpers.ColumnSet(
   ["categoryId", "parentId", "categoryName", "isActive", "createdAt"],
@@ -590,6 +600,7 @@ exports.orderItemsHelper = new pgp.helpers.ColumnSet(
     "orderItemPrice",
     "orderItemDiscount",
     "orderItemTotalPrice",
+    "productOptions",
     "isActive",
     "createdAt",
     "updatedAt"
@@ -706,6 +717,8 @@ exports.serviceReviewsHelper = new pgp.helpers.ColumnSet(
   }
 );
 
+
+
 exports.categoriesTbl = `CREATE TABLE IF NOT EXISTS public.categories ( ${categoriesColumns} );`;
 exports.categoryItemsTbl = `CREATE TABLE IF NOT EXISTS public."categoryItems" ( ${categoryItemsColumns} );`;
 exports.menusTbl = `CREATE TABLE IF NOT EXISTS public.menus ( ${menusColumns} );`;
@@ -735,3 +748,4 @@ exports.chatsTbl = `CREATE TABLE IF NOT EXISTS public.chats ( ${chatsColumns} );
 exports.serviceTbl = `CREATE TABLE IF NOT EXISTS public.services ( ${serviceColumns} );`;
 exports.serviceBookingTbl = `CREATE TABLE IF NOT EXISTS public."serviceBooking" (${serviceBookingColumns});`;
 exports.serviceReviewsTbl = `CREATE TABLE IF NOT EXISTS public."serviceReviews" (${serviceReviewsColumns});`;
+exports.shippingAddressesTbl = `CREATE TABLE IF NOT EXISTS public."shippingAddresses" (${shippingAddressesColumns})`;

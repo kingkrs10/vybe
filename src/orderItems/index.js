@@ -34,7 +34,7 @@ router.get(
 );
 
 router.delete(
-   "/:orderItemId",
+   "/removeItems",
    authMiddleware,
    orderItemsController.remove
 );

@@ -4,8 +4,8 @@ module.exports ={
          const result = await client.query(`INSERT INTO "orderItems" (
             "orderItemId", "orderId", "productId", "productName",
             "orderItemQty", "orderItemPrice", "orderItemDiscount",
-            "orderItemTotalPrice", "shopId", "userId"
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            "orderItemTotalPrice", "orderItemsproductOptions", "shopId", "userId"
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
          [
             reqObj.orderItemId,
             reqObj.orderId,
@@ -15,6 +15,7 @@ module.exports ={
             reqObj.orderItemPrice,
             reqObj.orderItemDiscount,
             reqObj.orderItemTotalPrice,
+            reqObj.orderItemsproductOptions,
             reqObj.shopId,
             reqObj.userId
          ])
@@ -32,12 +33,14 @@ module.exports ={
             "orderItemPrice" = $2,
             "orderItemDiscount" = $3,
             "orderItemTotalPrice" = $4
-            WHERE "orderItemId" = $5`,
+            "orderItemsproductOptions" = $5
+            WHERE "orderItemId" = $6`,
          [
             reqObj.orderItemQty,
             reqObj.orderItemPrice,
             reqObj.orderItemDiscount,
             reqObj.orderItemTotalPrice,
+            reqObj.orderItemsproductOptions,
             reqObj.orderItemId
          ])
          return{ error: false, message:'Updated successfully'};
@@ -52,7 +55,7 @@ module.exports ={
          const result = await client.query(`SELECT
          OI."orderItemId",OI."orderId",OI."userId",OI."productId",OI."productName",
          P."productImageURL", OI."orderItemQty",P."productPrice" as "orderItemPrice", P."productDiscount" as
-         "orderItemDiscount",(P."productPrice"-P."productDiscount") * OI."orderItemQty" as "orderItemTotalPrice"
+         "orderItemDiscount",(P."productPrice"-P."productDiscount") * OI."orderItemQty" as "orderItemTotalPrice", OI."orderItemsproductOptions"
          FROM "orderItems" OI
          INNER JOIN "products" P ON P."productId" = OI."productId"
          WHERE OI."userId" = $1
@@ -72,7 +75,7 @@ module.exports ={
          const result = await client.query(`SELECT
          OI."orderItemId",OI."orderId",OI."userId",OI."productId",OI."productName",
          P."productImageURL", OI."orderItemQty",OI."orderItemPrice",OI."orderItemDiscount",
-         OI."orderItemTotalPrice",OI."createdAt",OI."updatedAt",OI."isActive"
+         OI."orderItemTotalPrice", OI."orderItemsproductOptions", OI."createdAt",OI."updatedAt",OI."isActive"
          FROM "orderItems" OI
          INNER JOIN "products" P ON P."productId" = OI."productId"
          WHERE OI."orderItemId" = $1
@@ -91,7 +94,7 @@ module.exports ={
          const result = await client.query(`SELECT
          OI."orderItemId",OI."orderId",OI."userId",OI."productId",OI."productName",
          P."productImageURL", OI."orderItemQty",OI."orderItemPrice",OI."orderItemDiscount",
-         OI."orderItemTotalPrice",OI."createdAt",OI."updatedAt",OI."isActive"
+         OI."orderItemTotalPrice", OI."orderItemsproductOptions", OI."createdAt",OI."updatedAt",OI."isActive"
          FROM "orderItems" OI
          INNER JOIN "products" P ON P."productId" = OI."productId"
          WHERE OI."userId" = $1
@@ -110,9 +113,8 @@ module.exports ={
       try{
          const result = await client.query(`UPDATE "orderItems" SET
          "isActive"= $1
-         WHERE "orderItemId" = $2`,
+         WHERE "orderItemId" = ANY ($2 ::uuid[])`,
          [false, reqObj.orderItemId])
-
          return{ error: false, message:'Deleted successfully'}
 
       } catch(error){
