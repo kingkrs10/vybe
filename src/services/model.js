@@ -101,7 +101,7 @@ module.exports = {
             "serviceThumpImageURL" ,
             "serviceMediumImageURL" ,
             "serviceDescription",
-            "categoryId" ,
+             S."categoryId" ,
             "subCategoryItemId",
             "locationName" ,
             "latitude" ,
@@ -110,12 +110,12 @@ module.exports = {
             "paymentMethods",
             CI."categoryItemName",
             C.categoryName,
-            "isActive",
-            "createdAt"
+            S."isActive",
+            S."createdAt"
             FROM services S
-            
+
             INNER JOIN categories AS C ON C."categoryId" = S."categoryId"
-            INNER JOIN categoryItems AS CI ON CI."categoryItemId" = S."subCategoryItemId"
+            INNER JOIN "categoryItems" AS CI ON CI."categoryItemId" = S."subCategoryItemId"
 
             WHERE S."serviceId" = $1
          `,
@@ -129,16 +129,16 @@ module.exports = {
 
   getAll: async (reqObj, client) => {
     try {
-      const queryText = `SELECT 
+      const queryText = `SELECT
             "serviceId", "serviceName" , "userId" , "serviceImageURL",
             "serviceThumpImageURL", "serviceMediumImageURL", "serviceDescription",
-            "categoryId", "subCategoryItemId", "locationName", "latitude",
-            "longitude", "serviceStartingPrice", "paymentMethods", "isActive", "createdAt",
+            S."categoryId", "subCategoryItemId", "locationName", "latitude",
+            "longitude", "serviceStartingPrice", "paymentMethods", S."isActive", S."createdAt",
             CI."categoryItemName", C."categoryName",
          ( 3959 * acos( cos( radians($2) ) * cos( radians( S.latitude ) ) * cos( radians( S.longitude ) - radians($3) ) + sin( radians($2) ) * sin( radians( S.latitude) ) ) ) AS distance
          FROM  services S
          INNER JOIN categories AS C ON C."categoryId" = S."categoryId"
-         INNER JOIN categoryItems AS CI ON CI."categoryItemId" = S."subCategoryItemId"
+         INNER JOIN "categoryItems" AS CI ON CI."categoryItemId" = S."subCategoryItemId"
          WHERE S."isActive" = $1`;
       var qryValue = [true, reqObj.latitude, reqObj.longitude];
 
@@ -162,10 +162,10 @@ module.exports = {
          S."categoryId", S."subCategoryItemId", S."locationName", S."latitude",
          S."serviceImageURL", S."serviceThumpImageURL", S."serviceMediumImageURL",
          S."longitude", S."serviceStartingPrice", P."paymentMethods",
-         S."createdAt", S."updatedAt", S."isActive",         
+         S."createdAt", S."updatedAt", S."isActive",
          CI."categoryItemName"
          FROM "services" as S
-         INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  S."subCategoryItemId"        
+         INNER JOIN "categoryItems" CI ON CI."categoryItemId" =  S."subCategoryItemId"
          WHERE S."isActive" =$1
          AND S."subCategoryItemId" = $2
          LIMIT $3`,
