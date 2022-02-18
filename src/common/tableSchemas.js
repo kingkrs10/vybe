@@ -343,7 +343,10 @@ const shippingAddressesColumns = `
   "streetAddress" text,
   "place" character varying(350),
   "pincode" character varying(10),
-  "userId" uuid NOT NULL
+  "userId" uuid NOT NULL,
+  "isActive" boolean DEFAULT true,
+  "createdAt" timestamp with time zone DEFAULT current_timestamp,
+  "updatedAt" timestamp with time zone DEFAULT current_timestamp
 `;
 
 exports.categoriesHelper = new pgp.helpers.ColumnSet(
