@@ -32,7 +32,7 @@ module.exports ={
             "orderItemQty" = $1,
             "orderItemPrice" = $2,
             "orderItemDiscount" = $3,
-            "orderItemTotalPrice" = $4
+            "orderItemTotalPrice" = $4,
             "orderItemsproductOptions" = $5
             WHERE "orderItemId" = $6`,
          [

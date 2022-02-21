@@ -33,7 +33,7 @@ router.get(
    orderItemsController.getOne
 );
 
-router.delete(
+router.post(
    "/removeItems",
    authMiddleware,
    orderItemsController.remove
