@@ -24,9 +24,9 @@ module.exports = {
    getOne: async (reqObj, client) => {
       try{
          const result = await client.query(`SELECT
-         SCI."categoryItemId", CI."categoryItemName"
+         SCI."categoryItemId", CI."categoryName"
          FROM "shop_categoryItems"  SCI
-         INNER JOIN "categoryItems"  CI ON CI."categoryItemId" = SCI."categoryItemId"
+         INNER JOIN "categories"  CI ON CI."categoryId" = SCI."categoryItemId"
          WHERE SCI."shopId" = $1`,
          [reqObj.id])
          return { error: false, data: result.rows, messsge: 'Read successfully'}
