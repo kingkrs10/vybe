@@ -54,7 +54,8 @@ const getSubCategoryItems = async (request, response) =>{
     try{
         const tempBody = {
             ...request.currentUser,
-           ...request.body
+           ...request.body,
+           categoryId: request.body.categoryId
         }
         const result = await commonModel.tryBlock(
             tempBody,
