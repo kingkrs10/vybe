@@ -1,32 +1,23 @@
-const { Pool } = require("pg");
+const { Pool, Client } = require("pg");
 const pgp = require("pg-promise")({});
 
-const db_config = require("../config/config").relational_db;
+const connection_string =
+  require("../config/config").relational_db.connection_string;
 
 const pool = new Pool({
-   user: db_config.user,
-   host: db_config.cloudpath /* "localhost"*/,
-   database: db_config.database,
-   password: db_config.pass,
-   port: db_config.port,
-   max: 10,
-   idleTimeoutMillis: 10000,
-   connectionTimeoutMillis: 11000,
+  connectionString: connection_string,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-const dbclient = pgp({
-  host: db_config.host,
-  port: db_config.port,
-  user: db_config.user,
-  password: db_config.pass,
-  database: db_config.database,
-});
-
+const client = pgp({ connection_string });
 
 module.exports = {
-   getClientFromPool: () => {
-      return pool.connect();
-   },
-   dbclient,
-   pgp
+  getClientFromPool: () => {
+    return pool.connect();
+  },
+  pool,
+  client,
+  pgp,
 };

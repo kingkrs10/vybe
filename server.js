@@ -2,14 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 var schedule = require("node-schedule");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
-const config = require("./src/config/config");
 const router = require("./router");
+const config = require("./src/config/config");
 const currencyModel = require("./src/currency/model");
 const commonModel = require("./src/common/common");
 const app = express();
-
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -20,34 +19,35 @@ const rule = new schedule.RecurrenceRule();
 rule.hour = 12;
 
 schedule.scheduleJob(rule, () => {
-   axios
-   .get(
+  axios
+    .get(
       "http://api.currencylayer.com/live?access_key=b4eb98e1646afb0b3acfd691c2974dc9"
-   )
-   .then(async (response) => {
+    )
+    .then(async (response) => {
       const data = {
-         id: uuidv4(),
-         currencyDetails: [response.data.quotes],
-      }
+        id: uuidv4(),
+        currencyDetails: [response.data.quotes],
+      };
       await commonModel.tryBlock(
-         data,
-         "(UserCountryCurrency:update)",
-         currencyModel.updateCurrency
+        data,
+        "(UserCountryCurrency:update)",
+        currencyModel.updateCurrency
       );
       return true;
-   })
-   .catch((err) => {
+    })
+    .catch((err) => {
       console.log("err", err);
-   });
+    });
 });
 
 app.listen(config.app.port, async () => {
-   try {
-      console.log(`Example app listening on port ${config.app.port}!`);
-      await commonModel.dbInit();
-      console.log("All tables created successfully");
+  try {
+    console.log(`Cari Merchant API listening on port ${config.app.port}!`);
+    await commonModel.dbInit();
+    console.log("All tables created successfully");
   } catch (error) {
-      console.log("app.listen error", error);
+    console.log("app.listen error", error);
   }
-
 });
+
+module.exports = app;

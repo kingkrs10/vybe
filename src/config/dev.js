@@ -1,42 +1,55 @@
 module.exports = {
-   relational_db: {
-      host: "35.202.0.126",
-      port: 5432,
-      user: "postgres",
-      pass: "n9Lyi5Eboh1O3KKt",
-      database: "luhu-development",
-      cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
-   },
+  relational_db: {
+    user: "root",
+    host: "localhost",
+    database: "merchant",
+    password: "",
+    port: "26257",
+    // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
+    connection_string:
+      "postgres://cari:FsBSC3XWLmApXA1PI9NtBQ@free-tier5.gcp-europe-west1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&options=--cluster%3Dcari-distribution-4855",
+  },
 
-   app: {
-      port: 8081,
-      secretKey: "luhu-jwt-stuff-secret"
-   },
-   stripe_api_key:
-      "sk_test_51HIi1UKuVVSM1kRYQEEPj5OFOR0vGhgGGp7P8NO8o6RwsLe5Mpv7a1c8xyZwTj81Y2GvdNlntTp9FFHas1f3F1Pj00EswMHlps",
-   firebaseProjectId: "luhu-dev.appspot.com",
-   serviceAccountKey: {
-      type: "service_account",
-      project_id: "luhu-dev",
-      private_key_id: "7c94c94ca2a1a299d7c3feb8d08416fd98ef3238",
-      private_key:
-         "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCuDFVIfhW5Fp6l\n7Dl7XTN1oNGgPfFaO0V3W2y+RQqdvv4u8laD44hTdWSfXJaEOaeaVvNv/tTPLiVZ\n7NuiPdF1/ExvmwTsWWk1m8NaAaLpy+gVc7VP9hvJJqlxsIg7cPrtUXVs3/bPmOSx\n/dDSLpGwMRB1w3mXpuGfpwybxjJVzcD7PJe0xRWd2UeeBU7OVU0FBahb0TTLv+JC\nVbpoLFiYIqDGrRWjI2zSXdws9jZA2pj5aiSfzAIWDCVnMDdnM5Kpnyy6Hb1RCUim\nocMHr4XDlDY2KX2a+VqhOxQcNvoeu6+1yDBr10/pj7KinKVF8oKBgrZRnXJ8MZtx\nIFrqgi8DAgMBAAECggEAAJIFHDJ8si6zINi+Vwm3C1jddwGHoRH2Nm4JRfl4K/4s\nW015kY2/5WcDMtoOt1VUJhBWqeZMOyIIXDFrFKB7A86/+dKMH7G5GODhBnXusKMD\n4V06fXGYetO5uG8bVr6H7qhIdlhTVUxkMpbpIiyJkCLQI41UHQSQNrq7FmcoqC6o\nf/12uplMsBsGcHJDLGulOcDS94kvgQ5P49R5Sa0UqdmcGVPMrmD+aJPkY5NHhcyx\nkADIqXMMCwzV0AatmqlOKVZ63MJ8oivRxXxe8g8oApDmIpOKmSKa8RmenJMAtXlE\noNFvNQb2TWqC/TlJHIzDm5L0HW5YNisTRcNxsmP8oQKBgQDb1k7P3lMk61iTTThL\nfr6TfQaarqsJaYw9Z03Bed8aVN1ob/PPnyYz5lIZEt5Ao9nLT6hMhE28K8fTnui1\n/y+uLM6lOqeQMsKNmlG8EOo/dQUh/LZdncONiBXW0rNE05QubL/GlzW8T6GCdtqb\n5dTq6bOIBaQzpZowiWLznn/xkQKBgQDKrcdxreKzB1beADzYYdDjkXj2u6r0qhGs\nGkyy9Udol7RDRgZ5Uh3sOOXsysMVTdAqM1flmlEv8n2QMWD6DHoa0ItsdcZcineJ\nJyj5VxAmuHv3lNG913z117b/mwZ7pT0aaWe82RCQGr98G4m/rASBmlGas4VkXmT2\nr4b0AlqNUwKBgQCvd/FULarDry319Q7YA4RuCL86u+w9CQgtAsWnhnUzeUV4VNOQ\nhwFhL5eb99l6Us5GX4CAAqJhbbiECzTH/7W5Gn6el6CjkkCD8gcHS6ENoYPFSwbs\n1j3+O/7ihy8b4p1GKPsxsgPsGMtbbS60fNBj6MGp8obLyoS19RMMTRjmYQKBgQC2\nT6ES0a4VCioKYb5ZiYtD2IwtrNv3Xq+s1q9dXqLQI33j8a5LHSGLZhb0a+MVW7w+\n6ZZMEwaqkX5+4NvxsJ15V1PCySIYBfnGZnJF7xm5KsNgDf6ovJhL77FNtN4dBKK1\nClFlHv/2EAlkksTSo+IdznlPJeJ8SSiaeYN0JFXdvwKBgQCSti6EEROiMJiS/kIe\n0mbStGYIct2QpzbzQ6HkRxRtdzKrr0oJa/Qhw4FconzGGm/bETEABpwNxzaSLMjv\njT+wl0dLvDc/cPVjTka0XRBzFQHjeQgM6pW/vRbru7LRfYgJrHMLVxcdAwouuvhO\nuNoy2RvNZp+3YSKldJBOMhr3Ww==\n-----END PRIVATE KEY-----\n",
-      client_email: "firebase-adminsdk-52ar2@luhu-dev.iam.gserviceaccount.com",
-      client_id: "113787800772663393496",
-      auth_uri: "https://accounts.google.com/o/oauth2/auth",
-      token_uri: "https://oauth2.googleapis.com/token",
-      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-      client_x509_cert_url:
-         "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-52ar2%40luhu-dev.iam.gserviceaccount.com",
-   },
-   twilioTest: {
-      accountSid: 'AC7527c54a4e94b4cf887855d63d55287b',
-      authToken: 'b6f938eeabeaca59a58cf18edc6e9def',
-   },
-   firbaseDatabaseFileName: "luhu-dev-firebase-database.json",
-   firbaseCredentialsFileName: "serviceAccountKey-dev.json",
-   users_collection_name: "users",
-   offers_collection_name: "staticOffers",
-   currency_collection_name: "currency",
-   transaction_history_collection_name: "transactionHistory",
-}
+  // relational_db: {
+  //   host: "35.202.0.126",
+  //   port: 5432,
+  //   user: "postgres",
+  //   pass: "n9Lyi5Eboh1O3KKt",
+  //   database: "distribution",
+  //   cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
+  // },
+
+  app: {
+    port: 3333,
+    secretKey:
+      "YuxhBVW8uv6mxpTeYjJLMtTsiHB5rrkIuoClx8l9/JvsAlvtuZ5w9SAwLUFAvE6DJXjXYsnizg3BKYv/oED37Dy98e5sCNy4JnDhD7tpHdW9xjBkj+i9d1U9Z/U9SKLuU+PqkjtX/Avy8Qq9pHjZ+u9crI+MExwW7WzNgv3dB1CwQM852Dzfk7NBV4PXZ3WqvirnLFy4CoyIspbjMjfNQ/t7/3gXLsVMKqGYVVAws5SxqHcMdP/qiAdFdETAHnyVLrwZL4hB3ke6Xm5Ub5v1En6nzwJiEAxG9OtbcT+LKvnKHMKrS6La+ZstGEyoMiVIJvKInwqkpvQDZOXe2SQhfA==",
+  },
+  stripe_api_key:
+    "sk_test_51HIi1UKuVVSM1kRYQEEPj5OFOR0vGhgGGp7P8NO8o6RwsLe5Mpv7a1c8xyZwTj81Y2GvdNlntTp9FFHas1f3F1Pj00EswMHlps",
+  firebaseProjectId: "cari-merchant-dev.appspot.com",
+  serviceAccountKey: {
+    type: "service_account",
+    project_id: "cari-merchant-dev",
+    private_key_id: "744e4a5fd4623e00771038554475b419bc775900",
+    private_key:
+      "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCzfBtDGX9vo1Qq\n6NtVYpQi4r6o7aE575x2CXMj04pFl5FpBb8leGNONffCYneOgheLjGzNcIRzuSf/\nksDiODQ2jio52SaaZXG9fPTeMHPta8ln0BBfGo7BssqPmQ67I0cPvnz3zHSigTMx\naCVDGMNxvrdnV6MLbSi+UEdW4FFYd4T1BrpJLI/wPcoR/g9wR7iIvy03OO1BHv61\nXCT+IW1uPd/AoJnBnfzWCl67SLPT+Xbnv6rjx5IQxiCXGLdnpEGvXFUSa6hNzWmf\ntW9EJc7kzwZKIU6SMzMN8COekBzYadxXHj7myl0dxCVakMPx2SUE/QWtpcPlL1eL\n3oSrcu7xAgMBAAECggEAEKAJzGzTs40O8kyQaHfRneuf2njsarfpp7tXWXWyRKD1\n/KLmIjvlAu0Xzn8dcOtW7/upZlwqQKfhbxhyWmH3YChJ/ALDwyBraTBmZCBb1J2b\n0cxhf9WvbHy5q5RzW104q1orLC7ZjOXnzodFkFH+ZI5UYbOp7BiH4h0AhqkPj+CW\njrTE1VDtGH4Hm/j1AAsHO9AAcc4AmA5UHZ0tB6GKyLY2AlO0klKJHjBeGmsexT5Z\nWw7bMcZmZ3Zq6IQ/9xvIvI/zxLpnHVhfD6cI0MSx2ZYlWx8SNxEcEc+N92joXgqa\nmUg1T0iPUjzd5lYKUikR75Xyqr90V9xYV/A0ooCo2QKBgQDZc7q+VhcRjd2Yu4MV\nKTdtXWRV9aJLhRwfVIowJfjPt13QW1lesvLprdaAnAx6mIJLNeNMJhdLP7IksQhG\nTC4YnXr6hqRa6OUWdhL+v7HnxMY34POuMH1WL7ORqHsKcQhCz9qyUAA32ix6MtRk\nFyXQhg9vLAlOIorcyiN5HprVrQKBgQDTTV7P2yQRSnsCYVDJW+qEh2Iq8/mBnl5A\nDtkj+pE5pw+u4qTgQvogjtkKLcZeSQ+H5+pRbjEk5VPmWhzR3/1eIKylmmI0H4lb\n/xnT0VSQjpYVA+LdKmOk89gV7/kJl5rs7TiEfhU0r6XqqAtKhz+WVumc+Ke8qGdz\nAaOS48R+1QKBgQCg7Fhiy2s+/nHjucEERABU2yyJwMJeiR+KwBGUGEXN0rGGpFO7\nFUtXS+LWQqWphHvIFRUlIXtToMvBA5JQE8h5RvHfvQycioYe3TqpdEvAbYsTh1JO\nsmvPAHYvcTO9QnEOoKwEEdhXfQo1VLCBce/2JX/+keRBAqcpRh6CX/fN8QKBgQCM\n7NQoMtKKSa9itf7IXOo7O4Poe9FTdokLlhuSGGJVHiuiivxFqcXigwMT+9WKOpYG\nIVGwv5o9LknXnxALlaUI6yfaRu3qL4JP/gJ+t+T7iG1mVLIwqT3N3OeoMeVZVWh5\nTflcvC5udhtlNnBZY3ywSwUBsQFGHNbp6BTtOcVqhQKBgEKrbPs7Zv8XPEvpVYi/\nPR30QSd5eZcqGjgpL1No7WL6sNELZhzZNdfPJ7uPJeFUCQ3EeQONCwyWMC6aFLmb\n3ZXaJqMxs/uzOYZ/xN+IEv2bo3bm2gRZ3Yr1Bbia63AUKZnXBhB66syQSJ+RWvT3\nxc5kGeuXlQEQsgfiIy0mMxhC\n-----END PRIVATE KEY-----\n",
+    client_email:
+      "firebase-adminsdk-lwqsm@cari-merchant-dev.iam.gserviceaccount.com",
+    client_id: "114443609571435768452",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url:
+      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-lwqsm%40cari-merchant-dev.iam.gserviceaccount.com",
+  },
+  twilioTest: {
+    accountSid: "AC7527c54a4e94b4cf887855d63d55287b",
+    authToken: "b6f938eeabeaca59a58cf18edc6e9def",
+  },
+  firbaseDatabaseFileName: "luhu-dev-firebase-database.json",
+  firbaseCredentialsFileName: "serviceAccountKey-dev.json",
+  users_collection_name: "users",
+  offers_collection_name: "offers",
+  currency_collection_name: "currency",
+  transaction_history_collection_name: "transactionHistory",
+};
