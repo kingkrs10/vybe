@@ -51,7 +51,7 @@ module.exports = {
         : 0;
 
       var queryText = `SELECT
-			"userId", balance, "notificationUnReadcount", "deviceId", "firstName", "lastName", "stripeCustomerId", latitude, longitude,
+			"userId", balance, "notificationUnReadcount", "deviceId", "firstName", "lastName", "emailAddress", "stripeCustomerId", latitude, longitude,
 			"currencyCode",	"currencySymbol", profession, "isActive", "createdAt", "phoneNumber", "firebaseUId" as uid, "userImage", "userThumpImage", "userMediumImage",
 			( 3959 * acos( cos( radians($4) ) * cos( radians( U.latitude ) ) * cos( radians( U.longitude ) - radians($5) ) + sin( radians($4) ) * sin( radians( U.latitude ) ) ) ) AS distance
 			FROM users U

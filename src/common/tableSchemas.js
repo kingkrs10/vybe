@@ -68,6 +68,7 @@ const usersColumns = `
   "deviceId" text[],
   "firstName" character varying(150),
   "lastName" character varying(150),
+  "emailAddress" character varying(150),
   "stripeCustomerId" character varying(30),
   latitude numeric,
   longitude numeric,
