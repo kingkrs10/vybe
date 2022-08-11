@@ -7,7 +7,7 @@ module.exports = {
     port: "26257",
     // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
     connection_string:
-      "postgresql://cari:FsBSC3XWLmApXA1PI9NtBQ@free-tier5.gcp-europe-west1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&options=--cluster%3Dcari-distribution-4855",
+      "postgresql://cari:xBrxzsnzkck9CztBk80fNQ@free-tier5.gcp-europe-west1.cockroachlabs.cloud:26257/distribution?sslmode=verify-full&options=--cluster%3Dcari-distribution-4859",
   },
 
   // relational_db: {

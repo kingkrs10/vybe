@@ -95,7 +95,7 @@ module.exports = {
       const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
       const result = await client.query(
         `SELECT
-			"userId", balance, "notificationUnReadcount", "deviceId", "firstName", "lastName", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
+			"userId", balance, "notificationUnReadcount", "deviceId", "firstName", "lastName", "emailAddress", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
 			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" as uid, "userImage", "userThumpImage", "userMediumImage"
 			FROM users
 			${whereCondition} AND "isActive" = $2`,
@@ -134,15 +134,16 @@ module.exports = {
 				"firstName" = $4,
         "lastName" = $5,
 				"phoneNumber" = $6,
-				"stripeCustomerId" = $7,
-				latitude = $8,
-				longitude= $9,
-				"currencyCode"= $10,
-				"currencySymbol"= $11,
-				profession= $12,
-				"userImage" = $13,
-				"userThumpImage"= $14,
-				"userMediumImage"= $15
+        "emailAddress" = $7,
+				"stripeCustomerId" = $8,
+				latitude = $9,
+				longitude= $10,
+				"currencyCode"= $11,
+				"currencySymbol"= $12,
+				profession= $13,
+				"userImage" = $14,
+				"userThumpImage"= $15,
+				"userMediumImage"= $16
 				WHERE "firebaseUId" = $1 RETURNING *`,
         [
           uid,
@@ -151,6 +152,7 @@ module.exports = {
           reqObj.firstName,
           reqObj.lastName,
           reqObj.phoneNumber,
+          reqObj.emailAddress,
           reqObj.stripeCustomerId,
           reqObj.latitude,
           reqObj.longitude,
