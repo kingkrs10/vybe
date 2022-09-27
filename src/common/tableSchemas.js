@@ -174,6 +174,7 @@ const shopMemberColumns = `
 const productsColumns = `
   "productId" uuid NOT NULL PRIMARY KEY,
   "productShopId" uuid,
+  "productUPC" character varying(250),
   "productName" character varying(250),
   "productDescription" text,
   "productPrice" numeric DEFAULT 0,
@@ -203,6 +204,19 @@ const productReviewsColumns = `
   "reviewImageURL" text[],
   "reviewThumpImageURL" text[],
   "reviewMediumImageURL" text[],
+  "isActive" boolean NOT NULL DEFAULT true,
+  "createdAt" timestamp with time zone DEFAULT current_timestamp,
+  "updatedAt" timestamp with time zone DEFAULT current_timestamp
+`;
+
+const upcColumns = `
+  "upcId" uuid NOT NULL PRIMARY KEY,
+  "upcCode" character varying(250),
+  "upcName" character varying(250),
+  "upcDescription" text,
+  "upcPrice" numeric DEFAULT 0,
+  "upcImageURL" text,
+  "upcCategory" text,
   "isActive" boolean NOT NULL DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -538,6 +552,7 @@ exports.productsHelper = new pgp.helpers.ColumnSet(
   [
     "productId",
     "productShopId",
+    "productUPC",
     "productName",
     "productDescription",
     "productPrice",
@@ -557,6 +572,23 @@ exports.productsHelper = new pgp.helpers.ColumnSet(
   ],
   {
     table: "products",
+  }
+);
+
+exports.upcHelper = new pgp.helpers.ColumnSet(
+  [
+    "upcId",
+    "upcCode",
+    "upcName",
+    "upcDescription",
+    "upcPrice",
+    "upcImageURL",
+    "upcCategory",
+    "isActive",
+    "createdAt",
+  ],
+  {
+    table: "upcCodes",
   }
 );
 
@@ -746,6 +778,7 @@ exports.shopCategoryItemsTbl = `CREATE TABLE IF NOT EXISTS public."shop_category
 exports.shopCollectionsTbl = `CREATE TABLE IF NOT EXISTS public."shopCollections" ( ${shopCollectionColumns} );`;
 exports.shopMembersTbl = `CREATE TABLE IF NOT EXISTS public.shop_members ( ${shopMemberColumns} );`;
 exports.productsTbl = `CREATE TABLE IF NOT EXISTS public.products ( ${productsColumns} );`;
+exports.upcTbl = `CREATE TABLE IF NOT EXISTS public.upcCodes ( ${upcColumns} );`;
 exports.productReviewsTbl = `CREATE TABLE IF NOT EXISTS public."productReviews" ( ${productReviewsColumns} );`;
 exports.ordersTbl = `CREATE TABLE IF NOT EXISTS public.orders ( ${ordersColumns} );`;
 exports.orderItemsTbl = `CREATE TABLE IF NOT EXISTS public."orderItems" ( ${orderItemsColumns} );`;

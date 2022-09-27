@@ -36,7 +36,7 @@ module.exports = {
           reqObj.shopMediumImageURL,
           reqObj.socialMedia,
           reqObj.shipping_processing_time,
-          reqObj.shipping_customs_and_import_taxes
+          reqObj.shipping_customs_and_import_taxes,
         ]
       );
       let success = true;
@@ -44,7 +44,7 @@ module.exports = {
 
       if (result.rowCount > 0) {
         await Promise.all(
-          reqObj.shopMembers.map(async item => {
+          reqObj.shopMembers.map(async (item) => {
             try {
               await shopMembersModel.create(
                 { ...item, shopId: reqObj.shopId },
@@ -58,7 +58,7 @@ module.exports = {
         );
 
         await Promise.all(
-          reqObj.shopCategoryItems.map(async item => {
+          reqObj.shopCategoryItems.map(async (item) => {
             try {
               await shopCategoryItems.create(
                 { ...item, shopId: reqObj.shopId },
@@ -120,7 +120,7 @@ module.exports = {
           reqObj.socialMedia,
           reqObj.shipping_processing_time,
           reqObj.shipping_customs_and_import_taxes,
-          reqObj.shopID
+          reqObj.shopID,
         ]
       );
       let success = true;
@@ -129,7 +129,7 @@ module.exports = {
         await shopMembersModel.remove({ shopId: reqObj.shopID }, client);
 
         await Promise.all(
-          reqObj.shopMembers.map(async item => {
+          reqObj.shopMembers.map(async (item) => {
             try {
               await shopMembersModel.create(
                 { ...item, shopId: reqObj.shopID },
@@ -145,7 +145,7 @@ module.exports = {
         await shopCategoryItems.remove({ shopId: reqObj.shopID }, client);
 
         await Promise.all(
-          reqObj.shopCategoryItems.map(async item => {
+          reqObj.shopCategoryItems.map(async (item) => {
             try {
               await shopCategoryItems.create(
                 { ...item, shopId: reqObj.shopID },
@@ -182,10 +182,11 @@ module.exports = {
          S."isActive",S."createdAt",S."updatedAt" , U."userImage", U."userThumpImage", U."userMediumImage"
          FROM shops S
          INNER JOIN users AS U ON U."userId" = S."userId"
-         WHERE S."shopId" = $1
+         WHERE S."userId" = $1
          `,
         [reqObj.id]
       );
+      // console.log(result);
       return { error: false, data: result.rows };
     } catch (error) {
       return { error: true, message: error.toString() };
@@ -237,7 +238,7 @@ module.exports = {
           reqObj.latitude,
           reqObj.longitude,
           limit,
-          reqObj.categoryId
+          reqObj.categoryId,
         ];
       }
 
@@ -265,5 +266,5 @@ module.exports = {
     } catch (error) {
       return { error: true, message: error.toString() };
     }
-  }
+  },
 };
