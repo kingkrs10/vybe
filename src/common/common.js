@@ -9,39 +9,20 @@ const usersModel = require("../users/model");
 const responseController = require("./ResponseController");
 
 const {
-  categoriesTbl,
-  categoryItemsTbl,
-  menusTbl,
-  offersTbl,
-  offersFavoritesTbl,
-  offersHashTagsTbl,
-  offersReportsTbl,
+  loansTbl,
   usersTbl,
   usersBlockedUsersTbl,
   usersCountryCurrencyTbl,
   usersInvitesTbl,
   statusTbl,
   paymentMethodsTbl,
-  shopsTbl,
-  shopCategoryItemsTbl,
-  shopCollectionsTbl,
-  shopMembersTbl,
-  productsTbl,
-  productReviewsTbl,
-  ordersTbl,
-  orderItemsTbl,
   transactionHistoriesTbl,
   notificationsTbl,
-  messagesTbl,
   currencyTbl,
-  chatsTbl,
-  serviceTbl,
-  serviceBookingTbl,
-  serviceReviewsTbl,
   shippingAddressesTbl,
 } = require("./tableSchemas");
 
-const intiQuery = `${categoriesTbl} ${categoryItemsTbl} ${menusTbl} ${offersTbl} ${offersFavoritesTbl} ${offersHashTagsTbl} ${offersReportsTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${shopsTbl} ${shopCategoryItemsTbl} ${shopCollectionsTbl} ${shopMembersTbl} ${productsTbl} ${productReviewsTbl} ${ordersTbl} ${orderItemsTbl} ${notificationsTbl} ${currencyTbl} ${chatsTbl} ${messagesTbl} ${transactionHistoriesTbl} ${serviceTbl} ${serviceBookingTbl} ${serviceReviewsTbl} ${shippingAddressesTbl}`;
+const intiQuery = `${loansTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${notificationsTbl} ${currencyTbl} ${transactionHistoriesTbl} ${shippingAddressesTbl}`;
 
 const tryBlock = async (data, modelName, model) => {
   let client = null;
@@ -74,8 +55,6 @@ const createJwtToken = async (userData) => {
     userId: userData.userId,
     firebaseUId: userData.uid,
     phoneNumber: userData.phoneNumber,
-    latitude: userData.latitude,
-    longitude: userData.longitude,
     logintime: Math.round(new Date().getTime() / 1000),
   };
   const token = jwt.sign(JSON.stringify(payload), config.app.secretKey);

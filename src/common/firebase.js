@@ -5,7 +5,7 @@ const { serviceAccountKey, firebaseProjectId } = require("../config/config");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountKey),
   storageBucket: firebaseProjectId,
-  databaseURL: "https://livera-development.firebaseio.com",
+  databaseURL: "https://gini-development.firebaseio.com",
 });
 
 // Cloud storage

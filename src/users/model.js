@@ -2,14 +2,24 @@ const _isEmpty = require("lodash/isEmpty");
 
 module.exports = {
   create: async (reqObj, client) => {
+    // console.log(`Request data: ${JSON.stringify(reqObj)}`);
     try {
       const result = await client.query(
-        `INSERT INTO users(
-				"userId", balance, "notificationUnReadcount", "deviceId",
-				"firstName", "lastName", "emailAddress", "phoneNumber", "stripeCustomerId",
-				"currencyCode", "currencySymbol", "firebaseUId",
-				"userImage", "userThumpImage", "userMediumImage",latitude, longitude)
-				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *`,
+        `INSERT INTO users (
+            "userId",
+            balance,
+            "notificationUnReadcount",
+            "deviceId",
+            "firstName",
+            "lastName",
+            "emailAddress",
+            "phoneNumber",
+            "stripeCustomerId",
+            "currencyCode",
+            "currencySymbol",
+            "firebaseUId"
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
         [
           reqObj.uid,
           reqObj.balance,
@@ -23,14 +33,11 @@ module.exports = {
           reqObj.currencyCode,
           reqObj.currencySymbol,
           reqObj.firebaseUId,
-          reqObj.imageURl,
-          reqObj.thump_imageURL,
-          reqObj.medium_imageURL,
-          reqObj.latitude,
-          reqObj.longitude,
         ]
       );
       let resultData = result.rowCount ? result.rows[0] : {};
+      // console.log(JSON.stringify(resultData));
+      // console.log(JSON.stringify(result.data));
       return {
         error: false,
         data: resultData,
@@ -95,14 +102,35 @@ module.exports = {
       const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
       const result = await client.query(
         `SELECT
-			"userId", balance, "notificationUnReadcount", "deviceId", "firstName", "lastName", "emailAddress", "phoneNumber", "createdAt", "stripeCustomerId", latitude,
-			longitude, "currencyCode", "currencySymbol", profession, "firebaseUId" as uid, "userImage", "userThumpImage", "userMediumImage"
+        "userId",
+        balance,
+        "notificationUnReadcount",
+        "deviceId",
+        "firstName",
+        "lastName",
+        "emailAddress",
+        "stripeCustomerId",
+        "currencyCode",
+        "currencySymbol",
+        "phoneNumber",
+        "dateOfBirth",
+        "gender",
+        "city",
+        "education",
+        "employer",
+        "monthlyRent",
+        "monthlyIncome",
+        "creditScore",
+        "idMatch",
+        "familyStatus",
+        "hasCar",
+        "firebaseUId" as uid
 			FROM users
 			${whereCondition} AND "isActive" = $2`,
         [val, true]
       );
       const data = result.rows[0] || {};
-      return { error: false, data, message: "get data successfully" };
+      return { error: false, data, message: "Get data successfully" };
     } catch (error) {
       return { error: true, message: error.toString() };
     }
@@ -125,47 +153,68 @@ module.exports = {
   },
 
   update: async (Obj, client) => {
+    // balance,
+    // "notificationUnReadcount",
+    // "deviceId",
+    // "firstName",
+    // "lastName",
+    // "emailAddress",
+    // "stripeCustomerId",
+    // "currencyCode",
+    // "currencySymbol",
+    // "phoneNumber",
+    // "dateOfBirth",
+    // "gender",
+    // "city",
+    // "education",
+    // "employer",
+    // "monthlyRent",
+    // "monthlyIncome",
+    // "creditScore",
+    // "idMatch",
+    // "familyStatus",
+    // "hasCar",
+    // console.log("update request " + JSON.stringify(Obj));
     try {
-      const { reqObj, uid } = Obj;
+      const { reqObj, userId } = Obj;
       const result = await client.query(
-        `UPDATE users SET
-				balance = $2,
-				"deviceId" = $3,
-				"firstName" = $4,
-        "lastName" = $5,
-				"phoneNumber" = $6,
-        "emailAddress" = $7,
-				"stripeCustomerId" = $8,
-				latitude = $9,
-				longitude= $10,
-				"currencyCode"= $11,
-				"currencySymbol"= $12,
-				profession= $13,
-				"userImage" = $14,
-				"userThumpImage"= $15,
-				"userMediumImage"= $16
-				WHERE "firebaseUId" = $1 RETURNING *`,
+        `UPDATE users SET 
+          "firstName" = $2,
+          "lastName" = $3,
+          "dateOfBirth" = $4,
+          "gender" = $5,
+          "city" = $6,
+          "education" = $7,
+          "employer" = $8,
+          "monthlyRent" = $9,
+          "monthlyIncome" = $10,
+          "creditScore" = $11,
+          "idMatch" = $12,
+          "familyStatus" = $13,
+          "hasCar" = $14,
+          "updatedAt" = now()
+        WHERE "userId" = $1 RETURNING *`,
         [
-          uid,
-          reqObj.balance,
-          `{${reqObj.deviceId}}`,
+          userId,
           reqObj.firstName,
           reqObj.lastName,
-          reqObj.phoneNumber,
-          reqObj.emailAddress,
-          reqObj.stripeCustomerId,
-          reqObj.latitude,
-          reqObj.longitude,
-          reqObj.currencyCode,
-          reqObj.currencySymbol,
-          reqObj.profession,
-          reqObj.imageURl,
-          reqObj.thump_imageURL,
-          reqObj.medium_imageURL,
+          reqObj.dateOfBirth,
+          reqObj.gender,
+          reqObj.city,
+          reqObj.education,
+          reqObj.employer,
+          reqObj.monthlyRent,
+          reqObj.monthlyIncome,
+          reqObj.creditScore,
+          reqObj.idMatch,
+          reqObj.familyStatus,
+          reqObj.hasCar,
         ]
       );
 
       let data = result.rowCount > 0 ? result.rows[0] : null;
+      // console.log(JSON.stringify(data));
+
       return { error: false, data: data, message: "Data saved successfully" };
     } catch (error) {
       return { error: true, message: error.toString() };

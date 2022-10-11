@@ -42,7 +42,7 @@ schedule.scheduleJob(rule, () => {
 
 app.listen(config.app.port, async () => {
   try {
-    console.log(`Cari Merchant API listening on port ${config.app.port}!`);
+    console.log(`Gini API listening on port ${config.app.port}!`);
     await commonModel.dbInit();
     console.log("All tables created successfully");
   } catch (error) {

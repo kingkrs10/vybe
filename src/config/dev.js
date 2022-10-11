@@ -7,7 +7,7 @@ module.exports = {
     port: "26257",
     // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
     connection_string:
-      "postgresql://cari:xBrxzsnzkck9CztBk80fNQ@free-tier5.gcp-europe-west1.cockroachlabs.cloud:26257/distribution?sslmode=verify-full&options=--cluster%3Dcari-distribution-4859",
+      "postgresql://ginidevelopment:sjlt8XRM0ZhOBskuhlMNww@free-tier5.gcp-europe-west1.cockroachlabs.cloud:26257/gini?sslmode=verify-full&options=--cluster%3Dgini-dev-5393",
   },
 
   // relational_db: {
@@ -26,21 +26,21 @@ module.exports = {
   },
   stripe_api_key:
     "sk_test_51HIi1UKuVVSM1kRYQEEPj5OFOR0vGhgGGp7P8NO8o6RwsLe5Mpv7a1c8xyZwTj81Y2GvdNlntTp9FFHas1f3F1Pj00EswMHlps",
-  firebaseProjectId: "cari-merchant-dev.appspot.com",
+  firebaseProjectId: "gini-development.appspot.com",
   serviceAccountKey: {
     type: "service_account",
-    project_id: "cari-merchant-dev",
-    private_key_id: "744e4a5fd4623e00771038554475b419bc775900",
+    project_id: "gini-development",
+    private_key_id: "919ec397c824d397cad65466a652a204d084b589",
     private_key:
-      "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCzfBtDGX9vo1Qq\n6NtVYpQi4r6o7aE575x2CXMj04pFl5FpBb8leGNONffCYneOgheLjGzNcIRzuSf/\nksDiODQ2jio52SaaZXG9fPTeMHPta8ln0BBfGo7BssqPmQ67I0cPvnz3zHSigTMx\naCVDGMNxvrdnV6MLbSi+UEdW4FFYd4T1BrpJLI/wPcoR/g9wR7iIvy03OO1BHv61\nXCT+IW1uPd/AoJnBnfzWCl67SLPT+Xbnv6rjx5IQxiCXGLdnpEGvXFUSa6hNzWmf\ntW9EJc7kzwZKIU6SMzMN8COekBzYadxXHj7myl0dxCVakMPx2SUE/QWtpcPlL1eL\n3oSrcu7xAgMBAAECggEAEKAJzGzTs40O8kyQaHfRneuf2njsarfpp7tXWXWyRKD1\n/KLmIjvlAu0Xzn8dcOtW7/upZlwqQKfhbxhyWmH3YChJ/ALDwyBraTBmZCBb1J2b\n0cxhf9WvbHy5q5RzW104q1orLC7ZjOXnzodFkFH+ZI5UYbOp7BiH4h0AhqkPj+CW\njrTE1VDtGH4Hm/j1AAsHO9AAcc4AmA5UHZ0tB6GKyLY2AlO0klKJHjBeGmsexT5Z\nWw7bMcZmZ3Zq6IQ/9xvIvI/zxLpnHVhfD6cI0MSx2ZYlWx8SNxEcEc+N92joXgqa\nmUg1T0iPUjzd5lYKUikR75Xyqr90V9xYV/A0ooCo2QKBgQDZc7q+VhcRjd2Yu4MV\nKTdtXWRV9aJLhRwfVIowJfjPt13QW1lesvLprdaAnAx6mIJLNeNMJhdLP7IksQhG\nTC4YnXr6hqRa6OUWdhL+v7HnxMY34POuMH1WL7ORqHsKcQhCz9qyUAA32ix6MtRk\nFyXQhg9vLAlOIorcyiN5HprVrQKBgQDTTV7P2yQRSnsCYVDJW+qEh2Iq8/mBnl5A\nDtkj+pE5pw+u4qTgQvogjtkKLcZeSQ+H5+pRbjEk5VPmWhzR3/1eIKylmmI0H4lb\n/xnT0VSQjpYVA+LdKmOk89gV7/kJl5rs7TiEfhU0r6XqqAtKhz+WVumc+Ke8qGdz\nAaOS48R+1QKBgQCg7Fhiy2s+/nHjucEERABU2yyJwMJeiR+KwBGUGEXN0rGGpFO7\nFUtXS+LWQqWphHvIFRUlIXtToMvBA5JQE8h5RvHfvQycioYe3TqpdEvAbYsTh1JO\nsmvPAHYvcTO9QnEOoKwEEdhXfQo1VLCBce/2JX/+keRBAqcpRh6CX/fN8QKBgQCM\n7NQoMtKKSa9itf7IXOo7O4Poe9FTdokLlhuSGGJVHiuiivxFqcXigwMT+9WKOpYG\nIVGwv5o9LknXnxALlaUI6yfaRu3qL4JP/gJ+t+T7iG1mVLIwqT3N3OeoMeVZVWh5\nTflcvC5udhtlNnBZY3ywSwUBsQFGHNbp6BTtOcVqhQKBgEKrbPs7Zv8XPEvpVYi/\nPR30QSd5eZcqGjgpL1No7WL6sNELZhzZNdfPJ7uPJeFUCQ3EeQONCwyWMC6aFLmb\n3ZXaJqMxs/uzOYZ/xN+IEv2bo3bm2gRZ3Yr1Bbia63AUKZnXBhB66syQSJ+RWvT3\nxc5kGeuXlQEQsgfiIy0mMxhC\n-----END PRIVATE KEY-----\n",
+      "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCilvNRfgWZaUwQ\ncK9sdp1lenP1BUK9P54awheru0G4ExRU1MEHDjDlGRQJgxEkRB2dl+XBGWUn0+tx\nVOxB89GVqCj0SN76BboPj/6ZE7Jf+FU/bDsrEEpo7nMWLHnJQNI1u9P5d0Je4Fsh\nD91g1smP/lc3e0jq9/rgbvfhC9lOaVNI0Kewjf6JeYhYz6sYKnvSRjrwmcualOqU\ncfNg/SXsiviMLZ4GORWoLHBqFb92YKVdWlZWFKgZ8UDzcva/v70T9zopXk275YK5\n5B1VGfj0h4hVrn9z0A29N3rGFXOzCkzf29TUguSNtUDEQRURGZ8UCdJtf3vcjU17\nefP6KLlzAgMBAAECggEAOvNkUX3R5efJzoQs9rSjKPIXLRW1Nwzj9Gu/TWLd1zID\nwyZIvpgknkxTeYduJaoU2tkCUts0VBaAXV0fNGKE8TBBeSEax6hf59ibxUDhAe72\nacKCSYDkmdsrGzURCylXjmgF2YOmKuRJ5ljsOXpnJrBfSxyGObuj2NAjTBORvN3b\nNOanAF52ZYHx9m7s0U7EarsaYsDatU3MJNbXei4vuwQwAZfwOVFKmpViEaOjinTb\neFr0lBYGv1iG7JikmWUjrWQjLn7stA+UJoSyg2ZN5eYla9NSuQShi5GcNmX6qY/8\nREVa/aMC44ruXp6VrFMVpFkrOc7C51VAAZFN+ygIMQKBgQDZtGv/ZZXyM5ReITNB\nfhdqhMNjmpwjN6GcfZ3BPTmcLrojTo/tAZEVylqS879CZiKPqD0zlBj/b5+gwcqP\n/oXgqLaJKrq77gcxuWWwWUdlF8ShOdNrvDwLABKtMWaUedLLRBXeCpEhjapPEUqz\nOnj5ysdYaYtsHaR0bsDIgTIjFwKBgQC/MJxK9jVy69DJgptHUWwlWM6RHaHPBMNT\nZ4iKeK8n0aPPbOQF21WVQNQT0HjdZiruJ9jX3uSCJWGyaR/d3cHPosgFn9/CS741\nh0hlcPF7yspokEQn5ykyNGphdTNq8HISqQHZ4jTPcshSXSFjCQSPOmexYXevPFVC\nChodWrCGBQKBgDtHUmTfj128x7h9x8wcflnFvsI/ViaMvlezKKJ2flpVqt90Q+Jg\nG9ZYHCOJdVmqH90IDWoe+FONXGTUf8iHoIKUzec5mFEVtiXG+rZzCOqw9xyDd1sN\njTfdlDhOjET/ivNIHcAxFmWRgn83ESUOVeSGX5NmYc1VoPMHOT0fWLyPAoGATqWh\ndViojfihb3NRitncodRRTPKikDVGYDXTvhp8+uVK/FWvyxT5tKbxVqFIRtLzT/qG\nQe7Hkx3rfWevGyZQxqgQnfexJQzhVsWqq0f1nlXCQ5cs4jk+Ag/7vtFmcFQuqKxr\nPYTG8psl+nOi+0lHXd/JrfcJM8We0Ma1DWQz/z0CgYEArHOX7BWgIb3BvmqYT1m0\nNbhkDrRfVhDm4QR2g54cLc0aOSB7fYL46l05dDWCtzCuD5ePdCngyjOkEi6o5wCC\nmYgp6iuSfhJRFQ61LDUGQOOx9QQnL8o/1NeS+srZc2As/5v7lm5oCXKfhu74SP9g\n/d5L43aWv65lfjNGfz8DMmU=\n-----END PRIVATE KEY-----\n",
     client_email:
-      "firebase-adminsdk-lwqsm@cari-merchant-dev.iam.gserviceaccount.com",
-    client_id: "114443609571435768452",
+      "firebase-adminsdk-dw3oz@gini-development.iam.gserviceaccount.com",
+    client_id: "105877144529929266369",
     auth_uri: "https://accounts.google.com/o/oauth2/auth",
     token_uri: "https://oauth2.googleapis.com/token",
     auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
     client_x509_cert_url:
-      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-lwqsm%40cari-merchant-dev.iam.gserviceaccount.com",
+      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-dw3oz%40gini-development.iam.gserviceaccount.com",
   },
   twilioTest: {
     accountSid: "AC7527c54a4e94b4cf887855d63d55287b",
@@ -49,7 +49,7 @@ module.exports = {
   firbaseDatabaseFileName: "luhu-dev-firebase-database.json",
   firbaseCredentialsFileName: "serviceAccountKey-dev.json",
   users_collection_name: "users",
-  offers_collection_name: "offers",
+  loans_collection_name: "loans",
   currency_collection_name: "currency",
   transaction_history_collection_name: "transactionHistory",
 };

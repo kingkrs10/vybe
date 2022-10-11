@@ -17,41 +17,18 @@ const { firebaseAdmin } = require("../common/firebase");
 const create = async (request, response) => {
   try {
     const userId = uuidv4();
-    // var imagePath = null;
-    // var mediumImagePath = null;
-    // var thumpImagePath = null;
-
-    // if (!_isEmpty(request.body.profileImage)) {
-    //   imagePath = request.body.profileImage;
-    // }
-
-    // if (
-    //   request.body.profileMediumImage &&
-    //   !_isEmpty(request.body.profileMediumImage)
-    // ) {
-    //   mediumImagePath = request.body.profileMediumImage;
-    // }
-
-    // if (
-    //   request.body.profileThumpImage &&
-    //   !_isEmpty(request.body.profileThumpImage)
-    // ) {
-    //   thumpImagePath = request.body.profileThumpImage;
-    // }
 
     const tempBody = {
       ...request.body,
-      // imageURl: imagePath,
-      // userMediumImage: mediumImagePath,
-      // userThumpImage: thumpImagePath,
       uid: userId,
     };
-    // console.log(tempBody);
+    // console.log(JSON.stringify(tempBody));
     const result = await commonModel.tryBlock(
       tempBody,
       "(User:create)",
       usersModel.create
     );
+    // console.log(result.data);
     if (result.error) {
       sendErrorResponse(response, result.message);
     } else if (!_isEmpty(result.data)) {
@@ -89,6 +66,7 @@ const getAll = async (request, response, next) => {
 };
 
 const getOne = async (request, response, next) => {
+  // console.log(request.params.id);
   try {
     const result = await commonModel.tryBlock(
       { id: request.params.id },
@@ -98,21 +76,21 @@ const getOne = async (request, response, next) => {
     if (result.error) {
       sendErrorResponse(response, result.message);
     } else if (!_isEmpty(result.data)) {
-      const resUserCountryCurrency = await commonModel.tryBlock(
-        result.data.userid,
-        "(Offers:getUserCountryCurrency)",
-        userCountryCurrencyModel.getUserCountryCurrency
-      );
-      const resultData = {
-        ...result.data,
-        countryCurrency: resUserCountryCurrency.data,
-        currencyDetails: {
-          code: result.data.currencyCode,
-          symbol: result.data.currencySymbol,
-        },
-      };
-
-      sendSuccessResponse(response, resultData);
+      // const resUserCountryCurrency = await commonModel.tryBlock(
+      //   result.data.userid,
+      //   "(Offers:getUserCountryCurrency)",
+      //   userCountryCurrencyModel.getUserCountryCurrency
+      // );
+      // const resultData = {
+      //   ...result.data,
+      //   countryCurrency: resUserCountryCurrency.data,
+      //   currencyDetails: {
+      //     code: result.data.currencyCode,
+      //     symbol: result.data.currencySymbol,
+      //   },
+      // };
+      // console.log(result.data);
+      sendSuccessResponse(response, result.data);
     } else {
       sendNoContentResponse(response);
     }
@@ -131,24 +109,6 @@ const update = async (request, response, next) => {
           reqObj: request.body,
           uid: request.params.id,
         };
-
-        if (!_isEmpty(request.body.profileImage)) {
-          data.reqObj.imageURl = request.body.profileImage;
-        }
-
-        if (
-          request.body.profileMediumImage &&
-          !_isEmpty(request.body.profileMediumImage)
-        ) {
-          data.reqObj.medium_imageURL = request.body.profileMediumImage;
-        }
-
-        if (
-          request.body.profileThumpImage &&
-          !_isEmpty(request.body.profileThumpImage)
-        ) {
-          data.reqObj.thump_imageURL = request.body.profileThumpImage;
-        }
 
         const result = await commonModel.tryBlock(
           data,
@@ -237,6 +197,7 @@ const updateBlockedUsers = async (request, response, next) => {
 };
 
 const getAuthToken = async (request, response, next) => {
+  console.log(request.params);
   try {
     const result = await commonModel.tryBlock(
       { phoneNumber: request.params.phoneNumber },
