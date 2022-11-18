@@ -90,7 +90,7 @@ module.exports = {
     try {
       const result = await client.query(
         `SELECT
-				O."loanId", O."createdAt", O."updatedAt", O."userId", O."isActive",
+				O."loanId", O."createdAt", O."updatedAt", O."userId", O."isActive", O."loanAmount", O."loanDuration", O."facilitationFee",
 				U."firstName", U."firebaseUId" uid
 				FROM loans O
 				INNER JOIN users U ON U."userId" = O."userId"

@@ -18,8 +18,9 @@ module.exports = {
             "currencyCode",
             "currencySymbol",
             "firebaseUId"
+            "level"
         ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
         [
           reqObj.uid,
           reqObj.balance,
@@ -33,6 +34,7 @@ module.exports = {
           reqObj.currencyCode,
           reqObj.currencySymbol,
           reqObj.firebaseUId,
+          0,
         ]
       );
       let resultData = result.rowCount ? result.rows[0] : {};
@@ -124,6 +126,7 @@ module.exports = {
         "idMatch",
         "familyStatus",
         "hasCar",
+        "level",
         "firebaseUId" as uid
 			FROM users
 			${whereCondition} AND "isActive" = $2`,
@@ -153,28 +156,6 @@ module.exports = {
   },
 
   update: async (Obj, client) => {
-    // balance,
-    // "notificationUnReadcount",
-    // "deviceId",
-    // "firstName",
-    // "lastName",
-    // "emailAddress",
-    // "stripeCustomerId",
-    // "currencyCode",
-    // "currencySymbol",
-    // "phoneNumber",
-    // "dateOfBirth",
-    // "gender",
-    // "city",
-    // "education",
-    // "employer",
-    // "monthlyRent",
-    // "monthlyIncome",
-    // "creditScore",
-    // "idMatch",
-    // "familyStatus",
-    // "hasCar",
-    // console.log("update request " + JSON.stringify(Obj));
     try {
       const { reqObj, userId } = Obj;
       const result = await client.query(
@@ -192,6 +173,7 @@ module.exports = {
           "idMatch" = $12,
           "familyStatus" = $13,
           "hasCar" = $14,
+          "level" = $15,
           "updatedAt" = now()
         WHERE "userId" = $1 RETURNING *`,
         [
@@ -209,6 +191,7 @@ module.exports = {
           reqObj.idMatch,
           reqObj.familyStatus,
           reqObj.hasCar,
+          reqObj.level,
         ]
       );
 
