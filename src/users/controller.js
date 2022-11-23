@@ -197,7 +197,7 @@ const updateBlockedUsers = async (request, response, next) => {
 };
 
 const getAuthToken = async (request, response, next) => {
-  console.log(request.params);
+  // console.log(request.params);
   try {
     const result = await commonModel.tryBlock(
       { phoneNumber: request.params.phoneNumber },

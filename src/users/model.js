@@ -247,7 +247,7 @@ module.exports = {
       );
 
       let data = result.rowCount > 0 ? result.rows[0] : null;
-      console.log(data);
+      // console.log(data);
       return {
         error: false,
         data: data,

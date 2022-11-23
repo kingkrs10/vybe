@@ -32,7 +32,7 @@ const createCustomer = async (request, response, next) => {
           "(Stripe:createNewCustomer)",
           userModel.updateStripeId
         );
-        console.log(result);
+        // console.log(result);
         sendSuccessResponse(response, result);
       })
       .catch((err) => {
@@ -68,7 +68,7 @@ const getAllCardDetails = async (request, response, next) => {
     await stripe.customers
       .listSources(request.body.customer_Id, { object: "card", limit: 10 })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         const result = {
           error: false,
           data: res.data,
@@ -130,7 +130,7 @@ const geCustomerDetails = async (request, response, next) => {
     await stripe.customers
       .retrieve(request.body.customer_Id)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         const result = {
           error: false,
           data: res,
