@@ -11,6 +11,7 @@ const {
 const stripe = Stripe(config.stripe_api_key);
 
 const createCustomer = async (request, response, next) => {
+  // console.log(request);
   try {
     await stripe.customers
       .create({
@@ -20,12 +21,18 @@ const createCustomer = async (request, response, next) => {
         description: request.body.name,
       })
       .then(async (res) => {
-        const tempBody = { ...request.body, stripeCustomerId: res.id };
+        const tempBody = {
+          ...request.body,
+          uid: request.currentUser.userId,
+          stripeCustomerId: res.id,
+        };
+        // console.log(tempBody);
         const result = await commonModel.tryBlock(
           tempBody,
           "(Stripe:createNewCustomer)",
-          userModel.updateStripeCustomerId
+          userModel.updateStripeId
         );
+        console.log(result);
         sendSuccessResponse(response, result);
       })
       .catch((err) => {
@@ -61,6 +68,7 @@ const getAllCardDetails = async (request, response, next) => {
     await stripe.customers
       .listSources(request.body.customer_Id, { object: "card", limit: 10 })
       .then((res) => {
+        console.log(res);
         const result = {
           error: false,
           data: res.data,
@@ -122,6 +130,7 @@ const geCustomerDetails = async (request, response, next) => {
     await stripe.customers
       .retrieve(request.body.customer_Id)
       .then((res) => {
+        console.log(res);
         const result = {
           error: false,
           data: res,

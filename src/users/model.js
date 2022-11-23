@@ -236,14 +236,23 @@ module.exports = {
   },
 
   updateStripeId: async (reqObj, client) => {
+    console.log(reqObj);
     try {
       const result = await client.query(
         `UPDATE users SET
-				"stripeCustomerId" = $2
-				WHERE "userId" = $1`,
+				"stripeCustomerId" = $2,
+        "updatedAt" = now()
+				WHERE "userId" = $1 RETURNING *`,
         [reqObj.uid, reqObj.stripeCustomerId]
       );
-      return { error: false, message: "Data update successfully" };
+
+      let data = result.rowCount > 0 ? result.rows[0] : null;
+      console.log(data);
+      return {
+        error: false,
+        data: data,
+        message: "Data update successfully",
+      };
     } catch (error) {
       return { error: true, message: error.toString() };
     }
