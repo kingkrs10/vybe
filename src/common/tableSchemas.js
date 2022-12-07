@@ -1,41 +1,51 @@
 const { pgp } = require("./pgHelper");
 
-const loansColumns = `
-  "loanId" uuid NOT NULL PRIMARY KEY,
+const eventsColumns = `
+  "eventId" uuid NOT NULL PRIMARY KEY,
   "userId" uuid NOT NULL,
-  "loanAmount" numeric,
-  "loanDuration" character varying(10),
-  "facilitationFee" numeric,
+  "name" character varying(150),
+  "description" text, 
+  "category" character varying(30),
+  "type" character varying(10),
+  "address" character varying(150),
+  "country" character varying(30),
+  "city" character varying(30),
+  "state" character varying(30),
+  "postalCode" character varying(10),
+  "virtualUrl" text, 
+  "password" character varying(150), 
+  "timezone" character varying(150), 
+  "startDate" date DEFAULT current_date,
+  "startTime" time with time zone DEFAULT current_time,
+  "endDate" date,
+  "endTime" time with time zone,
+  "endVisible" boolean DEFAULT false, 
+  "image" text,
+  "website" text, 
+  "twitter"  character varying(150),
+  "facebook"  character varying(150),
+  "instagram"  character varying(150),
   "isActive" boolean NOT NULL DEFAULT true,
-  "dueAt" timestamp with time zone DEFAULT current_timestamp,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
 `;
 
 const usersColumns = `
   "userId" uuid NOT NULL PRIMARY KEY,
-  balance numeric DEFAULT 0,
+  "balance" numeric DEFAULT 0,
   "notificationUnReadcount" numeric,
   "deviceId" text[],
   "firstName" character varying(150),
   "lastName" character varying(150),
+  "password" character varying(150),
   "emailAddress" character varying(150),
   "stripeCustomerId" character varying(30),
   "currencyCode" character varying(10),
   "currencySymbol" character varying(5),
   "phoneNumber" character varying(25),
   "firebaseUId" character varying(50),
-  "dateOfBirth" timestamp with time zone,
-  "gender" character varying(10),
-  "city" character varying(10),
-  "education" character varying(50),
-  "employer" character varying(150),
-  monthlyRent numeric,
-  monthlyIncome numeric,
-  creditScore numeric,
+  "country" character varying(150),
   "idMatch" boolean DEFAULT false,
-  "familyStatus" character varying(25),
-  "hasCar" boolean DEFAULT false,
   "senderId" uuid,
   "isActive" boolean NOT NULL DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
@@ -50,11 +60,11 @@ const usersBlockedUsersColumns = `
 
 const usersCountryCurrencyColumns = `
   "userId" uuid NOT NULL,
-  amount numeric,
+  "amount" numeric,
   "oppPersonBalance" numeric,
-  currency character varying(5),
-  label character varying(5),
-  value character varying(5),
+  "currency" character varying(5),
+  "label" character varying(5),
+  "value" character varying(5),
   "balanceData" character varying(20),
   "createdAt" timestamp with time zone DEFAULT current_timestamp
 `;
@@ -81,11 +91,11 @@ const paymentMethodsColumns = `
   "createdAt" timestamp with time zone DEFAULT current_timestamp
 `;
 
-const transactionHistoriesColumns = `
+const transactionsColumns = `
   "transactionId" uuid NOT NULL  PRIMARY KEY,
   "senderUserId" uuid NOT NULL,
   "receiverUserId" uuid NOT NULL,
-  amount numeric,
+  "amount" numeric,
   "senderCurrencyCode" character varying(10),
   "senderSymbol" character varying(5),
   "firebaseTransactionId" character varying(50),
@@ -107,7 +117,7 @@ const currencyColumns = `
   "currencyDetails" text[]
 `;
 
-const shippingAddressesColumns = `
+const addressesColumns = `
   "addressId" uuid NOT NULL PRIMARY KEY,
   "firstName" character varying(250),
   "lastName" character varying(250),
@@ -125,17 +135,36 @@ const shippingAddressesColumns = `
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
 `;
 
-exports.loansHelper = new pgp.helpers.ColumnSet(
+exports.eventsHelper = new pgp.helpers.ColumnSet(
   [
-    "loanId",
+    "eventId",
     "userId",
-    "loanAmount",
-    "loanDuration",
-    "facilitationFee",
+    "name",
+    "description",
+    "category",
+    "type",
+    "address",
+    "country",
+    "city",
+    "state",
+    "postalCode",
+    "virtualUrl",
+    "password",
+    "timezone",
+    "startDate",
+    "startTime",
+    "endDate",
+    "endTime",
+    "endVisible",
+    "image",
+    "website",
+    "twitter",
+    "facebook",
+    "instagram",
     "isActive",
   ],
   {
-    table: "loans",
+    table: "events",
   }
 );
 
@@ -145,26 +174,17 @@ exports.usersHelper = new pgp.helpers.ColumnSet(
     "balance",
     "notificationUnReadcount",
     "deviceId",
-    "fisrtName",
+    "firstName",
     "lastName",
+    "password",
     "emailAddress",
     "stripeCustomerId",
     "currencyCode",
     "currencySymbol",
-    "isActive",
     "phoneNumber",
     "firebaseUId",
-    "dateOfBirth",
-    "gender",
-    "city",
-    "education",
-    "employer",
-    "monthlyRent",
-    "monthlyIncome",
-    "creditScore",
+    "country",
     "idMatch",
-    "familyStatus",
-    "hasCar",
     "senderId",
   ],
   {
@@ -215,7 +235,7 @@ exports.paymentMethodsHelper = new pgp.helpers.ColumnSet(
   }
 );
 
-exports.shipppingAddressesHelper = new pgp.helpers.ColumnSet(
+exports.addressesHelper = new pgp.helpers.ColumnSet(
   [
     "addressId",
     "firstName",
@@ -233,11 +253,11 @@ exports.shipppingAddressesHelper = new pgp.helpers.ColumnSet(
     "createdAt",
   ],
   {
-    table: "shippingAddresses",
+    table: "addresses",
   }
 );
 
-exports.transactionHistoriesHelper = new pgp.helpers.ColumnSet(
+exports.transactionsHelper = new pgp.helpers.ColumnSet(
   [
     "transactionId",
     "amount",
@@ -249,7 +269,7 @@ exports.transactionHistoriesHelper = new pgp.helpers.ColumnSet(
     "createdAt",
   ],
   {
-    table: "transactionHistories",
+    table: "transactions",
   }
 );
 
@@ -260,14 +280,14 @@ exports.notificationsHelper = new pgp.helpers.ColumnSet(
   }
 );
 
-exports.loansTbl = `CREATE TABLE IF NOT EXISTS public.loans ( ${loansColumns} );`;
-exports.usersTbl = `CREATE TABLE IF NOT EXISTS public.users ( ${usersColumns} );`;
+exports.eventsTbl = `CREATE TABLE IF NOT EXISTS public."events" ( ${eventsColumns} );`;
+exports.usersTbl = `CREATE TABLE IF NOT EXISTS public."users" ( ${usersColumns} );`;
 exports.usersBlockedUsersTbl = `CREATE TABLE IF NOT EXISTS public."users_blockedUsers" ( ${usersBlockedUsersColumns} );`;
 exports.usersCountryCurrencyTbl = `CREATE TABLE IF NOT EXISTS public."users_countryCurrency" ( ${usersCountryCurrencyColumns} );`;
-exports.usersInvitesTbl = `CREATE TABLE IF NOT EXISTS public.users_invites ( ${usersInvitesColumns} );`;
-exports.statusTbl = `CREATE TABLE IF NOT EXISTS public.status ( ${statusColumns} );`;
+exports.usersInvitesTbl = `CREATE TABLE IF NOT EXISTS public."users_invites" ( ${usersInvitesColumns} );`;
+exports.statusTbl = `CREATE TABLE IF NOT EXISTS public."status" ( ${statusColumns} );`;
 exports.paymentMethodsTbl = `CREATE TABLE IF NOT EXISTS public."paymentMethods" ( ${paymentMethodsColumns} );`;
-exports.transactionHistoriesTbl = `CREATE TABLE IF NOT EXISTS public."transactionHistories" ( ${transactionHistoriesColumns} );`;
-exports.notificationsTbl = `CREATE TABLE IF NOT EXISTS public.notifications ( ${notificationsColumns} );`;
-exports.currencyTbl = `CREATE TABLE IF NOT EXISTS public.currency ( ${currencyColumns} );`;
-exports.shippingAddressesTbl = `CREATE TABLE IF NOT EXISTS public."shippingAddresses" (${shippingAddressesColumns})`;
+exports.transactionsTbl = `CREATE TABLE IF NOT EXISTS public."transactions" ( ${transactionsColumns} );`;
+exports.notificationsTbl = `CREATE TABLE IF NOT EXISTS public."notifications" ( ${notificationsColumns} );`;
+exports.currencyTbl = `CREATE TABLE IF NOT EXISTS public."currency" ( ${currencyColumns} );`;
+exports.addressesTbl = `CREATE TABLE IF NOT EXISTS public."addresses" (${addressesColumns})`;

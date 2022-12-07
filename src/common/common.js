@@ -9,20 +9,20 @@ const usersModel = require("../users/model");
 const responseController = require("./ResponseController");
 
 const {
-  loansTbl,
+  eventsTbl,
   usersTbl,
   usersBlockedUsersTbl,
   usersCountryCurrencyTbl,
   usersInvitesTbl,
   statusTbl,
   paymentMethodsTbl,
-  transactionHistoriesTbl,
+  transactionsTbl,
   notificationsTbl,
   currencyTbl,
-  shippingAddressesTbl,
+  addressesTbl,
 } = require("./tableSchemas");
 
-const intiQuery = `${loansTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${notificationsTbl} ${currencyTbl} ${transactionHistoriesTbl} ${shippingAddressesTbl}`;
+const initQuery = `${eventsTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${notificationsTbl} ${currencyTbl} ${transactionsTbl} ${addressesTbl}`;
 
 const tryBlock = async (data, modelName, model) => {
   let client = null;
@@ -62,42 +62,44 @@ const createJwtToken = async (userData) => {
 };
 
 const authMiddleware = async (request, response, next) => {
-  const token = request.headers.authorization;
-  if (!_isUndefined(token)) {
-    let authorization = token;
-    if (token.includes("Bearer")) {
-      authorization = token.split(" ")[1];
-    }
-    try {
-      jwt.verify(authorization, config.app.secretKey, async (err, decoded) => {
-        if (err) {
-          responseController.sendNotAuthorizedResponse(response);
-        }
-        if (decoded) {
-          const checkUserExist = await tryBlock(
-            { id: decoded.userId },
-            "(User:check auth Middleware)",
-            usersModel.getOne
-          );
-          if (checkUserExist) {
-            request.currentUser = decoded;
-            next();
-            return;
-          }
-        }
-      });
-    } catch (error) {
-      responseController.sendNotAuthorizedResponse(response);
-    }
-  } else {
-    responseController.sendNotAuthorizedResponse(response);
-  }
+  next();
+  return;
+  // const token = request.headers.authorization;
+  // if (!_isUndefined(token)) {
+  //   let authorization = token;
+  //   if (token.includes("Bearer")) {
+  //     authorization = token.split(" ")[1];
+  //   }
+  //   try {
+  //     jwt.verify(authorization, config.app.secretKey, async (err, decoded) => {
+  //       if (err) {
+  //         responseController.sendNotAuthorizedResponse(response);
+  //       }
+  //       if (decoded) {
+  //         const checkUserExist = await tryBlock(
+  //           { id: decoded.userId },
+  //           "(User:check auth Middleware)",
+  //           usersModel.getOne
+  //         );
+  //         if (checkUserExist) {
+  //           request.currentUser = decoded;
+  //           next();
+  //           return;
+  //         }
+  //       }
+  //     });
+  //   } catch (error) {
+  //     responseController.sendNotAuthorizedResponse(response);
+  //   }
+  // } else {
+  //   responseController.sendNotAuthorizedResponse(response);
+  // }
 };
 
 const dbInit = async () => {
   const client = await pgHelper.getClientFromPool();
   try {
-    await client.query(intiQuery);
+    await client.query(initQuery);
   } catch (error) {
     console.log(error);
     throw error.message;

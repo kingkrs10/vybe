@@ -7,18 +7,8 @@ module.exports = {
     port: "26257",
     // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
     connection_string:
-      "postgresql://ginidevelopment:sjlt8XRM0ZhOBskuhlMNww@free-tier5.gcp-europe-west1.cockroachlabs.cloud:26257/gini?sslmode=verify-full&options=--cluster%3Dgini-dev-5393",
+      "postgresql://kenroy:O_8Dc7SHNUIpJhDvagPEYQ@tickets-dev-6117.8nj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
   },
-
-  // relational_db: {
-  //   host: "35.202.0.126",
-  //   port: 5432,
-  //   user: "postgres",
-  //   pass: "n9Lyi5Eboh1O3KKt",
-  //   database: "distribution",
-  //   cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
-  // },
-
   app: {
     port: 3333,
     secretKey:
