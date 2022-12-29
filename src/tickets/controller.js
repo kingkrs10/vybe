@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const _map = require("lodash/map");
 const _isEmpty = require("lodash/isEmpty");
 
-const eventsModel = require("./model");
+const ticketsModel = require("./model");
 const usersModel = require("../users/model");
 const commonModel = require("../common/common");
 const {
@@ -15,20 +15,20 @@ const {
 
 const create = async (request, response) => {
   try {
-    const eventId = uuidv4();
+    const ticketId = uuidv4();
     //  console.log(request.body);
 
     const tempBody = {
       ...request.body,
       // userId: request.currentUser,
-      eventId: eventId,
+      ticketId: ticketId,
     };
-    console.log(tempBody);
+    // console.log(tempBody);
 
     const result = await commonModel.tryBlock(
       tempBody,
-      "(Events:create)",
-      eventsModel.create
+      "(Tickets:create)",
+      ticketsModel.create
     );
 
     if (result.error) {
@@ -53,7 +53,7 @@ const update = async (request, response, next) => {
     const result = await commonModel.tryBlock(
       data,
       "(Events:update)",
-      eventsModel.update
+      ticketsModel.update
     );
     if (result.error) {
       sendErrorResponse(response, result.message);
@@ -71,9 +71,9 @@ const getAll = async (request, response, next) => {
   // console.log(request);
   try {
     const result = await commonModel.tryBlock(
-      { uid: request.query.uid, pageNo: request.query.pageNo },
+      { eventId: request.query.eventId, pageNo: request.query.pageNo },
       "(Events:getAll)",
-      eventsModel.getAll
+      ticketsModel.getAll
     );
     if (result.error) {
       sendErrorResponse(response, result.message);
@@ -93,7 +93,7 @@ const getOne = async (request, response, next) => {
     const result = await commonModel.tryBlock(
       request,
       "(Events:getOne)",
-      eventsModel.getOne
+      ticketsModel.getOne
     );
     console.log(result);
     if (result.error) {
@@ -113,7 +113,7 @@ const remove = async (request, response, next) => {
     const result = await commonModel.tryBlock(
       request.params.id,
       "(Events:remove)",
-      eventsModel.remove
+      ticketsModel.remove
     );
     if (result.error) {
       sendErrorResponse(response, result.message);

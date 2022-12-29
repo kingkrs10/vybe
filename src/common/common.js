@@ -10,6 +10,7 @@ const responseController = require("./ResponseController");
 
 const {
   eventsTbl,
+  ticketsTbl,
   usersTbl,
   usersBlockedUsersTbl,
   usersCountryCurrencyTbl,
@@ -22,7 +23,7 @@ const {
   addressesTbl,
 } = require("./tableSchemas");
 
-const initQuery = `${eventsTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${notificationsTbl} ${currencyTbl} ${transactionsTbl} ${addressesTbl}`;
+const initQuery = `${eventsTbl} ${ticketsTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${notificationsTbl} ${currencyTbl} ${transactionsTbl} ${addressesTbl}`;
 
 const tryBlock = async (data, modelName, model) => {
   let client = null;

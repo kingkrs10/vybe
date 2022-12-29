@@ -4,57 +4,35 @@ module.exports = {
   create: async (reqObj, client) => {
     try {
       const result = await client.query(
-        `INSERT INTO events
-				("eventId", 
-        "userId", 
+        `INSERT INTO tickets
+				("ticketId",
+        "eventId",
         "name",
         "description",
-        "category",
         "type",
-        "address",
-        "country",
-        "city",
-        "state",
-        "postalCode",
-        "virtualUrl",
-        "password",
-        "timezone",
+        "price",
+        "quantity",
+        "limit",
         "startDate",
         "startTime",
         "endDate",
         "endTime",
-        "endVisible",
-        "image",
-        "website",
-        "twitter",
-        "facebook",
-        "instagram") 
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) RETURNING *`,
+        "invitationOnly") 
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
         [
+          reqObj.ticketId,
           reqObj.eventId,
-          reqObj.userId,
           reqObj.name,
           reqObj.description,
-          reqObj.category,
           reqObj.type,
-          reqObj.address,
-          reqObj.country,
-          reqObj.city,
-          reqObj.state,
-          reqObj.postalCode,
-          reqObj.virtualUrl,
-          reqObj.password,
-          reqObj.timezone,
+          reqObj.price,
+          reqObj.quantity,
+          reqObj.limit,
           reqObj.startDate,
           reqObj.startTime,
           reqObj.endDate,
           reqObj.endTime,
-          reqObj.endVisible,
-          reqObj.image,
-          reqObj.website,
-          reqObj.twitter,
-          reqObj.facebook,
-          reqObj.instagram,
+          reqObj.invitationOnly,
         ]
       );
 
@@ -101,7 +79,7 @@ module.exports = {
   },
 
   getAll: async (reqObj, client) => {
-    // console.log(reqObj.uid);
+    // console.log(reqObj.eventId);
     try {
       const limit = reqObj.limit ? reqObj.limit : 50;
       const pageNo =
@@ -109,32 +87,23 @@ module.exports = {
           ? 0
           : (parseInt(reqObj.pageNo) - 1) * limit + 1;
       const result = await client.query(
-        `SELECT "eventId", "userId", "name",
+        `SELECT "ticketId",
+        "eventId",
+        "name",
         "description",
-        "category",
         "type",
-        "address",
-        "country",
-        "city",
-        "state",
-        "postalCode",
-        "virtualUrl",
-        "password",
-        "timezone",
+        "price",
+        "quantity",
+        "limit",
         "startDate",
         "startTime",
         "endDate",
         "endTime",
-        "endVisible",
-        "image",
-        "website",
-        "twitter",
-        "facebook",
-        "instagram", "isActive", "createdAt", "updatedAt" 
-				FROM events
-				WHERE "userId" = $1
-         		AND "isActive" = $2`,
-        [reqObj.uid, true]
+        "invitationOnly" 
+				FROM tickets
+				WHERE "eventId" = $1
+        AND "isActive" = $2`,
+        [reqObj.eventId, true]
       );
       const data = result.rows || [];
       return { error: false, data, message: "get all data successfully" };
@@ -145,33 +114,25 @@ module.exports = {
 
   getOne: async (reqObj, client) => {
     const { currentUser } = reqObj;
-    const id = reqObj.params ? reqObj.params.id : reqObj.loanId;
+    const id = reqObj.params ? reqObj.params.id : reqObj.eventId;
     try {
       const result = await client.query(
         `SELECT
-				O."eventId", O."createdAt", O."updatedAt", O."userId", O."isActive", "description","name",
-        "category",
+				"ticketId",
+        "eventId",
+        "name",
+        "description",
         "type",
-        "address",
-        O."country",
-        "city",
-        "state",
-        "postalCode",
-        "virtualUrl",
-        O."password",
-        "timezone",
+        "price",
+        "quantity",
+        "limit",
         "startDate",
         "startTime",
         "endDate",
         "endTime",
-        "endVisible",
-        "image",
-        "website",
-        "twitter",
-        "facebook",
-        "instagram"
-				FROM events O
-				WHERE O."eventId" = $1`,
+        "invitationOnly" 
+				FROM tickets
+				WHERE "eventId" = $1`,
         [id]
       );
       const data = result.rows[0] || {};

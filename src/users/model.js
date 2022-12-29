@@ -9,7 +9,6 @@ module.exports = {
             "userId",
             balance,
             "notificationUnReadcount",
-            "deviceId",
             "firstName",
             "lastName",
             "emailAddress",
@@ -18,14 +17,12 @@ module.exports = {
             "currencyCode",
             "currencySymbol",
             "firebaseUId"
-            "level"
         ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
         [
           reqObj.uid,
           reqObj.balance,
           0,
-          `{${reqObj.deviceId}}`,
           reqObj.firstName,
           reqObj.lastName,
           reqObj.emailAddress,
@@ -34,7 +31,6 @@ module.exports = {
           reqObj.currencyCode,
           reqObj.currencySymbol,
           reqObj.firebaseUId,
-          0,
         ]
       );
       let resultData = result.rowCount ? result.rows[0] : {};
@@ -100,8 +96,8 @@ module.exports = {
         ? `WHERE "userId" =$1`
         : obj.id
         ? `WHERE "firebaseUId" = $1`
-        : `WHERE "phoneNumber" = $1`;
-      const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.phoneNumber;
+        : `WHERE "emailAddress" = $1`;
+      const val = obj.uid ? obj.uid : obj.id ? obj.id : obj.emailAddress;
       const result = await client.query(
         `SELECT
         "userId",
@@ -115,18 +111,6 @@ module.exports = {
         "currencyCode",
         "currencySymbol",
         "phoneNumber",
-        "dateOfBirth",
-        "gender",
-        "city",
-        "education",
-        "employer",
-        "monthlyRent",
-        "monthlyIncome",
-        "creditScore",
-        "idMatch",
-        "familyStatus",
-        "hasCar",
-        "level",
         "firebaseUId" as uid
 			FROM users
 			${whereCondition} AND "isActive" = $2`,

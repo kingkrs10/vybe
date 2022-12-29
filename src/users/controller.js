@@ -69,7 +69,7 @@ const getOne = async (request, response, next) => {
   // console.log(request.params.id);
   try {
     const result = await commonModel.tryBlock(
-      { id: request.params.id },
+      { emailAddress: request.params.emailAddress },
       "(User:getOne)",
       usersModel.getOne
     );
@@ -200,10 +200,11 @@ const getAuthToken = async (request, response, next) => {
   // console.log(request.params);
   try {
     const result = await commonModel.tryBlock(
-      { phoneNumber: request.params.phoneNumber },
+      { emailAddress: request.params.emailAddress },
       "(User:getAuthToken)",
       usersModel.getOne
     );
+    // console.log(result);
     if (result.error) {
       sendErrorResponse(response, result.message);
     } else if (!_isEmpty(result.data)) {

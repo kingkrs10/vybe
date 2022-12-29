@@ -6,6 +6,7 @@ const eventsColumns = `
   "name" character varying(150),
   "description" text, 
   "category" character varying(30),
+  "status" character varying(30),
   "type" character varying(10),
   "address" character varying(150),
   "country" character varying(30),
@@ -25,6 +26,25 @@ const eventsColumns = `
   "twitter"  character varying(150),
   "facebook"  character varying(150),
   "instagram"  character varying(150),
+  "isActive" boolean NOT NULL DEFAULT true,
+  "createdAt" timestamp with time zone DEFAULT current_timestamp,
+  "updatedAt" timestamp with time zone DEFAULT current_timestamp
+`;
+
+const ticketsColumns = `
+  "ticketId" uuid NOT NULL PRIMARY KEY,
+  "eventId" uuid NOT NULL,
+  "name" character varying(150),
+  "description" text,
+  "type" character varying(10),
+  "price" numeric,
+  "quantity" numeric,
+  "limit" numeric,
+  "startDate" date DEFAULT current_date,
+  "startTime" time with time zone DEFAULT current_time,
+  "endDate" date,
+  "endTime" time with time zone,
+  "invitationOnly" boolean DEFAULT false,
   "isActive" boolean NOT NULL DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -142,6 +162,7 @@ exports.eventsHelper = new pgp.helpers.ColumnSet(
     "name",
     "description",
     "category",
+    "status",
     "type",
     "address",
     "country",
@@ -165,6 +186,28 @@ exports.eventsHelper = new pgp.helpers.ColumnSet(
   ],
   {
     table: "events",
+  }
+);
+
+exports.ticketsHelper = new pgp.helpers.ColumnSet(
+  [
+    "ticketId",
+    "eventId",
+    "name",
+    "description",
+    "type",
+    "price",
+    "quantity",
+    "limit",
+    "startDate",
+    "startTime",
+    "endDate",
+    "endTime",
+    "invitationOnly",
+    "isActive",
+  ],
+  {
+    table: "tickets",
   }
 );
 
@@ -281,6 +324,7 @@ exports.notificationsHelper = new pgp.helpers.ColumnSet(
 );
 
 exports.eventsTbl = `CREATE TABLE IF NOT EXISTS public."events" ( ${eventsColumns} );`;
+exports.ticketsTbl = `CREATE TABLE IF NOT EXISTS public."tickets" ( ${ticketsColumns} );`;
 exports.usersTbl = `CREATE TABLE IF NOT EXISTS public."users" ( ${usersColumns} );`;
 exports.usersBlockedUsersTbl = `CREATE TABLE IF NOT EXISTS public."users_blockedUsers" ( ${usersBlockedUsersColumns} );`;
 exports.usersCountryCurrencyTbl = `CREATE TABLE IF NOT EXISTS public."users_countryCurrency" ( ${usersCountryCurrencyColumns} );`;
