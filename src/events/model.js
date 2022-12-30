@@ -143,9 +143,51 @@ module.exports = {
     }
   },
 
+  getAllEvents: async (reqObj, client) => {
+    // console.log(reqObj.uid);
+    try {
+      const limit = reqObj.limit ? reqObj.limit : 50;
+      const pageNo =
+        parseInt(reqObj.pageNo) === 1
+          ? 0
+          : (parseInt(reqObj.pageNo) - 1) * limit + 1;
+      const result = await client.query(
+        `SELECT "eventId", "userId", "name",
+        "description",
+        "category",
+        "type",
+        "address",
+        "country",
+        "city",
+        "state",
+        "postalCode",
+        "virtualUrl",
+        "password",
+        "timezone",
+        "startDate",
+        "startTime",
+        "endDate",
+        "endTime",
+        "endVisible",
+        "image",
+        "website",
+        "twitter",
+        "facebook",
+        "instagram", "isActive", "createdAt", "updatedAt" 
+				FROM events
+				WHERE "isActive" = $1`,
+        [true]
+      );
+      const data = result.rows || [];
+      return { error: false, data, message: "get all data successfully" };
+    } catch (error) {
+      return { error: true, message: error.toString() };
+    }
+  },
+
   getOne: async (reqObj, client) => {
     const { currentUser } = reqObj;
-    const id = reqObj.params ? reqObj.params.id : reqObj.loanId;
+    const id = reqObj.params ? reqObj.params.id : reqObj.eventId;
     try {
       const result = await client.query(
         `SELECT

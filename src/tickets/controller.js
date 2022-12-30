@@ -95,7 +95,7 @@ const getOne = async (request, response, next) => {
       "(Events:getOne)",
       ticketsModel.getOne
     );
-    console.log(result);
+    // console.log(result);
     if (result.error) {
       sendErrorResponse(response, result.message);
     } else if (!_isEmpty(result.data)) {

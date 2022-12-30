@@ -87,6 +87,26 @@ const getAll = async (request, response, next) => {
   }
 };
 
+const getAllEvents = async (request, response, next) => {
+  // console.log(request);
+  try {
+    const result = await commonModel.tryBlock(
+      { pageNo: request.query.pageNo },
+      "(Events:getAll)",
+      eventsModel.getAllEvents
+    );
+    if (result.error) {
+      sendErrorResponse(response, result.message);
+    } else if (!_isEmpty(result.data)) {
+      sendSuccessResponse(response, result.data);
+    } else {
+      sendNoContentResponse(response);
+    }
+  } catch (err) {
+    sendInternalErrorResponse(response, { message: err.toString() });
+  }
+};
+
 const getOne = async (request, response, next) => {
   // console.log(request);
   try {
@@ -95,7 +115,7 @@ const getOne = async (request, response, next) => {
       "(Events:getOne)",
       eventsModel.getOne
     );
-    console.log(result);
+    // console.log(result);
     if (result.error) {
       sendErrorResponse(response, result.message);
     } else if (!_isEmpty(result.data)) {
@@ -130,6 +150,7 @@ const remove = async (request, response, next) => {
 module.exports = {
   create,
   getAll,
+  getAllEvents,
   getOne,
   update,
   remove,
