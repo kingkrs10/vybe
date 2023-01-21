@@ -23,7 +23,7 @@ const create = async (request, response) => {
       // userId: request.currentUser,
       eventId: eventId,
     };
-    console.log(tempBody);
+    // console.log(tempBody);
 
     const result = await commonModel.tryBlock(
       tempBody,

@@ -9,9 +9,11 @@ const config = require("./src/config/config");
 // const currencyModel = require("./src/currency/model");
 const commonModel = require("./src/common/common");
 const app = express();
+const helmet = require("helmet");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(helmet());
 app.use(cors());
 app.use("/", router);
 
