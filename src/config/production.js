@@ -15,7 +15,7 @@ module.exports = {
       "YuxhBVW8uv6mxpTeYjJLMtTsiHB5rrkIuoClx8l9/JvsAlvtuZ5w9SAwLUFAvE6DJXjXYsnizg3BKYv/oED37Dy98e5sCNy4JnDhD7tpHdW9xjBkj+i9d1U9Z/U9SKLuU+PqkjtX/Avy8Qq9pHjZ+u9crI+MExwW7WzNgv3dB1CwQM852Dzfk7NBV4PXZ3WqvirnLFy4CoyIspbjMjfNQ/t7/3gXLsVMKqGYVVAws5SxqHcMdP/qiAdFdETAHnyVLrwZL4hB3ke6Xm5Ub5v1En6nzwJiEAxG9OtbcT+LKvnKHMKrS6La+ZstGEyoMiVIJvKInwqkpvQDZOXe2SQhfA==",
   },
   stripe_api_key:
-    "sk_test_51M2DUyLlJQFM2ARjMUbU3Q6zhgVdUjD9oTbLu5MKXZ9whP37LqwHTiDmh3oEedsyefEdS8IR7MSpCoCrbm6D0m8I00cAPpHSnj",
+    "sk_test_51MTFXaCUhdRlkvtY2q9Qx0tbsJbzli82TEIT6a16leZAa8lESaaKyIPkX4w7VncdrubFuiybmol7jNADGD7Tem0A00mZnjKLXk",
   firebaseProjectId: "gini-development.appspot.com",
   serviceAccountKey: {
     type: "service_account",

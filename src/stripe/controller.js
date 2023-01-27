@@ -174,6 +174,42 @@ const payWithStripe = async (request, response, next) => {
   }
 };
 
+const paymentIntent = async (request, response, next) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 1099,
+      currency: "usd",
+      automatic_payment_methods: { enabled: true },
+    });
+    sendSuccessResponse(response, {
+      client_secret: paymentIntent.client_secret,
+    });
+    // let checkData =
+    //   request.body.cardId === ""
+    //     ? {
+    //         amount: request.body.amount * 100,
+    //         currency: request.body.currency,
+    //         customer: request.body.customer_Id,
+    //       }
+    //     : {
+    //         amount: request.body.amount * 100,
+    //         currency: request.body.currency,
+    //         customer: request.body.customer_Id,
+    //         card: request.body.cardId,
+    //       };
+    // await stripe.charges
+    //   .create(checkData)
+    //   .then((result) => {
+    //     sendSuccessResponse(response, result);
+    //   })
+    //   .catch((err) => {
+    //     sendErrorResponse(response, err.toString());
+    //   });
+  } catch (err) {
+    sendInternalErrorResponse(response);
+  }
+};
+
 module.exports = {
   createCustomer,
   createCustomerCard,
@@ -182,4 +218,5 @@ module.exports = {
   updateDefaultPaymentCard,
   geCustomerDetails,
   payWithStripe,
+  paymentIntent,
 };

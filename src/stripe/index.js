@@ -1,49 +1,42 @@
 const express = require("express");
 const router = express.Router();
 const stripeController = require("./controller");
-const { authMiddleware } = require('../common/common');
+const { authMiddleware } = require("../common/common");
+
+router.post("/createCustomer", authMiddleware, stripeController.createCustomer);
 
 router.post(
-    "/createCustomer",
-    authMiddleware,
-    stripeController.createCustomer
+  "/createCustomerCard",
+  authMiddleware,
+  stripeController.createCustomerCard
 );
 
 router.post(
-    "/createCustomerCard",
-    authMiddleware,
-    stripeController.createCustomerCard
+  "/defaultpaymentcard",
+  authMiddleware,
+  stripeController.updateDefaultPaymentCard
 );
 
 router.post(
-    "/defaultpaymentcard",
-    authMiddleware,
-    stripeController.updateDefaultPaymentCard
+  "/customerDetails",
+  authMiddleware,
+  stripeController.geCustomerDetails
 );
 
 router.post(
-    "/customerDetails",
-    authMiddleware,
-    stripeController.geCustomerDetails
+  "/customerCardDetails",
+  authMiddleware,
+  stripeController.getAllCardDetails
 );
 
-router.post(
-    "/customerCardDetails",
-    authMiddleware,
-    stripeController.getAllCardDetails
-);
+router.post("/payment", authMiddleware, stripeController.payWithStripe);
 
-router.post(
-    "/payment",
-    authMiddleware,
-    stripeController.payWithStripe
-);
+router.get("/paymentIntent", authMiddleware, stripeController.paymentIntent);
 
 router.delete(
-    "/removeCustomerCard/:id/:cardId",
-    authMiddleware,
-    stripeController.removeCustomerCard
+  "/removeCustomerCard/:id/:cardId",
+  authMiddleware,
+  stripeController.removeCustomerCard
 );
-
 
 module.exports = router;
