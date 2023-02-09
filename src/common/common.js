@@ -21,9 +21,10 @@ const {
   notificationsTbl,
   currencyTbl,
   addressesTbl,
+  guestlistsTbl,
 } = require("./tableSchemas");
 
-const initQuery = `${eventsTbl} ${ticketsTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${notificationsTbl} ${currencyTbl} ${transactionsTbl} ${addressesTbl}`;
+const initQuery = `${eventsTbl} ${ticketsTbl} ${usersTbl} ${usersBlockedUsersTbl} ${usersCountryCurrencyTbl} ${usersInvitesTbl} ${statusTbl} ${paymentMethodsTbl} ${notificationsTbl} ${currencyTbl} ${transactionsTbl} ${addressesTbl} ${guestlistsTbl}`;
 
 const tryBlock = async (data, modelName, model) => {
   let client = null;

@@ -1,6 +1,7 @@
 const commonModel = require("../common/common");
 const config = require("../config/config");
 const userModel = require("../users/model");
+const transactionsModel = require("../transactions/model");
 const Stripe = require("stripe");
 const {
   sendErrorResponse,
@@ -16,14 +17,13 @@ const createCustomer = async (request, response, next) => {
     await stripe.customers
       .create({
         name: request.body.name,
-        source: request.body.token,
-        phone: request.body.phone,
-        description: request.body.name,
+        email: request.body.email,
       })
       .then(async (res) => {
+        // console.log(res);
         const tempBody = {
           ...request.body,
-          uid: request.currentUser.userId,
+          // uid: request.userId,
           stripeCustomerId: res.id,
         };
         // console.log(tempBody);
@@ -174,37 +174,57 @@ const payWithStripe = async (request, response, next) => {
   }
 };
 
+const webhook = async (request, response, next) => {
+  const event = request.body;
+
+  switch (event.type) {
+    case "payment_intent.succeeded":
+      const paymentIntent = event.data.object;
+      // Then define and call a method to handle the successful payment intent.
+      // handlePaymentIntentSucceeded(paymentIntent);
+      try {
+        await stripe.charges
+          .create(checkData)
+          .then((result) => {
+            sendSuccessResponse(response, result);
+          })
+          .catch((err) => {
+            sendErrorResponse(response, err.toString());
+          });
+      } catch (err) {
+        sendInternalErrorResponse(response);
+      }
+      break;
+    case "payment_method.attached":
+      const paymentMethod = event.data.object;
+      // Then define and call a method to handle the successful attachment of a PaymentMethod.
+      // handlePaymentMethodAttached(paymentMethod);
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+  response.json({ received: true });
+};
+
 const paymentIntent = async (request, response, next) => {
+  // console.log(
+  //   request.query.amount,
+  //   request.query.currency,
+  //   request.query.customer
+  // );
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: 1099,
-      currency: "usd",
+    const intent = await stripe.paymentIntents.create({
+      amount: request.query.amount,
+      currency: request.query.currency,
+      customer: request.query.customer,
+      setup_future_usage: "off_session",
       automatic_payment_methods: { enabled: true },
     });
+    // console.log(intent);
     sendSuccessResponse(response, {
-      client_secret: paymentIntent.client_secret,
+      client_secret: intent.client_secret,
     });
-    // let checkData =
-    //   request.body.cardId === ""
-    //     ? {
-    //         amount: request.body.amount * 100,
-    //         currency: request.body.currency,
-    //         customer: request.body.customer_Id,
-    //       }
-    //     : {
-    //         amount: request.body.amount * 100,
-    //         currency: request.body.currency,
-    //         customer: request.body.customer_Id,
-    //         card: request.body.cardId,
-    //       };
-    // await stripe.charges
-    //   .create(checkData)
-    //   .then((result) => {
-    //     sendSuccessResponse(response, result);
-    //   })
-    //   .catch((err) => {
-    //     sendErrorResponse(response, err.toString());
-    //   });
   } catch (err) {
     sendInternalErrorResponse(response);
   }
@@ -219,4 +239,5 @@ module.exports = {
   geCustomerDetails,
   payWithStripe,
   paymentIntent,
+  webhook,
 };

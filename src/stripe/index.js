@@ -39,4 +39,6 @@ router.delete(
   stripeController.removeCustomerCard
 );
 
+router.post("/webhook", authMiddleware, stripeController.webhook);
+
 module.exports = router;

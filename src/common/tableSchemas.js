@@ -20,7 +20,8 @@ const eventsColumns = `
   "startTime" time with time zone DEFAULT current_time,
   "endDate" date,
   "endTime" time with time zone,
-  "endVisible" boolean DEFAULT false, 
+  "endVisible" boolean DEFAULT true,
+  "mapVisible" boolean DEFAULT false,
   "image" text,
   "website" text, 
   "twitter"  character varying(150),
@@ -46,6 +47,36 @@ const ticketsColumns = `
   "endTime" time with time zone,
   "invitationOnly" boolean DEFAULT false,
   "isActive" boolean NOT NULL DEFAULT true,
+  "createdAt" timestamp with time zone DEFAULT current_timestamp,
+  "updatedAt" timestamp with time zone DEFAULT current_timestamp
+`;
+
+const transactionsColumns = `
+  "transactionId" uuid NOT NULL PRIMARY KEY,
+  "userId" uuid NOT NULL,
+  "eventId" uuid NOT NULL,
+  "stripeCustomerId" character varying(30),
+  "totalAmount" numeric,
+  "feeAmount" numeric,
+  "subTotal" numeric,
+  "rawData" jsonb,
+  "createdAt" timestamp with time zone DEFAULT current_timestamp,
+  "updatedAt" timestamp with time zone DEFAULT current_timestamp
+`;
+
+const guestlistsColumns = `
+  "guestlistId" uuid NOT NULL PRIMARY KEY,
+  "ticketId" uuid NOT NULL,
+  "eventId" uuid NOT NULL,
+  "transactionId" uuid NOT NULL,
+  "name" character varying(150),
+  "email" character varying(150),
+  "type" character varying(10),
+  "price" numeric,
+  "startDate" date DEFAULT current_date,
+  "startTime" time with time zone DEFAULT current_time,
+  "endDate" date,
+  "endTime" time with time zone,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
 `;
@@ -109,18 +140,6 @@ const paymentMethodsColumns = `
   "paymentMethodName" character varying(250),
   "isActive" boolean NOT NULL DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp
-`;
-
-const transactionsColumns = `
-  "transactionId" uuid NOT NULL  PRIMARY KEY,
-  "senderUserId" uuid NOT NULL,
-  "receiverUserId" uuid NOT NULL,
-  "amount" numeric,
-  "senderCurrencyCode" character varying(10),
-  "senderSymbol" character varying(5),
-  "firebaseTransactionId" character varying(50),
-  "createdAt" timestamp with time zone DEFAULT current_timestamp,
-  "updatedAt" timestamp with time zone DEFAULT current_timestamp
 `;
 
 const notificationsColumns = `
@@ -303,16 +322,40 @@ exports.addressesHelper = new pgp.helpers.ColumnSet(
 exports.transactionsHelper = new pgp.helpers.ColumnSet(
   [
     "transactionId",
-    "amount",
-    "senderUId",
-    "receiverUId",
-    "senderCurrencyCode",
-    "senderSymbol",
-    "firebaseTransactionId",
+    "userId",
+    "eventId",
+    "totalAmount",
+    "stripeCustomerId",
+    "feeAmount",
+    "subTotal",
+    "rawData",
     "createdAt",
+    "updatedAt",
   ],
   {
     table: "transactions",
+  }
+);
+
+exports.guestlistsHelper = new pgp.helpers.ColumnSet(
+  [
+    "guestlistId",
+    "ticketId",
+    "eventId",
+    "transactionId",
+    "name",
+    "email",
+    "type",
+    "price",
+    "startDate",
+    "startTime",
+    "endDate",
+    "endTime",
+    "createdAt",
+    "updatedAt",
+  ],
+  {
+    table: "guestlists",
   }
 );
 
@@ -333,5 +376,6 @@ exports.statusTbl = `CREATE TABLE IF NOT EXISTS public."status" ( ${statusColumn
 exports.paymentMethodsTbl = `CREATE TABLE IF NOT EXISTS public."paymentMethods" ( ${paymentMethodsColumns} );`;
 exports.transactionsTbl = `CREATE TABLE IF NOT EXISTS public."transactions" ( ${transactionsColumns} );`;
 exports.notificationsTbl = `CREATE TABLE IF NOT EXISTS public."notifications" ( ${notificationsColumns} );`;
+exports.guestlistsTbl = `CREATE TABLE IF NOT EXISTS public."guestlists" ( ${guestlistsColumns} );`;
 exports.currencyTbl = `CREATE TABLE IF NOT EXISTS public."currency" ( ${currencyColumns} );`;
-exports.addressesTbl = `CREATE TABLE IF NOT EXISTS public."addresses" (${addressesColumns})`;
+exports.addressesTbl = `CREATE TABLE IF NOT EXISTS public."addresses" ( ${addressesColumns} );`;
