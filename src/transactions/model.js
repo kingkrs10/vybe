@@ -85,6 +85,7 @@ module.exports = {
           "userId",
           "eventId",
           "stripeCustomerId",
+          "ticketsSold",
           "totalAmount",
           "feeAmount",
           "subTotal",
