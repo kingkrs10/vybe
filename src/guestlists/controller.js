@@ -68,7 +68,7 @@ const update = async (request, response, next) => {
 };
 
 const getAll = async (request, response, next) => {
-  console.log(request);
+  // console.log(request);
   try {
     const result = await commonModel.tryBlock(
       { eventId: request.query.eventId, pageNo: request.query.pageNo },
