@@ -2,35 +2,38 @@ const _isEmpty = require("lodash/isEmpty");
 
 module.exports = {
   create: async (reqObj, client) => {
+    console.log("reqObj", reqObj);
     try {
       const result = await client.query(
         `INSERT INTO events
-				("eventId", 
-        "userId", 
-        "name",
-        "description",
-        "category",
-        "type",
-        "address",
-        "country",
-        "city",
-        "state",
-        "postalCode",
-        "virtualUrl",
-        "password",
-        "timezone",
-        "startDate",
-        "startTime",
-        "endDate",
-        "endTime",
-        "endVisible",
-        "image",
-        "website",
-        "twitter",
-        "facebook",
-        "instagram",
-        "lat",
-        "lng") 
+				(
+          "eventId", 
+          "userId", 
+          "name",
+          "description",
+          "category",
+          "type",
+          "address",
+          "country",
+          "city",
+          "state",
+          "postalCode",
+          "virtualUrl",
+          "password",
+          "timezone",
+          "startDate",
+          "startTime",
+          "endDate",
+          "endTime",
+          "endVisible",
+          "image",
+          "website",
+          "twitter",
+          "facebook",
+          "instagram",
+          "lat",
+          "lng"
+        ) 
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26) RETURNING *`,
         [
           reqObj.eventId,
@@ -61,6 +64,8 @@ module.exports = {
           reqObj.lng,
         ]
       );
+      // .then((res) => console.log(res.rows[0]))
+      // .catch((e) => console.error(e.stack));
 
       let data = result.rowCount > 0 ? result.rows[0] : null;
       // console.log(data);

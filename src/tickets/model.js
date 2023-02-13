@@ -35,6 +35,8 @@ module.exports = {
           reqObj.invitationOnly,
         ]
       );
+      // .then((res) => console.log(res.rows[0]))
+      // .catch((e) => console.error(e.stack));
 
       let data = result.rowCount > 0 ? result.rows[0] : null;
       // console.log(data);
