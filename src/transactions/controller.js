@@ -3,6 +3,7 @@ const _map = require("lodash/map");
 const _isEmpty = require("lodash/isEmpty");
 const transactionsModel = require("./model");
 const guestlistsModel = require("../guestlists/model");
+const emailController = require("../email/controller");
 const commonModel = require("../common/common");
 const {
   sendErrorResponse,
@@ -33,8 +34,10 @@ const create = async (request, response) => {
     // process guests and create guestlists
     //
 
+    let guestlist_for_email = [];
+
     const guestlist = _map(request.body.guests, (guest) => {
-      return Object.values({
+      const data = {
         guestlistId: uuidv4(),
         ticketId: guest.ticketId,
         eventId: guest.eventId,
@@ -47,12 +50,18 @@ const create = async (request, response) => {
         startTime: guest.startTime,
         endDate: guest.endDate,
         endTime: guest.endTime,
-      });
+      };
+      guestlist_for_email.push(data);
+      return Object.values(data);
     });
 
-    // const guestsBody = {
-    //   guests: guestlist,
-    // };
+    const guestsBody = {
+      guests: guestlist_for_email,
+      total: request.body.total,
+      name: request.body.name,
+      email: request.body.email,
+      date: Date.now(),
+    };
 
     // console.log(transaction);
 
@@ -62,6 +71,9 @@ const create = async (request, response) => {
         "(Guestlists:create)",
         guestlistsModel.create
       );
+      // console.log(guestsBody);
+
+      await emailController.sendTransaction(guestsBody);
     }
 
     if (result.error) {

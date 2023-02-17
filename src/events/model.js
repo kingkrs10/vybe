@@ -2,7 +2,7 @@ const _isEmpty = require("lodash/isEmpty");
 
 module.exports = {
   create: async (reqObj, client) => {
-    console.log("reqObj", reqObj);
+    // console.log("reqObj", reqObj);
     try {
       const result = await client.query(
         `INSERT INTO events
