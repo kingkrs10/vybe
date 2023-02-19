@@ -16,23 +16,17 @@ const {
 const create = async (request, response) => {
   try {
     const transactionId = uuidv4();
-    // console.log(request.body);
 
     const transactionBody = {
       ...request.body,
       transactionId: transactionId,
     };
-    // console.log(tempBody);
 
     const transaction = await commonModel.tryBlock(
       transactionBody,
       "(Transactions:create)",
       transactionsModel.create
     );
-
-    // create transaction then process guests
-    // process guests and create guestlists
-    //
 
     let guestlist_for_email = [];
 
@@ -47,9 +41,7 @@ const create = async (request, response) => {
         type: guest.type,
         price: guest.price,
         startDate: guest.startDate,
-        startTime: guest.startTime,
         endDate: guest.endDate,
-        endTime: guest.endTime,
       };
       guestlist_for_email.push(data);
       return Object.values(data);
@@ -63,17 +55,18 @@ const create = async (request, response) => {
       date: Date.now(),
     };
 
-    // console.log(transaction);
-
     if (transaction.data != undefined) {
       const guestlists = await commonModel.tryBlock(
         guestlist,
         "(Guestlists:create)",
         guestlistsModel.create
       );
-      // console.log(guestsBody);
 
       await emailController.sendTransaction(guestsBody);
+
+      guestlist_for_email.map(async (guest) => {
+        await emailController.sendTickets(guest);
+      });
     }
 
     if (result.error) {

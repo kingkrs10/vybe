@@ -4,6 +4,8 @@ const _isEmpty = require("lodash/isEmpty");
 const client = require("@sendgrid/mail");
 const { sendgrid } = require("../config/config");
 client.setApiKey(sendgrid);
+const qrcode = require("qrcode");
+const moment = require("moment");
 
 // const eventsModel = require("./model");
 // const usersModel = require("../users/model");
@@ -39,6 +41,7 @@ const sendTransaction = async (request, response) => {
             guestlist: request.guests,
             subtotal: request.total.subtotal,
             total: request.total.total,
+            date: moment(new Date(Date.now())).format("MMMM, Do YYYY — h:mm A"),
           },
         },
       ],
@@ -58,7 +61,12 @@ const sendTransaction = async (request, response) => {
 
 const sendTickets = async (request, response) => {
   try {
+    let QRCode = await qrcode.toDataURL(request.guestlistId);
     const message = {
+      from: {
+        email: "hello@vybe.events",
+        name: "Hello from VYBE",
+      },
       personalizations: [
         {
           to: [
@@ -67,73 +75,39 @@ const sendTickets = async (request, response) => {
               name: request.name,
             },
           ],
+          dynamic_template_data: {
+            name: request.name,
+            email: request.email,
+            transaction: request.transactionId,
+            type: request.type,
+            price: request.price,
+            startDate: moment(request.startDate).format(
+              "MMMM, Do YYYY — h:mm A"
+            ),
+            date: moment(new Date(Date.now())).format("MMMM, Do YYYY — h:mm A"),
+          },
         },
       ],
-      from: {
-        email: "hello@vybe.vents",
-        name: "Hello from Vybe",
-      },
-      subject: "Your VYBE Ticket Order Confirmation",
-      mailSettings: {
-        bypassListManagement: {
-          enable: false,
+      attachments: [
+        {
+          filename: "qrcode.png",
+          type: "image/png",
+          content: QRCode.replace("data:image/png;base64,", ""),
+          content_id: "qrcode",
+          cid: "qrcode",
+          disposition: "inline",
+          encoding: "base64",
         },
-        footer: {
-          enable: false,
-        },
-        sandboxMode: {
-          enable: false,
-        },
-      },
-      trackingSettings: {
-        clickTracking: {
-          enable: true,
-          enableText: false,
-        },
-        openTracking: {
-          enable: true,
-          substitutionTag: "%open-track%",
-        },
-        subscriptionTracking: {
-          enable: false,
-        },
-        template_id: "d-f4a57e96d1b84d83af0482c8e63a629a",
-        dynamic_template_data: {
-          name: request.name,
-          email: request.email,
-          guestlist: request.guests,
-          subtotal: request.total.subtotal,
-          total: request.total.total,
-        },
-      },
+      ],
+      template_id: "d-3860d05e3be443c285d3e8767f0a43af",
     };
 
     client
       .send(message)
-      .then(() => console.log("Mail sent successfully"))
+      // .then(() => console.log("Mail sent successfully"))
       .catch((error) => {
         console.error(error);
       });
-    // const eventId = uuidv4();
-    // //  console.log(request.body);
-    // const tempBody = {
-    //   ...request.body,
-    //   // userId: request.currentUser,
-    //   eventId: eventId,
-    // };
-    // console.log(tempBody);
-    // const result = await commonModel.tryBlock(
-    //   tempBody,
-    //   "(Events:create)",
-    //   eventsModel.create
-    // );
-    // if (result.error) {
-    //   sendErrorResponse(response, result.message);
-    // } else if (!_isEmpty(result.data)) {
-    //   sendCreatedResponse(response, result.data);
-    // } else {
-    //   sendInternalErrorResponse(response);
-    // }
   } catch (err) {
     sendInternalErrorResponse(response, { message: err.toString() });
   }
