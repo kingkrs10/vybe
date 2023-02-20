@@ -46,8 +46,8 @@ const create = async (request, response) => {
 const update = async (request, response, next) => {
   try {
     const data = {
-      reqObj: { ...request.body, currentUser: request.currentUser },
-      offerId: request.params.id,
+      ...request.body,
+      eventId: request.params.id,
     };
 
     const result = await commonModel.tryBlock(

@@ -125,6 +125,7 @@ const update = async (request, response, next) => {
       "(Events:update)",
       eventsModel.update
     );
+
     if (result.error) {
       sendErrorResponse(response, result.message);
     } else if (!_isEmpty(result.data)) {

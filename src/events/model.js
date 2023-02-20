@@ -75,29 +75,66 @@ module.exports = {
     }
   },
 
-  update: async (Obj, client) => {
+  update: async (reqObj, client) => {
     try {
-      const { reqObj, offerId } = Obj;
-
       const result = await client.query(
-        `UPDATE loans SET
-				"headLine" = $2,
-				"offerDescription" = $3,
-				"locationName" = $4,
-				latitude = $5,
-				longitude = $6,
-				"offerImage" = $7,
-				"offerThumpImage" = $8,
-				"offerMediumImage" = $9,
+        `UPDATE events SET
+        "userId" = $2, 
+        "name" = $3,
+        "description" = $4,
+        "category" = $5,
+        "type" = $6,
+        "address" = $7,
+        "country" = $8,
+        "city" = $9,
+        "state" = $10,
+        "postalCode" = $11,
+        "virtualUrl" = $12,
+        "password" = $13,
+        "timezone" = $14,
+        "startDate" = $15,
+        "startTime" = $16,  
+        "endDate" = $17,
+        "endTime" = $18,
+        "endVisible"  = $19,
+        "image" = $20,
+        "website" = $21,
+        "twitter" = $22,
+        "facebook" = $23,
+        "instagram" = $24,
+        "lat" = $25,
+        "lng" = $26,
+        "isActive" = $27,
 				"updatedAt" = now()
-				WHERE "offerId" = $1 RETURNING *`,
+				WHERE "eventId" = $1 RETURNING *`,
         [
-          offerId,
-          reqObj.headLine,
-          reqObj.offerDescription,
-          reqObj.locationName,
-          reqObj.latitude,
-          reqObj.longitude,
+          reqObj.eventId,
+          reqObj.userId,
+          reqObj.name,
+          reqObj.description,
+          reqObj.category,
+          reqObj.type,
+          reqObj.address,
+          reqObj.country,
+          reqObj.city,
+          reqObj.state,
+          reqObj.postalCode,
+          reqObj.virtualUrl,
+          reqObj.password,
+          reqObj.timezone,
+          reqObj.startDate,
+          reqObj.startTime,
+          reqObj.endDate,
+          reqObj.endTime,
+          reqObj.endVisible,
+          reqObj.image,
+          reqObj.website,
+          reqObj.twitter,
+          reqObj.facebook,
+          reqObj.instagram,
+          reqObj.lat,
+          reqObj.lng,
+          reqObj.isActive,
         ]
       );
 
@@ -139,11 +176,11 @@ module.exports = {
         "website",
         "twitter",
         "facebook",
-        "instagram", "isActive", "createdAt", "updatedAt", "lat", "lng"
+        "instagram", "createdAt", "updatedAt", "lat", "lng", "isActive"
 				FROM events
 				WHERE "userId" = $1
-         		AND "isActive" = $2`,
-        [reqObj.uid, true]
+        ORDER BY "createdAt" ASC`,
+        [reqObj.uid]
       );
       const data = result.rows || [];
       return { error: false, data, message: "get all data successfully" };
@@ -161,7 +198,9 @@ module.exports = {
           ? 0
           : (parseInt(reqObj.pageNo) - 1) * limit + 1;
       const result = await client.query(
-        `SELECT "eventId", "userId", "name",
+        `SELECT "eventId", 
+        "userId", 
+        "name",
         "description",
         "category",
         "type",
@@ -182,9 +221,14 @@ module.exports = {
         "website",
         "twitter",
         "facebook",
-        "instagram", "isActive", "createdAt", "updatedAt","lat", "lng"
+        "instagram", 
+        "createdAt", 
+        "updatedAt",
+        "lat", 
+        "lng"
 				FROM events
-				WHERE "isActive" = $1`,
+				WHERE "isActive" = $1
+        ORDER BY "createdAt" ASC`,
         [true]
       );
       const data = result.rows || [];

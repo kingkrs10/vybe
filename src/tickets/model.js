@@ -104,7 +104,8 @@ module.exports = {
         "invitationOnly" 
 				FROM tickets
 				WHERE "eventId" = $1
-        AND "isActive" = $2`,
+        AND "isActive" = $2
+        ORDER BY "createdAt" ASC`,
         [reqObj.eventId, true]
       );
       const data = result.rows || [];
