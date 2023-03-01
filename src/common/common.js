@@ -64,38 +64,37 @@ const createJwtToken = async (userData) => {
 };
 
 const authMiddleware = async (request, response, next) => {
-  next();
-  return;
-  // const token = request.headers.authorization;
-  // if (!_isUndefined(token)) {
-  //   let authorization = token;
-  //   if (token.includes("Bearer")) {
-  //     authorization = token.split(" ")[1];
-  //   }
-  //   try {
-  //     jwt.verify(authorization, config.app.secretKey, async (err, decoded) => {
-  //       if (err) {
-  //         responseController.sendNotAuthorizedResponse(response);
-  //       }
-  //       if (decoded) {
-  //         const checkUserExist = await tryBlock(
-  //           { id: decoded.userId },
-  //           "(User:check auth Middleware)",
-  //           usersModel.getOne
-  //         );
-  //         if (checkUserExist) {
-  //           request.currentUser = decoded;
-  //           next();
-  //           return;
-  //         }
-  //       }
-  //     });
-  //   } catch (error) {
-  //     responseController.sendNotAuthorizedResponse(response);
-  //   }
-  // } else {
-  //   responseController.sendNotAuthorizedResponse(response);
-  // }
+  const token = request.headers.authorization;
+  if (!_isUndefined(token)) {
+    let authorization = token;
+    if (token.includes("Bearer")) {
+      authorization = token.split(" ")[1];
+    }
+    try {
+      jwt.verify(authorization, config.app.secretKey, async (err, decoded) => {
+        if (err) {
+          responseController.sendNotAuthorizedResponse(response);
+        }
+        if (decoded) {
+          // console.log("decoded", decoded);
+          const checkUserExist = await tryBlock(
+            { id: decoded.userId },
+            "(User:check auth Middleware)",
+            usersModel.getOne
+          );
+          if (checkUserExist) {
+            request.currentUser = decoded;
+            next();
+            return;
+          }
+        }
+      });
+    } catch (error) {
+      responseController.sendNotAuthorizedResponse(response);
+    }
+  } else {
+    responseController.sendNotAuthorizedResponse(response);
+  }
 };
 
 const dbInit = async () => {

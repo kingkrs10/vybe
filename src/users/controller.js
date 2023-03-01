@@ -197,7 +197,7 @@ const updateBlockedUsers = async (request, response, next) => {
 };
 
 const getAuthToken = async (request, response, next) => {
-  // console.log(request.params);
+  // console.log("getToken", request.params);
   try {
     const result = await commonModel.tryBlock(
       { emailAddress: request.params.emailAddress },
@@ -209,7 +209,9 @@ const getAuthToken = async (request, response, next) => {
       sendErrorResponse(response, result.message);
     } else if (!_isEmpty(result.data)) {
       const JwtToken = await commonModel.createJwtToken(result.data);
-      sendSuccessResponse(response, { authToken: JwtToken });
+      // console.log(JwtToken);
+      sendSuccessResponse(response, { ...result.data, authToken: JwtToken });
+      // console.log({ ...result.data, authToken: JwtToken });
     } else {
       sendNoContentResponse(response);
     }

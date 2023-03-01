@@ -1,13 +1,7 @@
 module.exports = {
   relational_db: {
-    user: "root",
-    host: "localhost",
-    database: "merchant",
-    password: "",
-    port: "26257",
-    // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
     connection_string:
-      "postgresql://kenroy:O_8Dc7SHNUIpJhDvagPEYQ@tickets-dev-6117.8nj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
+      "postgresql://vybe-production:f9spRmoCyUpQyuNnN_aEpw@vybe-production-7568.5xj.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full",
   },
   app: {
     port: 3333,
@@ -17,7 +11,7 @@ module.exports = {
   sendgrid:
     "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",
   stripe_api_key:
-    "sk_test_51MTFXaCUhdRlkvtY2q9Qx0tbsJbzli82TEIT6a16leZAa8lESaaKyIPkX4w7VncdrubFuiybmol7jNADGD7Tem0A00mZnjKLXk",
+    "pk_live_51MTFXaCUhdRlkvtYstFFvM77UoTvNY9b5viZllrVTlapGok2RiyRDNrvvvhsD6dSsOhVpJcGUksuuyUTKsuTb2ja00YTgRXKbU",
   firebaseProjectId: "gini-development.appspot.com",
   serviceAccountKey: {
     type: "service_account",

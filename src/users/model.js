@@ -110,8 +110,7 @@ module.exports = {
         "stripeCustomerId",
         "currencyCode",
         "currencySymbol",
-        "phoneNumber",
-        "firebaseUId" as uid
+        "phoneNumber"
 			FROM users
 			${whereCondition} AND "isActive" = $2`,
         [val, true]
