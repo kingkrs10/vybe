@@ -76,40 +76,39 @@ module.exports = {
   },
 
   update: async (reqObj, client) => {
+    // console.log("reqObj", reqObj);
     try {
       const result = await client.query(
         `UPDATE events SET
-        "userId" = $2, 
-        "name" = $3,
-        "description" = $4,
-        "category" = $5,
-        "type" = $6,
-        "address" = $7,
-        "country" = $8,
-        "city" = $9,
-        "state" = $10,
-        "postalCode" = $11,
-        "virtualUrl" = $12,
-        "password" = $13,
-        "timezone" = $14,
-        "startDate" = $15,
-        "startTime" = $16,  
-        "endDate" = $17,
-        "endTime" = $18,
-        "endVisible"  = $19,
-        "image" = $20,
-        "website" = $21,
-        "twitter" = $22,
-        "facebook" = $23,
-        "instagram" = $24,
-        "lat" = $25,
-        "lng" = $26,
-        "isActive" = $27,
+        "name" = $2,
+        "description" = $3,
+        "category" = $4,
+        "type" = $5,
+        "address" = $6,
+        "country" = $7,
+        "city" = $8,
+        "state" = $9,
+        "postalCode" = $10,
+        "virtualUrl" = $11,
+        "password" = $12,
+        "timezone" = $13,
+        "startDate" = $14,
+        "startTime" = $15,  
+        "endDate" = $16,
+        "endTime" = $17,
+        "endVisible"  = $18,
+        "image" = $19,
+        "website" = $20,
+        "twitter" = $21,
+        "facebook" = $22,
+        "instagram" = $23,
+        "lat" = $24,
+        "lng" = $25,
+        "isActive" = $26,
 				"updatedAt" = now()
 				WHERE "eventId" = $1 RETURNING *`,
         [
           reqObj.eventId,
-          reqObj.userId,
           reqObj.name,
           reqObj.description,
           reqObj.category,
@@ -137,6 +136,10 @@ module.exports = {
           reqObj.isActive,
         ]
       );
+      // .then((res) => console.log(res.rows[0]))
+      // .catch((e) => console.error(e.stack));
+
+      // console.log(result);
 
       let data = result.rowCount > 0 ? result.rows[0] : null;
 
@@ -179,7 +182,7 @@ module.exports = {
         "instagram", "createdAt", "updatedAt", "lat", "lng", "isActive"
 				FROM events
 				WHERE "userId" = $1
-        ORDER BY "createdAt" ASC`,
+        ORDER BY "createdAt" DESC`,
         [reqObj.uid]
       );
       const data = result.rows || [];
@@ -273,6 +276,25 @@ module.exports = {
       );
       const data = result.rows[0] || {};
       return { error: false, data };
+    } catch (error) {
+      return { error: true, message: error.toString() };
+    }
+  },
+
+  publish: async (reqObj, client) => {
+    // console.log("reqObj", reqObj);
+    try {
+      const result = await client.query(
+        `UPDATE events SET
+        "isActive" = $2,
+				"updatedAt" = now()
+				WHERE "eventId" = $1 RETURNING *`,
+        [reqObj.eventId, reqObj.isActive]
+      );
+
+      let data = result.rowCount > 0 ? result.rows[0] : null;
+
+      return { error: false, data, message: "Data update successfully" };
     } catch (error) {
       return { error: true, message: error.toString() };
     }

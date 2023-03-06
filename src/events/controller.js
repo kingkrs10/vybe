@@ -67,6 +67,30 @@ const update = async (request, response, next) => {
   }
 };
 
+const publish = async (request, response, next) => {
+  try {
+    const data = {
+      ...request.body,
+      eventId: request.params.id,
+    };
+
+    const result = await commonModel.tryBlock(
+      data,
+      "(Events:Publish)",
+      eventsModel.publish
+    );
+    if (result.error) {
+      sendErrorResponse(response, result.message);
+    } else if (!_isEmpty(result.data)) {
+      sendSuccessResponse(response, result.data);
+    } else {
+      sendInternalErrorResponse(response);
+    }
+  } catch (err) {
+    sendInternalErrorResponse(response, { message: err.toString() });
+  }
+};
+
 const getAll = async (request, response, next) => {
   // console.log(request);
   try {
@@ -154,4 +178,5 @@ module.exports = {
   getOne,
   update,
   remove,
+  publish,
 };
