@@ -4,7 +4,7 @@ var config;
 if (process.env.NODE_ENV === "development") {
   config = require("./dev.js");
 } else {
-  config = require("./produdction.js");
+  config = require("./production.js");
 }
 
 module.exports = config;
