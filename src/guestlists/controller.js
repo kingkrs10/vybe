@@ -43,6 +43,30 @@ const create = async (request, response) => {
   }
 };
 
+const checkin = async (request, response, next) => {
+  try {
+    const data = {
+      // reqObj: { ...request.body, currentUser: request.currentUser },
+      guestlistId: request.params.id,
+    };
+
+    const result = await commonModel.tryBlock(
+      data,
+      "(Guestlist:update)",
+      guestlistsModel.checkin
+    );
+    if (result.error) {
+      sendErrorResponse(response, result.message);
+    } else if (!_isEmpty(result.data)) {
+      sendSuccessResponse(response, result.data);
+    } else {
+      sendInternalErrorResponse(response);
+    }
+  } catch (err) {
+    sendInternalErrorResponse(response, { message: err.toString() });
+  }
+};
+
 const update = async (request, response, next) => {
   try {
     const data = {
@@ -133,4 +157,5 @@ module.exports = {
   getOne,
   update,
   remove,
+  checkin,
 };

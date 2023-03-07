@@ -109,6 +109,7 @@ const getOne = async (request, response, next) => {
 };
 
 const remove = async (request, response, next) => {
+  // console.log(request);
   try {
     const result = await commonModel.tryBlock(
       request.params.id,

@@ -1,7 +1,7 @@
 module.exports = {
   relational_db: {
     connection_string:
-      "postgresql://vybe-production:f9spRmoCyUpQyuNnN_aEpw@vybe-production-7568.5xj.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full",
+      "postgresql://vybe-production:f9spRmoCyUpQyuNnN_aEpw@vybe-production-7568.5xj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
   },
   app: {
     port: 3333,

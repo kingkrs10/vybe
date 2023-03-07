@@ -148,13 +148,14 @@ module.exports = {
   remove: async (id, client) => {
     try {
       const result = await client.query(
-        `UPDATE loans SET "isActive" = $1  WHERE "loanId" = $2`,
+        `UPDATE tickets SET "isActive" = $1 WHERE "ticketId" = $2`,
         [false, id]
       );
+      // .catch((e) => console.error(e.stack));
       return {
         error: false,
-        removedOfferId: id,
-        message: "Loan removed successfully",
+        removedTicketId: id,
+        message: "Ticket removed successfully",
       };
     } catch (error) {
       return { error: true, message: error.toString() };

@@ -37,6 +37,26 @@ module.exports = {
     }
   },
 
+  checkin: async (Obj, client) => {
+    try {
+      const { guestlistId } = Obj;
+
+      const result = await client.query(
+        `UPDATE guestlists SET
+				"checkedIn" = true,
+				"updatedAt" = now()
+				WHERE "guestlistId" = $1 RETURNING *`,
+        [guestlistId]
+      );
+
+      let data = result.rowCount > 0 ? result.rows[0] : null;
+
+      return { error: false, data, message: "Data update successfully" };
+    } catch (error) {
+      return { error: true, message: error.toString() };
+    }
+  },
+
   update: async (Obj, client) => {
     try {
       const { reqObj, offerId } = Obj;

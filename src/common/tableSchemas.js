@@ -27,7 +27,9 @@ const eventsColumns = `
   "twitter" character varying(150),
   "facebook" character varying(150),
   "instagram" character varying(150),
-  "isActive" boolean NOT NULL DEFAULT true,
+  "lat" numeric,
+  "lng" numeric,
+  "isActive" boolean NOT NULL DEFAULT false,  
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
 `;
@@ -46,6 +48,8 @@ const ticketsColumns = `
   "endDate" date,
   "endTime" time with time zone,
   "invitationOnly" boolean DEFAULT false,
+  "lat" numeric,
+  "lng" numeric,
   "isActive" boolean NOT NULL DEFAULT true,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -77,6 +81,7 @@ const guestlistsColumns = `
   "startTime" time with time zone DEFAULT current_time,
   "endDate" date,
   "endTime" time with time zone,
+  "checkedIn" boolean DEFAULT false,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
 `;
@@ -201,6 +206,8 @@ exports.eventsHelper = new pgp.helpers.ColumnSet(
     "twitter",
     "facebook",
     "instagram",
+    "lat",
+    "lng",
     "isActive",
   ],
   {

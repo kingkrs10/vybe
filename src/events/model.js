@@ -157,8 +157,9 @@ module.exports = {
         parseInt(reqObj.pageNo) === 1
           ? 0
           : (parseInt(reqObj.pageNo) - 1) * limit + 1;
-      const result = await client.query(
-        `SELECT "eventId", "userId", "name",
+      const result = await client
+        .query(
+          `SELECT "eventId", "userId", "name",
         "description",
         "category",
         "type",
@@ -183,8 +184,9 @@ module.exports = {
 				FROM events
 				WHERE "userId" = $1
         ORDER BY "createdAt" DESC`,
-        [reqObj.uid]
-      );
+          [reqObj.uid]
+        )
+        .catch((e) => console.error(e.stack));
       const data = result.rows || [];
       return { error: false, data, message: "get all data successfully" };
     } catch (error) {
