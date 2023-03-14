@@ -12,7 +12,7 @@ const {
 const stripe = Stripe(config.stripe_api_key);
 
 const createCustomer = async (request, response, next) => {
-  // console.log(request);
+  // console.log(request.body);
   try {
     await stripe.customers
       .create({
