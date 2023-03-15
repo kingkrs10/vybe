@@ -12,8 +12,8 @@ const {
 const stripe = Stripe(config.stripe_api_key);
 
 const createCustomer = async (request, response, next) => {
-  // console.log(request.body);
   try {
+    // console.log(request.body);
     await stripe.customers
       .create({
         name: request.body.name,

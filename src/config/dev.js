@@ -7,8 +7,8 @@ module.exports = {
     port: "26257",
     // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
     connection_string:
-      // "postgresql://kenroy:O_8Dc7SHNUIpJhDvagPEYQ@tickets-dev-6117.8nj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
-      "postgresql://vybe-production:f9spRmoCyUpQyuNnN_aEpw@vybe-production-7568.5xj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
+      "postgresql://kenroy:O_8Dc7SHNUIpJhDvagPEYQ@tickets-dev-6117.8nj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
+    // "postgresql://vybe-production:f9spRmoCyUpQyuNnN_aEpw@vybe-production-7568.5xj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
   },
   app: {
     port: 3333,

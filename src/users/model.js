@@ -219,7 +219,7 @@ module.exports = {
   },
 
   updateStripeId: async (reqObj, client) => {
-    // console.log(reqObj);
+    console.log(reqObj);
     try {
       const result = await client.query(
         `UPDATE users SET
