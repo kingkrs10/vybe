@@ -11,7 +11,7 @@ module.exports = {
   sendgrid:
     "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",
   stripe_api_key:
-    "pk_live_51MTFXaCUhdRlkvtYstFFvM77UoTvNY9b5viZllrVTlapGok2RiyRDNrvvvhsD6dSsOhVpJcGUksuuyUTKsuTb2ja00YTgRXKbU",
+    "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",
   firebaseProjectId: "gini-development.appspot.com",
   serviceAccountKey: {
     type: "service_account",

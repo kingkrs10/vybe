@@ -14,11 +14,9 @@ module.exports = {
         "quantity",
         "limit",
         "startDate",
-        "startTime",
         "endDate",
-        "endTime",
         "invitationOnly") 
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
         [
           reqObj.ticketId,
           reqObj.eventId,
@@ -29,9 +27,7 @@ module.exports = {
           reqObj.quantity,
           reqObj.limit,
           reqObj.startDate,
-          reqObj.startTime,
           reqObj.endDate,
-          reqObj.endTime,
           reqObj.invitationOnly,
         ]
       );
