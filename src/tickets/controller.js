@@ -45,9 +45,10 @@ const create = async (request, response) => {
 
 const update = async (request, response, next) => {
   try {
+    // console.log(request.body);
     const data = {
-      reqObj: { ...request.body, currentUser: request.currentUser },
-      offerId: request.params.id,
+      // reqObj: { ...request.body, currentUser: request.currentUser },
+      ...request.body,
     };
 
     const result = await commonModel.tryBlock(

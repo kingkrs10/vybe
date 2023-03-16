@@ -42,31 +42,38 @@ module.exports = {
     }
   },
 
-  update: async (Obj, client) => {
+  update: async (reqObj, client) => {
     try {
-      const { reqObj, offerId } = Obj;
+      // const { reqObj, offerId } = Obj;
 
-      const result = await client.query(
-        `UPDATE loans SET
-				"headLine" = $2,
-				"offerDescription" = $3,
-				"locationName" = $4,
-				latitude = $5,
-				longitude = $6,
-				"offerImage" = $7,
-				"offerThumpImage" = $8,
-				"offerMediumImage" = $9,
+      const result = await client
+        .query(
+          `UPDATE tickets SET
+       "name" = $2,
+        "description" = $3,
+        "type" = $4,
+        "price" = $5,
+        "quantity" = $6,
+        "limit" = $7,
+        "startDate" = $8,
+        "endDate" = $9,
+        "invitationOnly" = $10,
 				"updatedAt" = now()
-				WHERE "offerId" = $1 RETURNING *`,
-        [
-          offerId,
-          reqObj.headLine,
-          reqObj.offerDescription,
-          reqObj.locationName,
-          reqObj.latitude,
-          reqObj.longitude,
-        ]
-      );
+				WHERE "ticketId" = $1 RETURNING *`,
+          [
+            reqObj.id,
+            reqObj.name,
+            reqObj.description,
+            reqObj.type,
+            reqObj.price,
+            reqObj.quantity,
+            reqObj.limit,
+            reqObj.startDate,
+            reqObj.endDate,
+            reqObj.invitationOnly,
+          ]
+        )
+        .catch((e) => console.error(e.stack));
 
       let data = result.rowCount > 0 ? result.rows[0] : null;
 
