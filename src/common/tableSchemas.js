@@ -59,6 +59,7 @@ const transactionsColumns = `
   "totalAmount" numeric,
   "feeAmount" numeric,
   "subTotal" numeric,
+  "ticketsSold" numeric,
   "rawData" jsonb,
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -325,6 +326,7 @@ exports.transactionsHelper = new pgp.helpers.ColumnSet(
     "stripeCustomerId",
     "feeAmount",
     "subTotal",
+    "ticketsSold",
     "rawData",
     "createdAt",
     "updatedAt",

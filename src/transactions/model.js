@@ -14,9 +14,10 @@ module.exports = {
           "totalAmount",
           "feeAmount",
           "subTotal",
+          "ticketsSold",
           "rawData"
         ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
         [
           reqObj.transactionId,
           reqObj.userId,
@@ -25,6 +26,7 @@ module.exports = {
           reqObj.total.totalAmount,
           reqObj.total.fee,
           reqObj.total.subtotal,
+          reqObj.ticketsSold,
           reqObj.rawData,
         ]
       );
