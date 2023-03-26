@@ -22,7 +22,7 @@ module.exports = {
           reqObj.userId,
           reqObj.eventId,
           reqObj.customerId,
-          reqObj.total.total,
+          reqObj.total.totalAmount,
           reqObj.total.fee,
           reqObj.total.subtotal,
           reqObj.rawData,

@@ -44,6 +44,7 @@ const create = async (request, response) => {
         endDate: guest.endDate,
       };
       guestlist_for_email.push(data);
+      // console.log(guestlist_for_email);
       return Object.values(data);
     });
 
@@ -55,7 +56,7 @@ const create = async (request, response) => {
       date: Date.now(),
     };
 
-    if (transaction.data != undefined) {
+    if (transaction.data !== undefined) {
       const guestlists = await commonModel.tryBlock(
         guestlist,
         "(Guestlists:create)",
@@ -69,10 +70,10 @@ const create = async (request, response) => {
       });
     }
 
-    if (result.error) {
-      sendErrorResponse(response, result.message);
-    } else if (!_isEmpty(result.data)) {
-      sendCreatedResponse(response, result.data);
+    if (transaction.error) {
+      sendErrorResponse(response, transaction.message);
+    } else if (!_isEmpty(transaction.data)) {
+      sendCreatedResponse(response, transaction.data);
     } else {
       sendInternalErrorResponse(response);
     }

@@ -20,9 +20,7 @@ module.exports = {
           "type",
           "price",
           "startDate",
-          "startTime",
-          "endDate",
-          "endTime"
+          "endDate"
         ) 
         VALUES %L RETURNING *`,
           reqObj
@@ -110,9 +108,8 @@ module.exports = {
         "type",
         "price",
         "startDate",
-        "startTime",
         "endDate",
-        "endTime"
+        "checkedIn"
 				FROM guestlists
 				WHERE "eventId" = $1`,
         [reqObj.eventId]
@@ -139,9 +136,8 @@ module.exports = {
         "quantity",
         "limit",
         "startDate",
-        "startTime",
         "endDate",
-        "endTime",
+        "checkedIn",
         "invitationOnly" 
 				FROM tickets
 				WHERE "eventId" = $1`,
