@@ -27,6 +27,7 @@ const eventsColumns = `
   "instagram" character varying(150),
   "lat" numeric,
   "lng" numeric,
+  "currency" character varying(5),
   "isActive" boolean NOT NULL DEFAULT false,  
   "createdAt" timestamp with time zone DEFAULT current_timestamp,
   "updatedAt" timestamp with time zone DEFAULT current_timestamp
@@ -175,193 +176,194 @@ const addressesColumns = `
 `;
 
 exports.eventsHelper = new pgp.helpers.ColumnSet(
-  [
-    "eventId",
-    "userId",
-    "name",
-    "description",
-    "category",
-    "status",
-    "type",
-    "address",
-    "country",
-    "city",
-    "state",
-    "postalCode",
-    "virtualUrl",
-    "password",
-    "timezone",
-    "startDate",
-    "endDate",
-    "endVisible",
-    "image",
-    "website",
-    "twitter",
-    "facebook",
-    "instagram",
-    "lat",
-    "lng",
-    "isActive",
-  ],
-  {
-    table: "events",
-  }
+   [
+      "eventId",
+      "userId",
+      "name",
+      "description",
+      "category",
+      "status",
+      "type",
+      "address",
+      "country",
+      "city",
+      "state",
+      "postalCode",
+      "virtualUrl",
+      "password",
+      "timezone",
+      "startDate",
+      "endDate",
+      "endVisible",
+      "image",
+      "website",
+      "twitter",
+      "facebook",
+      "instagram",
+      "lat",
+      "lng",
+      "currency",
+      "isActive",
+   ],
+   {
+      table: "events",
+   }
 );
 
 exports.ticketsHelper = new pgp.helpers.ColumnSet(
-  [
-    "ticketId",
-    "eventId",
-    "name",
-    "description",
-    "type",
-    "price",
-    "quantity",
-    "limit",
-    "startDate",
-    "endDate",
-    "invitationOnly",
-    "isActive",
-  ],
-  {
-    table: "tickets",
-  }
+   [
+      "ticketId",
+      "eventId",
+      "name",
+      "description",
+      "type",
+      "price",
+      "quantity",
+      "limit",
+      "startDate",
+      "endDate",
+      "invitationOnly",
+      "isActive",
+   ],
+   {
+      table: "tickets",
+   }
 );
 
 exports.usersHelper = new pgp.helpers.ColumnSet(
-  [
-    "userId",
-    "balance",
-    "notificationUnReadcount",
-    "deviceId",
-    "firstName",
-    "lastName",
-    "password",
-    "emailAddress",
-    "stripeCustomerId",
-    "currencyCode",
-    "currencySymbol",
-    "phoneNumber",
-    "firebaseUId",
-    "country",
-    "idMatch",
-    "senderId",
-  ],
-  {
-    table: "users",
-  }
+   [
+      "userId",
+      "balance",
+      "notificationUnReadcount",
+      "deviceId",
+      "firstName",
+      "lastName",
+      "password",
+      "emailAddress",
+      "stripeCustomerId",
+      "currencyCode",
+      "currencySymbol",
+      "phoneNumber",
+      "firebaseUId",
+      "country",
+      "idMatch",
+      "senderId",
+   ],
+   {
+      table: "users",
+   }
 );
 
 exports.usersBlockedUsersHelper = new pgp.helpers.ColumnSet(
-  ["userId", "blockedUserId"],
-  {
-    table: "users_blockedUsers",
-  }
+   ["userId", "blockedUserId"],
+   {
+      table: "users_blockedUsers",
+   }
 );
 
 exports.usersCountryCurrency = new pgp.helpers.ColumnSet(
-  [
-    "userId",
-    "amount",
-    "oppPersonBalance",
-    "currency",
-    "label",
-    "value",
-    "balanceData",
-  ],
-  {
-    table: "users_countryCurrency",
-  }
+   [
+      "userId",
+      "amount",
+      "oppPersonBalance",
+      "currency",
+      "label",
+      "value",
+      "balanceData",
+   ],
+   {
+      table: "users_countryCurrency",
+   }
 );
 
 exports.usersInvitesHelper = new pgp.helpers.ColumnSet(
-  ["senderUId", "receiverUId", "receiverPhoneNumber", "status"],
-  {
-    table: "users_invites",
-  }
+   ["senderUId", "receiverUId", "receiverPhoneNumber", "status"],
+   {
+      table: "users_invites",
+   }
 );
 
 exports.statusHelper = new pgp.helpers.ColumnSet(
-  ["statusId", "statusName", "isActive"],
-  {
-    table: "status",
-  }
+   ["statusId", "statusName", "isActive"],
+   {
+      table: "status",
+   }
 );
 
 exports.paymentMethodsHelper = new pgp.helpers.ColumnSet(
-  ["paymentMethodId", "paymentMethodName", "isActive"],
-  {
-    table: "paymentMethods",
-  }
+   ["paymentMethodId", "paymentMethodName", "isActive"],
+   {
+      table: "paymentMethods",
+   }
 );
 
 exports.addressesHelper = new pgp.helpers.ColumnSet(
-  [
-    "addressId",
-    "firstName",
-    "lastName",
-    "streetAddress",
-    "floorUnit",
-    "country",
-    "state",
-    "city",
-    "phoneNumber",
-    "pincode",
-    "userId",
-    "isDefault",
-    "isActive",
-    "createdAt",
-  ],
-  {
-    table: "addresses",
-  }
+   [
+      "addressId",
+      "firstName",
+      "lastName",
+      "streetAddress",
+      "floorUnit",
+      "country",
+      "state",
+      "city",
+      "phoneNumber",
+      "pincode",
+      "userId",
+      "isDefault",
+      "isActive",
+      "createdAt",
+   ],
+   {
+      table: "addresses",
+   }
 );
 
 exports.transactionsHelper = new pgp.helpers.ColumnSet(
-  [
-    "transactionId",
-    "userId",
-    "eventId",
-    "totalAmount",
-    "stripeCustomerId",
-    "feeAmount",
-    "subTotal",
-    "ticketsSold",
-    "rawData",
-    "createdAt",
-    "updatedAt",
-  ],
-  {
-    table: "transactions",
-  }
+   [
+      "transactionId",
+      "userId",
+      "eventId",
+      "totalAmount",
+      "stripeCustomerId",
+      "feeAmount",
+      "subTotal",
+      "ticketsSold",
+      "rawData",
+      "createdAt",
+      "updatedAt",
+   ],
+   {
+      table: "transactions",
+   }
 );
 
 exports.guestlistsHelper = new pgp.helpers.ColumnSet(
-  [
-    "guestlistId",
-    "ticketId",
-    "eventId",
-    "transactionId",
-    "name",
-    "email",
-    "type",
-    "price",
-    "startDate",
-    "endDate",
-    "checkedIn",
-    "createdAt",
-    "updatedAt",
-  ],
-  {
-    table: "guestlists",
-  }
+   [
+      "guestlistId",
+      "ticketId",
+      "eventId",
+      "transactionId",
+      "name",
+      "email",
+      "type",
+      "price",
+      "startDate",
+      "endDate",
+      "checkedIn",
+      "createdAt",
+      "updatedAt",
+   ],
+   {
+      table: "guestlists",
+   }
 );
 
 exports.notificationsHelper = new pgp.helpers.ColumnSet(
-  ["notificationId", "offerId", "senderUId", "receiverUId"],
-  {
-    table: "notifications",
-  }
+   ["notificationId", "offerId", "senderUId", "receiverUId"],
+   {
+      table: "notifications",
+   }
 );
 
 exports.eventsTbl = `CREATE TABLE IF NOT EXISTS public."events" ( ${eventsColumns} );`;

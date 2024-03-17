@@ -1,17 +1,11 @@
 module.exports = {
   relational_db: {
-    user: "root",
-    host: "localhost",
-    database: "merchant",
-    password: "",
-    port: "26257",
-    // cloudpath: "/cloudsql/luhu-dev:us-central1:luhu-development-db-postgres",
     connection_string:
       "postgresql://kenroy:O_8Dc7SHNUIpJhDvagPEYQ@tickets-dev-6117.8nj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
     // "postgresql://vybe-production:f9spRmoCyUpQyuNnN_aEpw@vybe-production-7568.5xj.cockroachlabs.cloud:26257/tickets?sslmode=verify-full",
   },
   app: {
-    port: 3333,
+    port: 4444,
     secretKey:
       "YuxhBVW8uv6mxpTeYjJLMtTsiHB5rrkIuoClx8l9/JvsAlvtuZ5w9SAwLUFAvE6DJXjXYsnizg3BKYv/oED37Dy98e5sCNy4JnDhD7tpHdW9xjBkj+i9d1U9Z/U9SKLuU+PqkjtX/Avy8Qq9pHjZ+u9crI+MExwW7WzNgv3dB1CwQM852Dzfk7NBV4PXZ3WqvirnLFy4CoyIspbjMjfNQ/t7/3gXLsVMKqGYVVAws5SxqHcMdP/qiAdFdETAHnyVLrwZL4hB3ke6Xm5Ub5v1En6nzwJiEAxG9OtbcT+LKvnKHMKrS6La+ZstGEyoMiVIJvKInwqkpvQDZOXe2SQhfA==",
   },
